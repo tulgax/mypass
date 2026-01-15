@@ -1,0 +1,69 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import type { LucideIcon } from "lucide-react"
+
+import { useIsMobile } from "@/hooks/use-mobile"
+import { NavMain } from "@/components/nav-main"
+import { NavUser } from "@/components/nav-user"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar"
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  navItems?: {
+    title: string
+    url: string
+    icon?: LucideIcon
+    isActive?: boolean
+    items?: {
+      title: string
+      url: string
+    }[]
+  }[]
+  user?: {
+    name: string
+    email: string
+    avatar?: string
+  }
+  onSignOut?: () => void
+}
+
+export function AppSidebar({ navItems = [], user, onSignOut, ...props }: AppSidebarProps) {
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/dashboard">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <span className="text-lg font-bold">M</span>
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">MyPass</span>
+                  <span className="truncate text-xs">Studio Dashboard</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain items={navItems} />
+      </SidebarContent>
+      <SidebarFooter>
+        {user && <NavUser user={user} onSignOut={onSignOut} />}
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  )
+}

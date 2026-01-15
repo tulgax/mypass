@@ -2,6 +2,21 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Environment Setup
+
+1. Create a `.env.local` file in the root directory (if it doesn't exist)
+2. Add your Supabase credentials:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+You can find these values in your Supabase project settings:
+https://supabase.com/dashboard/project/_/settings/api
+
+### Running the Development Server
+
 First, run the development server:
 
 ```bash
