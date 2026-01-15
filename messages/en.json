@@ -222,6 +222,60 @@
       "title": "Manage bookings and payments easier",
       "button": "Try 14 days for free"
     },
+    "bookingPage": {
+      "title": "Your booking page with class schedule, appointments, and pricing",
+      "description": "Share what you do, when you're available, and how to book—all in one public profile. Clients can explore your services, join classes, purchase plans, and book instantly.",
+      "interactiveDemo": "Interactive Demo",
+      "login": "Log in",
+      "studioName": "Flow Pilates",
+      "studioTagline": "Strength meets flow.",
+      "tabs": {
+        "schedule": "Schedule",
+        "pricing": "Pricing",
+        "contact": "Contact"
+      },
+      "dateRange": "June 29 - July 5",
+      "status": {
+        "unavailable": "Unavailable",
+        "slots": "slots"
+      },
+      "classes": {
+        "morningStretch": "Morning Stretch",
+        "powerPilates": "Power Pilates",
+        "reformer": "Reformer",
+        "mat": "Mat",
+        "pilatesFlow": "Pilates Flow",
+        "eveningUnwind": "Evening Unwind"
+      },
+      "book": "Book",
+      "noClasses": "No classes available for this date.",
+      "pricing": {
+        "monthlySubscription": "Monthly subscription",
+        "monthlyPrice": "€80.00 every month",
+        "monthlyDescription": "All yoga classes. Charged every month. Cancel anytime.",
+        "groupSessions": "10 Group sessions",
+        "groupPrice": "€100.00",
+        "groupDescription": "Attend any Yoga class, 10 sessions total. Valid for 1 month."
+      },
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "contact": {
+        "location": "Location",
+        "phone": "Phone",
+        "email": "Email",
+        "hours": "Hours"
+      }
+    },
+    "logos": {
+      "title": "Join 1,000+ fitness businesses"
+    },
     "footer": {
       "company": {
         "title": "Company",

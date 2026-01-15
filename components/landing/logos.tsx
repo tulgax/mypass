@@ -1,20 +1,26 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
+import { useTranslations } from "next-intl"
 
 function LogosSection() {
+  const t = useTranslations('landing.logos')
+  const tHeader = useTranslations('landing.header.businessLinks')
+  
   const logos = [
-    "Pilates",
-    "Yoga",
-    "Gym",
-    "CrossFit",
-    "Boxing",
-    "Dance",
+    tHeader('pilates.label'),
+    tHeader('yoga.label'),
+    tHeader('gym.label'),
+    tHeader('crossfit.label'),
+    tHeader('boxing.label'),
+    tHeader('dance.label'),
   ]
 
   return (
     <section className="bg-background py-16">
       <div className="mx-auto w-full max-w-[1440px] px-6 md:px-8">
         <p className="text-center text-sm text-muted-foreground">
-          Join 1,000+ fitness businesses
+          {t('title')}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {logos.map((logo) => (

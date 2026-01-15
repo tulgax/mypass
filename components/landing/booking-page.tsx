@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { ChevronRight, MapPin, Phone, Mail, Clock, Users, ChevronLeft, Calendar } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
+import { useTranslations } from "next-intl"
 
 type ClassSession = {
   name: string
@@ -20,73 +21,75 @@ type ScheduleDay = {
   sessions: ClassSession[]
 }
 
-const SCHEDULE_DATA: ScheduleDay[] = [
-  { 
-    day: "Mon", 
-    date: 29,
-    displayDate: "29", 
-    status: "2 slots", 
-    sessions: [
-      { name: "Morning Stretch", time: "07:00 - 08:00", spots: "15/20", available: true },
-      { name: "Power Pilates", time: "18:00 - 19:00", spots: "12/20", available: true }
-    ] 
-  },
-  { 
-    day: "Tue", 
-    date: 30,
-    displayDate: "30", 
-    status: "Unavailable", 
-    sessions: [] 
-  },
-  { 
-    day: "Wed", 
-    date: 1,
-    displayDate: "1", 
-    status: "2 slots", 
-    sessions: [
-      { name: "Reformer", time: "09:00 - 10:00", spots: "0/20", available: true },
-      { name: "Mat", time: "17:00 - 18:00", spots: "0/20", available: true }
-    ]
-  },
-  { 
-    day: "Thu", 
-    date: 2,
-    displayDate: "2", 
-    status: "2 slots", 
-    sessions: [
-      { name: "Reformer", time: "09:00 - 10:00", spots: "2/20", available: true },
-      { name: "Mat", time: "18:00 - 19:00", spots: "5/20", available: true }
-    ]
-  },
-  { 
-    day: "Fri", 
-    date: 3,
-    displayDate: "3", 
-    status: "2 slots", 
-    sessions: [
-      { name: "Pilates Flow", time: "12:00 - 13:00", spots: "10/20", available: true },
-      { name: "Evening Unwind", time: "19:00 - 20:00", spots: "8/20", available: true }
-    ]
-  },
-  { 
-    day: "Sat", 
-    date: 4,
-    displayDate: "4", 
-    status: "Unavailable", 
-    sessions: [] 
-  },
-  { 
-    day: "Sun", 
-    date: 5,
-    displayDate: "5", 
-    status: "Unavailable", 
-    sessions: [] 
-  },
-]
-
 function BookingPageSection() {
+  const t = useTranslations('landing.bookingPage')
   const [activeTab, setActiveTab] = useState<"schedule" | "pricing" | "contact">("schedule")
   const [selectedDate, setSelectedDate] = useState<number>(1) // Default to Wed 1st
+  
+  // Schedule data with translations
+  const SCHEDULE_DATA: ScheduleDay[] = [
+    { 
+      day: t('days.mon'), 
+      date: 29,
+      displayDate: "29", 
+      status: `2 ${t('status.slots')}`, 
+      sessions: [
+        { name: t('classes.morningStretch'), time: "07:00 - 08:00", spots: "15/20", available: true },
+        { name: t('classes.powerPilates'), time: "18:00 - 19:00", spots: "12/20", available: true }
+      ] 
+    },
+    { 
+      day: t('days.tue'), 
+      date: 30,
+      displayDate: "30", 
+      status: t('status.unavailable'), 
+      sessions: [] 
+    },
+    { 
+      day: t('days.wed'), 
+      date: 1,
+      displayDate: "1", 
+      status: `2 ${t('status.slots')}`, 
+      sessions: [
+        { name: t('classes.reformer'), time: "09:00 - 10:00", spots: "0/20", available: true },
+        { name: t('classes.mat'), time: "17:00 - 18:00", spots: "0/20", available: true }
+      ]
+    },
+    { 
+      day: t('days.thu'), 
+      date: 2,
+      displayDate: "2", 
+      status: `2 ${t('status.slots')}`, 
+      sessions: [
+        { name: t('classes.reformer'), time: "09:00 - 10:00", spots: "2/20", available: true },
+        { name: t('classes.mat'), time: "18:00 - 19:00", spots: "5/20", available: true }
+      ]
+    },
+    { 
+      day: t('days.fri'), 
+      date: 3,
+      displayDate: "3", 
+      status: `2 ${t('status.slots')}`, 
+      sessions: [
+        { name: t('classes.pilatesFlow'), time: "12:00 - 13:00", spots: "10/20", available: true },
+        { name: t('classes.eveningUnwind'), time: "19:00 - 20:00", spots: "8/20", available: true }
+      ]
+    },
+    { 
+      day: t('days.sat'), 
+      date: 4,
+      displayDate: "4", 
+      status: t('status.unavailable'), 
+      sessions: [] 
+    },
+    { 
+      day: t('days.sun'), 
+      date: 5,
+      displayDate: "5", 
+      status: t('status.unavailable'), 
+      sessions: [] 
+    },
+  ]
   
   const selectedDayData = SCHEDULE_DATA.find(d => d.date === selectedDate)
 
@@ -101,7 +104,7 @@ function BookingPageSection() {
             transition={{ duration: 0.5 }}
             className="text-3xl font-medium tracking-[-0.05em] sm:text-4xl"
           >
-            Your booking page with class schedule, appointments, and pricing
+            {t('title')}
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -110,9 +113,7 @@ function BookingPageSection() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4 text-muted-foreground"
           >
-            Share what you do, when you're available, and how to book—all in one
-            public profile. Clients can explore your services, join classes,
-            purchase plans, and book instantly.
+            {t('description')}
           </motion.p>
 
           {/* Interactive Hint */}
@@ -128,7 +129,7 @@ function BookingPageSection() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
               </span>
-              Interactive Demo
+              {t('interactiveDemo')}
             </div>
           </motion.div>
         </div>
@@ -191,7 +192,7 @@ function BookingPageSection() {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      Log in
+                      {t('login')}
                     </motion.button>
                   </div>
                 </div>
@@ -211,7 +212,7 @@ function BookingPageSection() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-semibold">Flow Pilates</h3>
+                        <h3 className="text-xl font-semibold">{t('studioName')}</h3>
                         <svg
                           className="h-4 w-4 text-blue-500"
                           fill="currentColor"
@@ -225,24 +226,24 @@ function BookingPageSection() {
                         </svg>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Strength meets flow.
+                        {t('studioTagline')}
                       </p>
                     </div>
                   </div>
 
                   {/* Navigation Tabs */}
                   <div className="mt-6 flex gap-6 border-b border-border relative">
-                    {["schedule", "pricing", "contact"].map((tab) => (
+                    {(["schedule", "pricing", "contact"] as const).map((tab) => (
                       <button
                         key={tab}
-                        onClick={() => setActiveTab(tab as any)}
+                        onClick={() => setActiveTab(tab)}
                         className={`relative pb-2 text-sm font-medium transition-colors ${
                           activeTab === tab
                             ? "text-foreground"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {t(`tabs.${tab}`)}
                         {activeTab === tab && (
                           <motion.div
                             layoutId="activeTab"
@@ -266,7 +267,7 @@ function BookingPageSection() {
                           transition={{ duration: 0.2 }}
                         >
                           <div className="mb-4 flex items-center justify-between">
-                            <h4 className="text-sm font-medium">June 29 - July 5</h4>
+                            <h4 className="text-sm font-medium">{t('dateRange')}</h4>
                             <div className="flex items-center gap-1 text-muted-foreground">
                               <button className="rounded-full p-1 hover:bg-muted hover:text-foreground transition-colors">
                                 <ChevronLeft className="h-4 w-4" />
@@ -303,14 +304,14 @@ function BookingPageSection() {
                                     {item.displayDate}
                                   </div>
                                   <div className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
-                                    {item.status === "Unavailable" ? (
+                                    {item.status === t('status.unavailable') ? (
                                       <span className="text-muted-foreground/60">
-                                        Unavailable
+                                        {t('status.unavailable')}
                                       </span>
                                     ) : (
                                       <span className="flex items-center justify-center gap-0.5 md:gap-1">
                                         <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-green-500"></span>
-                                        <span className="hidden sm:inline">{item.sessions.length > 0 ? `${item.sessions.length} slots` : item.status}</span>
+                                        <span className="hidden sm:inline">{item.sessions.length > 0 ? `${item.sessions.length} ${t('status.slots')}` : item.status}</span>
                                         <span className="sm:hidden">{item.sessions.length > 0 ? item.sessions.length : ""}</span>
                                       </span>
                                     )}
@@ -353,7 +354,7 @@ function BookingPageSection() {
                                             
                                             <div className="flex items-center gap-1 md:gap-1.5">
                                               <MapPin className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                                              <span className="hidden sm:inline">Flow Pilates</span>
+                                              <span className="hidden sm:inline">{t('studioName')}</span>
                                               <span className="sm:hidden">Flow</span>
                                             </div>
 
@@ -369,7 +370,7 @@ function BookingPageSection() {
                                           whileTap={{ scale: 0.95 }}
                                           className="h-7 md:h-8 rounded-full bg-muted px-3 md:px-5 text-[10px] md:text-xs font-medium transition-colors hover:bg-foreground hover:text-background shrink-0"
                                         >
-                                          Book
+                                          {t('book')}
                                         </motion.button>
                                       </div>
                                       {/* Separator line except for last item */}
@@ -387,7 +388,7 @@ function BookingPageSection() {
                                   exit={{ opacity: 0 }}
                                   className="flex h-32 md:h-40 flex-col items-center justify-center rounded-lg border border-dashed border-border p-4 md:p-8 text-center text-muted-foreground"
                                 >
-                                  <p className="text-xs md:text-sm">No classes available for this date.</p>
+                                  <p className="text-xs md:text-sm">{t('noClasses')}</p>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -420,13 +421,13 @@ function BookingPageSection() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="text-xs md:text-sm font-medium">
-                                Monthly subscription
+                                {t('pricing.monthlySubscription')}
                               </h4>
                               <p className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
-                                €80.00 every month
+                                {t('pricing.monthlyPrice')}
                               </p>
                               <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
-                                All yoga classes. Charged every month. Cancel anytime.
+                                {t('pricing.monthlyDescription')}
                               </p>
                             </div>
                             <motion.button 
@@ -452,13 +453,13 @@ function BookingPageSection() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="text-xs md:text-sm font-medium">
-                                10 Group sessions
+                                {t('pricing.groupSessions')}
                               </h4>
                               <p className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
-                                €100.00
+                                {t('pricing.groupPrice')}
                               </p>
                               <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
-                                Attend any Yoga class, 10 sessions total. Valid for 1 month.
+                                {t('pricing.groupDescription')}
                               </p>
                             </div>
                             <motion.button 
@@ -490,7 +491,7 @@ function BookingPageSection() {
                               <MapPin className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-xs md:text-sm font-medium">Location</h4>
+                              <h4 className="text-xs md:text-sm font-medium">{t('contact.location')}</h4>
                               <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 123 Wellness Street<br />
                                 Downtown District<br />
@@ -508,7 +509,7 @@ function BookingPageSection() {
                               <Phone className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-xs md:text-sm font-medium">Phone</h4>
+                              <h4 className="text-xs md:text-sm font-medium">{t('contact.phone')}</h4>
                               <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 <a
                                   href="tel:+1234567890"
@@ -529,7 +530,7 @@ function BookingPageSection() {
                               <Mail className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-xs md:text-sm font-medium">Email</h4>
+                              <h4 className="text-xs md:text-sm font-medium">{t('contact.email')}</h4>
                               <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 <a
                                   href="mailto:hello@flowpilates.com"
@@ -550,7 +551,7 @@ function BookingPageSection() {
                               <Clock className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-xs md:text-sm font-medium">Hours</h4>
+                              <h4 className="text-xs md:text-sm font-medium">{t('contact.hours')}</h4>
                               <div className="mt-0.5 md:mt-1 space-y-0.5 md:space-y-1 text-[10px] md:text-xs text-muted-foreground">
                                 <p>Monday - Friday: 6:00 AM - 9:00 PM</p>
                                 <p>Saturday: 7:00 AM - 8:00 PM</p>
