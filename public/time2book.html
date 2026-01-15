@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fitness Studio Management Software — time2book·me (HTML Clone)</title>
+
+    <!-- Font (matches time2book.me) -->
+    <link rel="preconnect" href="https://fonts.ycode.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.ycode.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    />
+
+    <style>
+      :root {
+        --bg: #ffffff;
+        --text: #171717; /* rgb(23,23,23) */
+        --muted: rgba(23, 23, 23, 0.6);
+        --muted-2: rgba(23, 23, 23, 0.1);
+        --muted-3: rgba(23, 23, 23, 0.05);
+        --btn: #171717;
+        --btn-text: #ffffff;
+        --pill: 9999px;
+        --radius-12: 12px;
+        --container: 1440px;
+        --divider: rgba(23, 23, 23, 0.1);
+        --badge: rgba(157, 245, 158, 0.7);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        color: var(--text);
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .container {
+        width: 100%;
+        max-width: var(--container);
+        padding-left: 32px;
+        padding-right: 32px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Nav */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        padding: 21px 0;
+      }
+      .nav-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-width: 0;
+      }
+      .logo img {
+        height: 18px;
+        width: auto;
+      }
+      .nav-mid {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        justify-content: center;
+      }
+      .nav-link {
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--text);
+      }
+      .nav-link:hover {
+        opacity: 0.8;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: var(--pill);
+        border: 1px solid transparent;
+        font-size: 14px;
+        line-height: 21px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: var(--btn);
+        color: var(--btn-text);
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+      .btn-secondary {
+        background: rgba(23, 23, 23, 0.1);
+        color: var(--text);
+      }
+      .btn-secondary:hover {
+        background: rgba(23, 23, 23, 0.05);
+      }
+      .btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* Typography */
+      h1 {
+        font-size: 48px;
+        font-weight: 500;
+        letter-spacing: -0.05em;
+        line-height: 1.1;
+        margin: 0;
+      }
+      h2 {
+        font-size: 36px;
+        font-weight: 500;
+        letter-spacing: -0.05em;
+        line-height: 1.1;
+        margin: 0;
+      }
+      p {
+        font-size: 16px;
+        line-height: 24px;
+        margin: 0;
+      }
+      .muted {
+        color: var(--text);
+        opacity: 0.6;
+      }
+
+      /* Layout Utilities */
+      .section {
+        padding: 80px 0;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .flex-col {
+        display: flex;
+        flex-direction: column;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .justify-center {
+        justify-content: center;
+      }
+      .gap-20 {
+        gap: 20px;
+      }
+      .gap-32 {
+        gap: 32px;
+      }
+      
+      /* Hero */
+      .hero {
+        padding-top: 80px;
+      }
+      .hero-content {
+        max-width: 780px;
+        margin: 0 auto 56px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        text-align: center;
+      }
+      .hero-btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .hero-bubbles {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+      }
+      .bubble {
+        width: 72px;
+        height: 72px;
+        border-radius: 9999px;
+        overflow: hidden;
+        background: #f5f5f5;
+      }
+      .bubble img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .hero-img-wrap {
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 1136px;
+        margin: 0 auto;
+      }
+      .hero-img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+      }
+
+      /* Feature Split */
+      .feature-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        align-items: center;
+        max-width: 1136px;
+        margin: 0 auto;
+      }
+      .feature-row.reverse {
+        direction: rtl;
+      }
+      .feature-row.reverse > * {
+        direction: ltr;
+      }
+      .feature-text {
+        max-width: 520px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .bullets {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .bullet {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      /* Media Containers (Gray backgrounds for images) */
+      .media-container {
+        background: var(--muted-3);
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 40px 40px 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .media-container img {
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      /* Specific tweaks for image scaling */
+      .media-container.contain-mode img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+      
+      /* Booking Preview Section */
+      .booking-preview {
+        max-width: 768px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 40px; /* Space between text and image */
+      }
+      .booking-preview-text {
+        text-align: center;
+        max-width: 768px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .booking-img-wrap {
+        width: 100%;
+        /* No background here based on inspection of this specific image on live site, 
+           but the EVAL result said generic div wrapper? 
+           Wait, looking at live site, "Your booking page..." image is just an img element, 
+           not inside a gray box like the others. */
+      }
+      .booking-img-wrap img {
+        width: 100%;
+        height: auto;
+        display: block;
+        margin-bottom: -80px; /* Negative margin overlap */
+      }
+
+      /* Pricing */
+      .pricing {
+        padding: 100px 0;
+        background: #fff;
+      }
+      .pricing-head {
+        max-width: 490px;
+        margin: 0 auto 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+      }
+      .toggle {
+        display: inline-flex;
+        padding: 2px;
+        background: rgba(23, 23, 23, 0.05);
+        border-radius: 9999px;
+      }
+      .toggle button {
+        border: none;
+        background: transparent;
+        padding: 10px 24px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--text);
+      }
+      .toggle button[data-active="true"] {
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      }
+      .toggle .discount {
+        font-size: 12px;
+        margin-left: 4px;
+      }
+
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--divider);
+        border-bottom: 1px solid var(--divider);
+        max-width: 1136px; /* Match hero width for alignment */
+        margin: 0 auto;
+      }
+      .plan {
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .plan + .plan {
+        border-left: 1px solid var(--divider);
+      }
+      .badge {
+        display: inline-block;
+        background: var(--badge);
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        opacity: 0;
+      }
+      .badge.visible {
+        opacity: 1;
+      }
+      .price-amount {
+        font-size: 30px;
+        font-weight: 500;
+      }
+      .price-period {
+        font-size: 14px;
+        opacity: 0.6;
+      }
+      .feat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .feat {
+        display: flex;
+        gap: 10px;
+        font-size: 14px;
+        align-items: center;
+      }
+
+      /* CTA Band */
+      .cta-band {
+        text-align: center;
+        padding: 80px 0;
+      }
+      .cta-band h2 {
+        margin-bottom: 20px;
+      }
+
+      /* Footer */
+      footer {
+        padding: 80px 0;
+        border-top: 1px solid transparent;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 64px;
+      }
+      .footer-links {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+      }
+      .footer-col h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 16px;
+      }
+      .footer-col a {
+        display: block;
+        font-size: 14px;
+        opacity: 0.7;
+        margin-bottom: 12px;
+      }
+      .footer-bottom {
+        margin-top: 64px;
+        padding-top: 32px;
+        border-top: 1px solid var(--divider);
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        opacity: 0.6;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .feature-row {
+          grid-template-columns: 1fr;
+          gap: 40px;
+          text-align: center;
+        }
+        .feature-row.reverse {
+          direction: ltr;
+        }
+        .feature-text {
+          margin: 0 auto;
+          align-items: center;
+        }
+        .bullets {
+          align-items: flex-start; /* Keep bullets left aligned usually looks better, but let's see */
+          text-align: left;
+        }
+        .hero-top {
+          flex-direction: column;
+        }
+        .pricing-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .plan:nth-child(2n) {
+          border-right: none;
+        }
+        .plan:nth-child(3), .plan:nth-child(4) {
+          border-top: 1px solid var(--divider);
+        }
+      }
+      @media (max-width: 768px) {
+        h1 { font-size: 36px; }
+        h2 { font-size: 30px; }
+        .nav-mid { display: none; }
+        .pricing-grid { grid-template-columns: 1fr; border: none; }
+        .plan { border: 1px solid var(--divider); border-radius: 12px; margin-bottom: 16px; }
+        .plan + .plan { border-left: 1px solid var(--divider); }
+        .footer-grid { grid-template-columns: 1fr; }
+        .footer-links { grid-template-columns: 1fr 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav class="nav">
+      <div class="container nav-row">
+        <div class="nav-left">
+          <a href="#" class="logo">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Icons/time2bookme-black-px33iwxemr.svg" alt="time2book">
+          </a>
+        </div>
+        <div class="nav-mid">
+          <a href="#" class="nav-link">Product</a>
+          <a href="#" class="nav-link">Business</a>
+          <a href="#" class="nav-link">Pricing</a>
+          <a href="#" class="nav-link">Help</a>
+          <a href="#" class="nav-link">Refer &amp; Earn</a>
+        </div>
+        <div class="nav-right">
+          <a href="https://time2book.me/login" class="btn btn-secondary">Sign in</a>
+          <a href="https://time2book.me/login" class="btn btn-primary">Sign up</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <h1>Scheduling software for fitness studios and individual instructors</h1>
+            <div class="hero-actions">
+              <div class="hero-btns">
+                <a href="#" class="btn btn-primary">
+                  Start free trial
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn btn-secondary">Book a demo</a>
+              </div>
+              <p class="muted" style="font-size: 14px;">Join 1,000+ fitness businesses</p>
+            </div>
+            <div class="hero-bubbles">
+              <div class="bubble"><img src="https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-8yvwbwmrr8.webp" alt=""></div>
+              <div class="bubble"><img src="https://assets.ycodeapp.com/assets/app83049/Images/published/yoga-mat-62p5ownakr.webp" alt=""></div>
+              <div class="bubble"><img src="https://assets.ycodeapp.com/assets/app83049/Images/published/gym-anqe8msrlr.webp" alt=""></div>
+            </div>
+          </div>
+          <div class="hero-img-wrap">
+            <img class="hero-img" src="https://assets.ycodeapp.com/assets/app83049/Images/published/scheduling-software-ny7tdkagvo.webp" alt="Interface">
+          </div>
+        </div>
+      </section>
+
+      <!-- Booking Preview (No gray box, negative margin) -->
+      <section class="section">
+        <div class="container booking-preview">
+          <div class="booking-preview-text">
+            <h2>Your booking page with class schedule, appointments, and pricing</h2>
+            <p class="muted">Share what you do, when you're available, and how to book—all in one public profile. Clients can explore your services, join classes, purchase plans, and book instantly.</p>
+          </div>
+          <div class="booking-img-wrap">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-provider-profile-65erkjgovd.webp" alt="Booking Profile">
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 1: Checkout (Gray box image) -->
+      <section class="section">
+        <div class="container feature-row">
+          <div class="feature-text">
+            <h2>Let clients purchase your offerings in seconds</h2>
+            <p class="muted">We’ve designed a checkout flow your clients will love—quick, intuitive, and built for conversions. From browsing to booking and payment, everything just flows.</p>
+            <div class="bullets">
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Sell memberships, packs, and drop-in sessions
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Accept payments online or in person
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Track client purchases and payment history
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <a href="#" class="btn btn-secondary">Accept Payments</a>
+            </div>
+          </div>
+          <div class="media-container contain-mode">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-profile-pricing-fxqe4k9vnj.webp" alt="Checkout UI">
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 2: Schedule (Gray box image) -->
+      <section class="section">
+        <div class="container feature-row reverse">
+          <div class="feature-text">
+            <h2>A clear view of your business schedule</h2>
+            <p class="muted">Keep everything organized in one place. View upcoming classes and appointments, see who’s booked, track payments, and access key details at a glance.</p>
+            <div style="margin-top: 10px;">
+              <a href="#" class="btn btn-secondary">Explore Class Scheduling</a>
+            </div>
+          </div>
+          <div class="media-container">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/schedule-details-cgabdlpety.webp" alt="Schedule UI">
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 3: Manage Clients (Gray box image) -->
+      <section class="section">
+        <div class="container feature-row">
+          <div class="feature-text">
+            <h2>Manage clients seamlessly</h2>
+            <p class="muted">Easily manage all your clients in one place. See their contact details, track purchased plans, and review upcoming, past, and canceled visits at a glance.</p>
+            <div class="bullets">
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                See their memberships and class packs
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                View upcoming and past appointments
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Track full payment history
+              </div>
+            </div>
+          </div>
+          <div class="media-container">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-client-dialog-5h9cheh09v.webp" alt="Client UI">
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 4: Growth (Gray box image) -->
+      <section class="section">
+        <div class="container feature-row reverse">
+          <div class="feature-text">
+            <h2>Track your business growth</h2>
+            <p class="muted">Track revenue, bookings, and client activity with simple, clear reports. No spreadsheets, no confusion—just the numbers that matter, right where you need them.</p>
+            <div class="bullets">
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                See revenue growth and booking trends over time
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Spot your most active and highest-spending clients
+              </div>
+              <div class="bullet">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Discover which memberships and packs sell best
+              </div>
+            </div>
+          </div>
+          <div class="media-container">
+            <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-analytics-bkwnud4fhe.webp" alt="Analytics UI">
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section class="pricing">
+        <div class="container">
+          <div class="pricing-head">
+            <h1>Pricing</h1>
+            <p class="muted">Our pricing is built to support every stage of your studio’s journey—from your first bookings to fully booked weeks.</p>
+            <div class="toggle">
+              <button data-active="true" onclick="setPricing('monthly')">Pay monthly</button>
+              <button data-active="false" onclick="setPricing('yearly')">Pay yearly <span class="discount">-20%</span></button>
+            </div>
+            <p class="muted" style="font-size: 14px;">Save up to 34% paying yearly</p>
+          </div>
+
+          <div class="pricing-grid">
+            <!-- Starter -->
+            <div class="plan">
+              <span class="badge">Most popular</span> <!-- Hidden initially via CSS opacity if needed, but live site shows different badges -->
+              <div>
+                <span style="font-weight: 500; display: block;">Starter</span>
+                <span class="muted" style="font-size: 14px;">For solo trainers.</span>
+              </div>
+              <div>
+                <div class="price-amount" data-m="€29" data-y="€19">€29</div>
+                <div class="price-period" data-m="Per month, billed monthly" data-y="Per month, billed yearly">Per month, billed monthly</div>
+              </div>
+              <a href="#" class="btn btn-primary" style="width: 100%;">Start free trial</a>
+              <div class="feat-list">
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 50 Active clients</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Services</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Pricing plans</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Team members</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Email support</div>
+              </div>
+            </div>
+
+            <!-- Growth -->
+            <div class="plan">
+              <span class="badge visible">Most popular</span>
+              <div>
+                <span style="font-weight: 500; display: block;">Growth</span>
+                <span class="muted" style="font-size: 14px;">For growing studios.</span>
+              </div>
+              <div>
+                <div class="price-amount" data-m="€59" data-y="€49">€59</div>
+                <div class="price-period" data-m="Per month, billed monthly" data-y="Per month, billed yearly">Per month, billed monthly</div>
+              </div>
+              <a href="#" class="btn btn-primary" style="width: 100%;">Start free trial</a>
+              <div class="feat-list">
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 100 Active clients</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited services</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited pricing plans</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 team members</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Email support</div>
+              </div>
+            </div>
+
+            <!-- Professional -->
+            <div class="plan">
+              <span class="badge">Most popular</span>
+              <div>
+                <span style="font-weight: 500; display: block;">Professional</span>
+                <span class="muted" style="font-size: 14px;">For studios ready to scale.</span>
+              </div>
+              <div>
+                <div class="price-amount" data-m="€99" data-y="€79">€99</div>
+                <div class="price-period" data-m="Per month, billed monthly" data-y="Per month, billed yearly">Per month, billed monthly</div>
+              </div>
+              <a href="#" class="btn btn-primary" style="width: 100%;">Start free trial</a>
+              <div class="feat-list">
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> 200 Active clients</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited services</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited pricing plans</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited team members</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority email support</div>
+              </div>
+            </div>
+
+            <!-- Business -->
+            <div class="plan">
+              <span class="badge">Most popular</span>
+              <div>
+                <span style="font-weight: 500; display: block;">Business</span>
+                <span class="muted" style="font-size: 14px;">For large studios.</span>
+              </div>
+              <div>
+                <div class="price-amount" data-m="€199" data-y="€159">€199</div>
+                <div class="price-period" data-m="Per month, billed monthly" data-y="Per month, billed yearly">Per month, billed monthly</div>
+              </div>
+              <a href="#" class="btn btn-primary" style="width: 100%;">Start free trial</a>
+              <div class="feat-list">
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited active clients</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited services</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited pricing plans</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited team members</div>
+                <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority email support</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-center" style="margin-top: 40px;">
+            <a href="#" class="btn btn-secondary" style="background:transparent; color: var(--text); padding: 0;">Full pricing plan comparison</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Band -->
+      <section class="cta-band">
+        <div class="container">
+          <h2>Manage bookings and payments easier</h2>
+          <div style="margin-top: 20px;">
+            <a href="#" class="btn btn-primary">
+              Try 14 days for free
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <img src="https://assets.ycodeapp.com/assets/app83049/Images/published/512x512-fgzugniovv.webp" alt="time2book" style="width: 32px; height: 32px;">
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Company</h4>
+            <a href="#">Contact us</a>
+            <a href="#">Become an affiliate</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookie preferences</a>
+          </div>
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#">Booking &amp; Scheduling</a>
+            <a href="#">Payments</a>
+          </div>
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <a href="#">Help</a>
+            <a href="#">Blog</a>
+          </div>
+          <div class="footer-col">
+            <h4>Compare</h4>
+            <a href="#">Best Mindbody Alternative</a>
+            <a href="#">Best Momence Alternative</a>
+            <a href="#">Best LegitFit Alternative</a>
+          </div>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <div>2026 © time2book·me - All rights reserved.</div>
+        <a href="#" style="opacity: 1;">Instagram</a>
+      </div>
+    </footer>
+
+    <script>
+      function setPricing(mode) {
+        const btns = document.querySelectorAll('.toggle button');
+        btns.forEach(b => b.setAttribute('data-active', 'false'));
+        if (mode === 'monthly') btns[0].setAttribute('data-active', 'true');
+        else btns[1].setAttribute('data-active', 'true');
+
+        const amounts = document.querySelectorAll('.price-amount');
+        const periods = document.querySelectorAll('.price-period');
+        
+        amounts.forEach(el => el.textContent = el.getAttribute(mode === 'monthly' ? 'data-m' : 'data-y'));
+        periods.forEach(el => el.textContent = el.getAttribute(mode === 'monthly' ? 'data-m' : 'data-y'));
+      }
+    </script>
+  </body>
+</html>
