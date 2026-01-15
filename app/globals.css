@@ -150,4 +150,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  button,
+  a,
+  [role="button"],
+  [type="button"],
+  [type="submit"] {
+    @apply cursor-pointer;
+  }
+  button:disabled,
+  [role="button"]:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled {
+    @apply cursor-not-allowed;
+  }
 }
