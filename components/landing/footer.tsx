@@ -1,64 +1,98 @@
-import { Separator } from "@/components/ui/separator"
+import { StatusBadge } from "@/components/ui/status-badge"
+import Link from "next/link"
 
 const footerLinks = [
   {
     title: "Company",
     items: [
-      "Contact us",
-      "Become an affiliate",
-      "Privacy Policy",
-      "Terms of Service",
-      "Cookie preferences",
+      { label: "Contact us", href: "/contact" },
+      { label: "Become an affiliate", href: "#" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Cookie preferences", href: "/cookies" },
     ],
   },
   {
     title: "Product",
-    items: ["Booking & Scheduling", "Payments"],
+    items: [
+      { label: "Booking & Scheduling", href: "#" },
+      { label: "Payments", href: "#" },
+    ],
   },
   {
     title: "Resources",
-    items: ["Help", "Blog"],
-  },
-  {
-    title: "Compare",
     items: [
-      "Best Mindbody Alternative",
-      "Best Momence Alternative",
-      "Best LegitFit Alternative",
+      { label: "Help", href: "#" },
+      { label: "Blog", href: "#" },
     ],
   },
+  {
+    title: "Social",
+    items: [
+      { label: "Facebook", href: "#" },
+      { label: "LinkedIn", href: "#" },
+      { label: "X", href: "#" },
+      { label: "Youtube", href: "#" },
+    ],
+  },
+]
+
+const studioSolutions = [
+  "Yoga studio",
+  "CrossFit",
+  "Pilates",
+  "Gym",
+  "Boxing",
+  "Personal coach",
 ]
 
 function FooterSection() {
   return (
     <footer className="bg-background py-20">
       <div className="mx-auto w-full max-w-[1440px] px-6 md:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
-          <div>
-            <img
-              src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Logo/symbol%20grey.svg"
-              alt="MyPass icon"
-              className="h-8 w-8"
-              loading="lazy"
-            />
-          </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {footerLinks.map((group) => (
-              <div key={group.title} className="space-y-3">
-                <h4 className="text-sm font-semibold">{group.title}</h4>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  {group.items.map((item) => (
-                    <div key={item}>{item}</div>
-                  ))}
-                </div>
+        {/* Links Grid */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Company, Product, Resources, Social */}
+          {footerLinks.map((group) => (
+            <div key={group.title} className="space-y-3">
+              <h4 className="text-sm font-semibold">{group.title}</h4>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                {group.items.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="block hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
-            ))}
+            </div>
+          ))}
+
+          {/* Studio Solutions */}
+          <div>
+            <h4 className="text-sm font-semibold mb-3">Studio solutions</h4>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              {studioSolutions.map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="block hover:text-foreground transition-colors"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-        <Separator className="my-10" />
-        <div className="flex flex-col justify-between gap-4 text-sm text-muted-foreground sm:flex-row">
-          <span>2026 © time2book·me - All rights reserved.</span>
-          <span>Instagram</span>
+
+        {/* Copyright Section */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <div className="flex flex-col justify-between gap-4 text-sm text-muted-foreground sm:flex-row sm:items-center">
+            <span>2026 © MyPass - All rights reserved.</span>
+            <StatusBadge />
+          </div>
         </div>
       </div>
     </footer>

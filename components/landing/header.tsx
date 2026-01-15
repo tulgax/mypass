@@ -128,10 +128,14 @@ function HeaderNav() {
 
           {/* Desktop Buttons */}
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="secondary" size="default">
-              Sign in
-            </Button>
-            <Button size="default">Sign up</Button>
+            <Link href="/auth/signin">
+              <Button variant="secondary" size="default">
+                Sign in
+              </Button>
+            </Link>
+            <Link href="/auth/signup">
+              <Button size="default">Sign up</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -285,12 +289,16 @@ function HeaderNav() {
 
               {/* Mobile Buttons */}
               <div className="flex flex-col gap-2 pt-4">
-                <Button variant="secondary" size="default" className="w-full">
-                  Sign in
-                </Button>
-                <Button size="default" className="w-full">
-                  Sign up
-                </Button>
+                <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="secondary" size="default" className="w-full">
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <Button size="default" className="w-full">
+                    Sign up
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>
