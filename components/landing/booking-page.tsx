@@ -321,7 +321,7 @@ function BookingPageSection() {
                           </div>
 
                           {/* Class Listings */}
-                          <div className="space-y-6">
+                          <div className="space-y-4 md:space-y-6">
                             <AnimatePresence mode="wait">
                               {selectedDayData?.sessions && selectedDayData.sessions.length > 0 ? (
                                 <motion.div
@@ -329,7 +329,7 @@ function BookingPageSection() {
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   exit={{ opacity: 0, y: -10 }}
-                                  className="space-y-6"
+                                  className="space-y-4 md:space-y-6"
                                 >
                                   {selectedDayData.sessions.map((session, index) => (
                                     <motion.div 
@@ -339,25 +339,26 @@ function BookingPageSection() {
                                       transition={{ delay: index * 0.1 }}
                                       className="group"
                                     >
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1 space-y-2">
-                                          <h4 className="text-sm font-medium leading-none">
+                                      <div className="flex items-center justify-between gap-2 md:gap-4">
+                                        <div className="flex-1 space-y-1 md:space-y-2 min-w-0">
+                                          <h4 className="text-xs md:text-sm font-medium leading-none">
                                             {session.name}
                                           </h4>
                                           
-                                          <div className="flex items-center gap-6 text-xs text-muted-foreground">
-                                            <div className="flex items-center gap-1.5">
-                                              <Clock className="h-3.5 w-3.5" />
+                                          <div className="flex items-center gap-3 md:gap-6 text-[10px] md:text-xs text-muted-foreground flex-wrap">
+                                            <div className="flex items-center gap-1 md:gap-1.5">
+                                              <Clock className="h-3 w-3 md:h-3.5 md:w-3.5" />
                                               <span>{session.time}</span>
                                             </div>
                                             
-                                            <div className="flex items-center gap-1.5">
-                                              <MapPin className="h-3.5 w-3.5" />
-                                              <span>Flow Pilates</span>
+                                            <div className="flex items-center gap-1 md:gap-1.5">
+                                              <MapPin className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                                              <span className="hidden sm:inline">Flow Pilates</span>
+                                              <span className="sm:hidden">Flow</span>
                                             </div>
 
-                                            <div className="flex items-center gap-1.5">
-                                              <Users className="h-3.5 w-3.5" />
+                                            <div className="flex items-center gap-1 md:gap-1.5">
+                                              <Users className="h-3 w-3 md:h-3.5 md:w-3.5" />
                                               <span>{session.spots}</span>
                                             </div>
                                           </div>
@@ -366,14 +367,14 @@ function BookingPageSection() {
                                         <motion.button 
                                           whileHover={{ scale: 1.05 }}
                                           whileTap={{ scale: 0.95 }}
-                                          className="h-8 rounded-full bg-muted px-5 text-xs font-medium transition-colors hover:bg-foreground hover:text-background"
+                                          className="h-7 md:h-8 rounded-full bg-muted px-3 md:px-5 text-[10px] md:text-xs font-medium transition-colors hover:bg-foreground hover:text-background shrink-0"
                                         >
                                           Book
                                         </motion.button>
                                       </div>
                                       {/* Separator line except for last item */}
                                       {index < (selectedDayData.sessions.length - 1) && (
-                                        <div className="mt-6 h-px w-full bg-border/50" />
+                                        <div className="mt-4 md:mt-6 h-px w-full bg-border/50" />
                                       )}
                                     </motion.div>
                                   ))}
@@ -384,9 +385,9 @@ function BookingPageSection() {
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  className="flex h-40 flex-col items-center justify-center rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground"
+                                  className="flex h-32 md:h-40 flex-col items-center justify-center rounded-lg border border-dashed border-border p-4 md:p-8 text-center text-muted-foreground"
                                 >
-                                  <p>No classes available for this date.</p>
+                                  <p className="text-xs md:text-sm">No classes available for this date.</p>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -402,14 +403,14 @@ function BookingPageSection() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
-                          className="space-y-4"
+                          className="space-y-3 md:space-y-4"
                         >
                           {/* Monthly Subscription */}
                           <motion.div 
                             whileHover={{ scale: 1.02 }}
-                            className="flex items-center gap-4 rounded-xl p-2 hover:bg-muted/50 cursor-pointer transition-colors"
+                            className="flex items-center gap-2 md:gap-4 rounded-xl p-1.5 md:p-2 hover:bg-muted/50 cursor-pointer transition-colors"
                           >
-                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
+                            <div className="relative h-12 w-12 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg">
                               <Image
                                 src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg"
                                 alt="Monthly subscription"
@@ -417,31 +418,31 @@ function BookingPageSection() {
                                 className="object-cover"
                               />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">
                                 Monthly subscription
                               </h4>
-                              <p className="mt-1 text-sm font-medium">
+                              <p className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
                                 €80.00 every month
                               </p>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 All yoga classes. Charged every month. Cancel anytime.
                               </p>
                             </div>
                             <motion.button 
                               whileTap={{ scale: 0.9 }}
-                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                              className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
                             >
-                              <ChevronRight className="h-5 w-5" />
+                              <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
                             </motion.button>
                           </motion.div>
 
                           {/* 10 Group Sessions */}
                           <motion.div 
                             whileHover={{ scale: 1.02 }}
-                            className="flex items-center gap-4 rounded-xl p-2 hover:bg-muted/50 cursor-pointer transition-colors"
+                            className="flex items-center gap-2 md:gap-4 rounded-xl p-1.5 md:p-2 hover:bg-muted/50 cursor-pointer transition-colors"
                           >
-                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
+                            <div className="relative h-12 w-12 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg">
                               <Image
                                 src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg"
                                 alt="10 Group sessions"
@@ -449,22 +450,22 @@ function BookingPageSection() {
                                 className="object-cover"
                               />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">
                                 10 Group sessions
                               </h4>
-                              <p className="mt-1 text-sm font-medium">
+                              <p className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
                                 €100.00
                               </p>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 Attend any Yoga class, 10 sessions total. Valid for 1 month.
                               </p>
                             </div>
                             <motion.button 
                               whileTap={{ scale: 0.9 }}
-                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                              className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
                             >
-                              <ChevronRight className="h-5 w-5" />
+                              <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
                             </motion.button>
                           </motion.div>
                         </motion.div>
@@ -478,19 +479,19 @@ function BookingPageSection() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
-                          className="space-y-6"
+                          className="space-y-4 md:space-y-6"
                         >
                           {/* Location */}
                           <motion.div 
                             whileHover={{ x: 5 }}
-                            className="flex items-start gap-4"
+                            className="flex items-start gap-2 md:gap-4"
                           >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                              <MapPin className="h-5 w-5 text-foreground/60" />
+                            <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                              <MapPin className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">Location</h4>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">Location</h4>
+                              <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 123 Wellness Street<br />
                                 Downtown District<br />
                                 City, State 12345
@@ -501,14 +502,14 @@ function BookingPageSection() {
                           {/* Phone */}
                           <motion.div 
                             whileHover={{ x: 5 }}
-                            className="flex items-start gap-4"
+                            className="flex items-start gap-2 md:gap-4"
                           >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                              <Phone className="h-5 w-5 text-foreground/60" />
+                            <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                              <Phone className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">Phone</h4>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">Phone</h4>
+                              <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 <a
                                   href="tel:+1234567890"
                                   className="hover:text-foreground transition-colors"
@@ -522,17 +523,17 @@ function BookingPageSection() {
                           {/* Email */}
                           <motion.div 
                             whileHover={{ x: 5 }}
-                            className="flex items-start gap-4"
+                            className="flex items-start gap-2 md:gap-4"
                           >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                              <Mail className="h-5 w-5 text-foreground/60" />
+                            <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                              <Mail className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">Email</h4>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">Email</h4>
+                              <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
                                 <a
                                   href="mailto:hello@flowpilates.com"
-                                  className="hover:text-foreground transition-colors"
+                                  className="hover:text-foreground transition-colors break-all"
                                 >
                                   hello@flowpilates.com
                                 </a>
@@ -543,14 +544,14 @@ function BookingPageSection() {
                           {/* Hours */}
                           <motion.div 
                             whileHover={{ x: 5 }}
-                            className="flex items-start gap-4"
+                            className="flex items-start gap-2 md:gap-4"
                           >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                              <Clock className="h-5 w-5 text-foreground/60" />
+                            <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                              <Clock className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
                             </div>
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium">Hours</h4>
-                              <div className="mt-1 space-y-1 text-xs text-muted-foreground">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-medium">Hours</h4>
+                              <div className="mt-0.5 md:mt-1 space-y-0.5 md:space-y-1 text-[10px] md:text-xs text-muted-foreground">
                                 <p>Monday - Friday: 6:00 AM - 9:00 PM</p>
                                 <p>Saturday: 7:00 AM - 8:00 PM</p>
                                 <p>Sunday: 8:00 AM - 6:00 PM</p>
