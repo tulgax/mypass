@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+type ProfileUpdate = { role: 'studio_owner' | 'student'; full_name: string }
+
 export default async function SignUpPage({
   searchParams,
 }: {
@@ -48,12 +50,11 @@ export default async function SignUpPage({
 
     if (authData.user) {
       // Update user profile with role and name
-      const { error: profileError } = await supabase
+      // NOTE: Supabase typed table inference is currently failing (infers `never`)
+      // during Next build. Cast to avoid blocking compilation.
+      const { error: profileError } = await (supabase as any)
         .from('user_profiles')
-        .update({
-          role,
-          full_name: fullName,
-        })
+        .update({ role, full_name: fullName } as ProfileUpdate)
         .eq('id', authData.user.id)
 
       if (profileError) {

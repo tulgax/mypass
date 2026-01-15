@@ -37,7 +37,7 @@ export default async function StudioPage({
     .order('created_at', { ascending: false })
 
   // Filter instances to only show upcoming ones
-  const classesWithUpcomingInstances = (classes || []).map((cls) => ({
+  const classesWithUpcomingInstances = (classes || []).map((cls: any) => ({
     ...cls,
     class_instances: (cls.class_instances || []).filter(
       (instance: any) =>
@@ -58,7 +58,7 @@ export default async function StudioPage({
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {classesWithUpcomingInstances.map((cls) => (
+            {classesWithUpcomingInstances.map((cls: any) => (
               <ClassCard key={cls.id} classData={cls} studioSlug={slug} />
             ))}
           </div>

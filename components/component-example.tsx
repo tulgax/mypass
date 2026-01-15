@@ -22,7 +22,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -152,7 +151,7 @@ function FormExample() {
         <CardHeader>
           <CardTitle>User Information</CardTitle>
           <CardDescription>Please fill in your details below</CardDescription>
-          <CardAction>
+          <div className="mt-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -411,7 +410,7 @@ function FormExample() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem variant="destructive">
+                  <DropdownMenuItem className="text-destructive focus:text-destructive">
                     <LogOutIcon
                     />
                     Sign Out
@@ -420,7 +419,7 @@ function FormExample() {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-          </CardAction>
+          </div>
         </CardHeader>
         <CardContent>
           <form>

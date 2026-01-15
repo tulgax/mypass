@@ -61,7 +61,7 @@ export function AppSidebar({ navItems = [], user, onSignOut, ...props }: AppSide
         <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
-        {user && <NavUser user={user} onSignOut={onSignOut} />}
+        {user && <NavUser user={{ ...user, avatar: user.avatar ?? "" }} onSignOut={onSignOut} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

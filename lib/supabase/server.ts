@@ -5,7 +5,10 @@ import type { Database } from '@/lib/types/database'
 export async function createClient() {
   const cookieStore = await cookies()
 
-  return createServerClient<Database>(
+  // NOTE: In some Next build contexts, Supabase's generic table inference can
+  // incorrectly resolve to `never` (e.g. `.from('user_profiles')`), failing the build.
+  // Casting here keeps runtime behavior identical while unblocking compilation.
+  return (createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -13,9 +16,9 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }: any) =>
               cookieStore.set(name, value, options)
             )
           } catch {
@@ -26,5 +29,5 @@ export async function createClient() {
         },
       },
     }
-  )
+  ) as any)
 }

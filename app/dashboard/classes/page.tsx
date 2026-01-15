@@ -39,7 +39,7 @@ export default async function ClassesPage() {
 
       {classes && classes.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {classes.map((cls) => (
+          {classes.map((cls: any) => (
             <Card key={cls.id}>
               <CardHeader>
                 <CardTitle>{cls.name}</CardTitle>

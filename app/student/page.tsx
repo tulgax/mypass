@@ -23,7 +23,7 @@ export default async function StudentPage() {
           .from('class_instances')
           .select('id')
           .gt('scheduled_at', new Date().toISOString())
-      ).data?.map((ci) => ci.id) || []
+      ).data?.map((ci: { id: number }) => ci.id) || []
     )
 
   const { count: pastCount } = await supabase
@@ -37,7 +37,7 @@ export default async function StudentPage() {
           .from('class_instances')
           .select('id')
           .lt('scheduled_at', new Date().toISOString())
-      ).data?.map((ci) => ci.id) || []
+      ).data?.map((ci: { id: number }) => ci.id) || []
     )
 
   return (

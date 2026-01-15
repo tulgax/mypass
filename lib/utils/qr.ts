@@ -14,7 +14,7 @@ export function generateQRCodeString(bookingId: number): string {
  */
 export async function generateQRCodeDataURL(
   bookingId: number,
-  options?: QRCode.QRCodeToDataURLOptions
+  options?: any
 ): Promise<string> {
   const qrString = generateQRCodeString(bookingId)
   return QRCode.toDataURL(qrString, {

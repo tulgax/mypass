@@ -44,7 +44,7 @@ export default async function DashboardPage() {
     .select('id')
     .eq('studio_id', studio.id)
 
-  const classIds = classes?.map((c) => c.id) || []
+  const classIds = classes?.map((c: any) => c.id) || []
 
   // Get all class instances (only if we have classes)
   const { data: classInstances } = classIds.length > 0
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
         .in('class_id', classIds)
     : { data: [] }
 
-  const instanceIds = classInstances?.map((ci) => ci.id) || []
+  const instanceIds = classInstances?.map((ci: any) => ci.id) || []
 
   // Get all bookings (only if we have instances)
   const { data: bookings } = instanceIds.length > 0
@@ -77,22 +77,22 @@ export default async function DashboardPage() {
     : { data: [] }
 
   // Calculate stats
-  const totalRevenue = bookings?.reduce((sum, booking) => {
+  const totalRevenue = bookings?.reduce((sum: number, booking: any) => {
     const payment = Array.isArray(booking.payments) ? booking.payments[0] : booking.payments
     return sum + (payment?.amount || 0)
   }, 0) || 0
 
   const totalBookings = bookings?.length || 0
   const activeClasses = classes?.length || 0
-  const uniqueCustomers = new Set(bookings?.map((b) => b.student_id) || []).size
+  const uniqueCustomers = new Set(bookings?.map((b: any) => b.student_id) || []).size
 
   // Get revenue from payments table
   const { data: payments } = await supabase
     .from('payments')
     .select('amount, currency')
-    .in('id', bookings?.map((b) => b.payment_id).filter(Boolean) || [])
+    .in('id', bookings?.map((b: any) => b.payment_id).filter(Boolean) || [])
 
-  const actualRevenue = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0
+  const actualRevenue = payments?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0
   const currency = payments?.[0]?.currency || 'USD'
 
   return (

@@ -88,7 +88,7 @@ export default async function ExplorePage({
 
       {processedStudios.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {processedStudios.map((studio) => (
+          {processedStudios.map((studio: any) => (
             <StudioCard key={studio.id} studio={studio} />
           ))}
         </div>

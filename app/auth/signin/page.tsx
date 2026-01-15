@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+type ProfileRole = { role: 'studio_owner' | 'student' }
+
 export default async function SignInPage({
   searchParams,
 }: {
@@ -17,11 +19,11 @@ export default async function SignInPage({
   } = await supabase.auth.getUser()
 
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile } = (await supabase
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single()) as { data: ProfileRole | null }
 
     if (profile?.role === 'studio_owner') {
       redirect('/dashboard')
@@ -51,11 +53,11 @@ export default async function SignInPage({
     } = await supabase.auth.getUser()
 
     if (user) {
-      const { data: profile } = await supabase
+      const { data: profile } = (await supabase
         .from('user_profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .single()) as { data: ProfileRole | null }
 
       if (profile?.role === 'studio_owner') {
         redirect('/dashboard')

@@ -26,7 +26,7 @@ export default async function BookingsPage() {
       studio
         ? (
             await supabase.from('classes').select('id').eq('studio_id', studio.id)
-          ).data?.map((c) => c.id) || []
+          ).data?.map((c: { id: number }) => c.id) || []
         : []
     )
 
@@ -43,7 +43,7 @@ export default async function BookingsPage() {
     `)
     .in(
       'class_instance_id',
-      classInstances?.map((ci) => ci.id) || []
+      classInstances?.map((ci: { id: number }) => ci.id) || []
     )
     .order('created_at', { ascending: false })
 
