@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -35,6 +36,8 @@ function HeaderNav() {
   const [activeMenu, setActiveMenu] = useState<"product" | "business" | null>(
     null
   )
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileSubmenu, setMobileSubmenu] = useState<"product" | "business" | null>(null)
 
   const isExpanded = activeMenu !== null
   const spring = "350ms linear(0, 0.2657, 0.6492, 0.8964, 1.0028, 1.0282, 1.0223, 1.0112, 1.0036, 1.0001, 1, 1)"
@@ -58,41 +61,58 @@ function HeaderNav() {
         style={{ transition: `padding ${spring}` }}
       >
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="text-base font-semibold tracking-tight">
-            MyPass
+          <Link href="/" className="flex items-center">
+            {/* Full logo for desktop, symbol for mobile */}
+            <Image
+              src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Logo/black.svg"
+              alt="MyPass"
+              width={120}
+              height={27}
+              className="hidden h-6 w-auto md:block"
+              priority
+            />
+            <Image
+              src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Logo/symbol%20black.svg"
+              alt="MyPass"
+              width={40}
+              height={26}
+              className="h-6 w-auto md:hidden"
+              priority
+            />
           </Link>
 
+          {/* Desktop Navigation */}
           <nav className="hidden items-center gap-6 text-sm text-foreground/80 md:flex">
             <button
               type="button"
               data-menu="product"
               onMouseEnter={() => setActiveMenu("product")}
-            className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               Product
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                activeMenu === "product" && "rotate-180"
-              )}
-              style={{ transition: `transform ${spring}` }}
-            />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  activeMenu === "product" && "rotate-180"
+                )}
+                style={{ transition: `transform ${spring}` }}
+              />
             </button>
 
             <button
               type="button"
               data-menu="business"
               onMouseEnter={() => setActiveMenu("business")}
-            className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               Business
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                activeMenu === "business" && "rotate-180"
-              )}
-              style={{ transition: `transform ${spring}` }}
-            />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  activeMenu === "business" && "rotate-180"
+                )}
+                style={{ transition: `transform ${spring}` }}
+              />
             </button>
 
             <Link href="#pricing" className="hover:text-foreground">
@@ -106,17 +126,36 @@ function HeaderNav() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          {/* Desktop Buttons */}
+          <div className="hidden items-center gap-2 md:flex">
             <Button variant="secondary" size="default">
               Sign in
             </Button>
             <Button size="default">Sign up</Button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(!mobileMenuOpen)
+              setMobileSubmenu(null)
+            }}
+            className="flex items-center justify-center p-2 md:hidden"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
         </div>
 
+        {/* Desktop Dropdown Menu */}
         <div
           className={cn(
-            "overflow-hidden transition-[max-height,opacity] duration-200",
+            "hidden overflow-hidden transition-[max-height,opacity] duration-200 md:block",
             isExpanded ? "max-h-[320px] opacity-100" : "max-h-0 opacity-0"
           )}
           style={{ transition: `max-height ${spring}, opacity 150ms linear` }}
@@ -154,7 +193,109 @@ function HeaderNav() {
           </div>
         </div>
         </div>
-      </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={cn(
+            "overflow-hidden transition-[max-height,opacity] duration-200 md:hidden",
+            mobileMenuOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="border-t border-border bg-background py-4">
+            <nav className="flex flex-col space-y-1 px-6">
+              {/* Product Menu */}
+              <button
+                type="button"
+                onClick={() => setMobileSubmenu(mobileSubmenu === "product" ? null : "product")}
+                className="flex items-center justify-between py-3 text-left text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                Product
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    mobileSubmenu === "product" && "rotate-180"
+                  )}
+                />
+              </button>
+              {mobileSubmenu === "product" && (
+                <div className="space-y-1 pl-4 pb-2">
+                  {productLinks.map((item) => (
+                    <div key={item.label} className="rounded-lg py-2 px-3 space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Business Menu */}
+              <button
+                type="button"
+                onClick={() => setMobileSubmenu(mobileSubmenu === "business" ? null : "business")}
+                className="flex items-center justify-between py-3 text-left text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                Business
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    mobileSubmenu === "business" && "rotate-180"
+                  )}
+                />
+              </button>
+              {mobileSubmenu === "business" && (
+                <div className="space-y-1 pl-4 pb-2">
+                  {businessLinks.map((item) => (
+                    <div key={item.label} className="rounded-lg py-2 px-3 space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Link
+                href="#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                Pricing
+              </Link>
+              <Link
+                href="#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                Help
+              </Link>
+              <Link
+                href="#cta"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                Refer &amp; Earn
+              </Link>
+
+              {/* Mobile Buttons */}
+              <div className="flex flex-col gap-2 pt-4">
+                <Button variant="secondary" size="default" className="w-full">
+                  Sign in
+                </Button>
+                <Button size="default" className="w-full">
+                  Sign up
+                </Button>
+              </div>
+            </nav>
+          </div>
+        </div>
+        </div>
       </header>
     </div>
   )

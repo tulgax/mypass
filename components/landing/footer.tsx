@@ -36,8 +36,8 @@ function FooterSection() {
         <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
           <div>
             <img
-              src="https://assets.ycodeapp.com/assets/app83049/Images/published/512x512-fgzugniovv.webp"
-              alt="time2book icon"
+              src="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Logo/symbol%20grey.svg"
+              alt="MyPass icon"
               className="h-8 w-8"
               loading="lazy"
             />

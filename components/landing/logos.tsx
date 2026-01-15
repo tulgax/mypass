@@ -1,3 +1,5 @@
+import { Badge } from "@/components/ui/badge"
+
 function LogosSection() {
   const logos = [
     "Pilates",
@@ -14,14 +16,15 @@ function LogosSection() {
         <p className="text-center text-sm text-muted-foreground">
           Join 1,000+ fitness businesses
         </p>
-        <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {logos.map((logo) => (
-            <div
+            <Badge
               key={logo}
-              className="flex items-center justify-center rounded-full border border-border/60 bg-muted px-4 py-2 text-sm font-medium text-foreground/80"
+              variant="secondary"
+              className="px-4 py-1.5 text-sm font-medium"
             >
               {logo}
-            </div>
+            </Badge>
           ))}
         </div>
       </div>
