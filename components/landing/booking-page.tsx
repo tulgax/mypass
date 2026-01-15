@@ -281,40 +281,43 @@ function BookingPageSection() {
                           </div>
 
                           {/* Weekly Schedule */}
-                          <div className="mb-6 grid grid-cols-7 gap-2">
-                            {SCHEDULE_DATA.map((item, i) => (
-                              <motion.div
-                                key={`${item.day}-${item.date}`}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.05 }}
-                                onClick={() => setSelectedDate(item.date)}
-                                className={`rounded-lg border p-2 text-center cursor-pointer transition-colors ${
-                                  selectedDate === item.date 
-                                    ? "border-transparent bg-muted" 
-                                    : "border-border/50 hover:bg-muted/50"
-                                }`}
-                              >
-                                <div className="text-xs text-muted-foreground">
-                                  {item.day}
-                                </div>
-                                <div className="mt-1 text-sm font-medium">
-                                  {item.displayDate}
-                                </div>
-                                <div className="mt-1 text-xs text-muted-foreground">
-                                  {item.status === "Unavailable" ? (
-                                    <span className="text-muted-foreground/60">
-                                      Unavailable
-                                    </span>
-                                  ) : (
-                                    <span className="flex items-center justify-center gap-1">
-                                      <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                                      {item.sessions.length > 0 ? `${item.sessions.length} slots` : item.status}
-                                    </span>
-                                  )}
-                                </div>
-                              </motion.div>
-                            ))}
+                          <div className="mb-6 overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
+                            <div className="grid grid-cols-7 gap-2 min-w-[500px] md:min-w-0">
+                              {SCHEDULE_DATA.map((item, i) => (
+                                <motion.div
+                                  key={`${item.day}-${item.date}`}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: i * 0.05 }}
+                                  onClick={() => setSelectedDate(item.date)}
+                                  className={`rounded-lg border p-1.5 md:p-2 text-center cursor-pointer transition-colors ${
+                                    selectedDate === item.date 
+                                      ? "border-transparent bg-muted" 
+                                      : "border-border/50 hover:bg-muted/50"
+                                  }`}
+                                >
+                                  <div className="text-[10px] md:text-xs text-muted-foreground">
+                                    {item.day}
+                                  </div>
+                                  <div className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
+                                    {item.displayDate}
+                                  </div>
+                                  <div className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
+                                    {item.status === "Unavailable" ? (
+                                      <span className="text-muted-foreground/60">
+                                        Unavailable
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center justify-center gap-0.5 md:gap-1">
+                                        <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-green-500"></span>
+                                        <span className="hidden sm:inline">{item.sessions.length > 0 ? `${item.sessions.length} slots` : item.status}</span>
+                                        <span className="sm:hidden">{item.sessions.length > 0 ? item.sessions.length : ""}</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
                           </div>
 
                           {/* Class Listings */}
