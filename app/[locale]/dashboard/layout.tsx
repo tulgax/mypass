@@ -4,16 +4,20 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell'
 
 export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }) {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const { locale } = await params
+  
   if (!user) {
-    redirect('/auth/signin')
+    redirect(`/${locale}/auth/signin`)
   }
 
   const { data: profile } = await supabase
@@ -23,7 +27,7 @@ export default async function DashboardLayout({
     .single()
 
   if (profile?.role !== 'studio_owner') {
-    redirect('/student')
+    redirect(`/${locale}/student`)
   }
 
   const { data: studio } = await supabase
@@ -36,7 +40,7 @@ export default async function DashboardLayout({
     'use server'
     const supabase = await createClient()
     await supabase.auth.signOut()
-    redirect('/auth/signin')
+    redirect(`/${locale}/auth/signin`)
   }
 
   const { data: userProfile } = await supabase

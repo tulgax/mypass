@@ -1,45 +1,47 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-
-const features = [
-  {
-    title: "Let clients purchase your offerings in seconds",
-    description:
-      "We’ve designed a checkout flow your clients will love—quick, intuitive, and built for conversions.",
-    bullets: [
-      "Sell memberships, packs, and drop-in sessions",
-      "Accept payments online or in person",
-      "Track client purchases and payment history",
-    ],
-    cta: "Accept Payments",
-    image:
-      "https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-profile-pricing-fxqe4k9vnj.webp",
-  },
-  {
-    title: "A clear view of your business schedule",
-    description:
-      "Keep everything organized in one place. View upcoming classes and appointments, see who’s booked, and track payments.",
-    bullets: [],
-    cta: "Explore Class Scheduling",
-    image:
-      "https://assets.ycodeapp.com/assets/app83049/Images/published/schedule-details-cgabdlpety.webp",
-  },
-  {
-    title: "Manage clients seamlessly",
-    description:
-      "Easily manage all your clients in one place. See their contact details, track purchased plans, and review visits.",
-    bullets: [
-      "See their memberships and class packs",
-      "View upcoming and past appointments",
-      "Track full payment history",
-    ],
-    cta: null,
-    image:
-      "https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-client-dialog-5h9cheh09v.webp",
-  },
-]
+import { useTranslations } from "next-intl"
 
 function FeaturesSection() {
+  const t = useTranslations('landing.features')
+  
+  const features = [
+    {
+      title: t('purchaseOfferings.title'),
+      description: t('purchaseOfferings.description'),
+      bullets: [
+        t('purchaseOfferings.bullets.sellMemberships'),
+        t('purchaseOfferings.bullets.acceptPayments'),
+        t('purchaseOfferings.bullets.trackPurchases'),
+      ],
+      cta: t('purchaseOfferings.cta'),
+      image:
+        "https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-profile-pricing-fxqe4k9vnj.webp",
+    },
+    {
+      title: t('businessSchedule.title'),
+      description: t('businessSchedule.description'),
+      bullets: [],
+      cta: t('businessSchedule.cta'),
+      image:
+        "https://assets.ycodeapp.com/assets/app83049/Images/published/schedule-details-cgabdlpety.webp",
+    },
+    {
+      title: t('manageClients.title'),
+      description: t('manageClients.description'),
+      bullets: [
+        t('manageClients.bullets.memberships'),
+        t('manageClients.bullets.appointments'),
+        t('manageClients.bullets.paymentHistory'),
+      ],
+      cta: null,
+      image:
+        "https://assets.ycodeapp.com/assets/app83049/Images/published/pilates-studio-client-dialog-5h9cheh09v.webp",
+    },
+  ]
+
   return (
     <section className="bg-background py-20">
       <div className="mx-auto w-full max-w-[1440px] space-y-14 px-6 md:px-8">

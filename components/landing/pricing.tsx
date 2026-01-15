@@ -7,68 +7,70 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-
-const plans = [
-  {
-    name: "Starter",
-    description: "For solo trainers.",
-    monthlyPrice: 29,
-    yearlyPrice: 19,
-    highlight: false,
-    features: [
-      "50 Active clients",
-      "5 Services",
-      "5 Pricing plans",
-      "Team members",
-      "Email support",
-    ],
-  },
-  {
-    name: "Growth",
-    description: "For growing studios.",
-    monthlyPrice: 59,
-    yearlyPrice: 49,
-    highlight: true,
-    features: [
-      "100 Active clients",
-      "Unlimited services",
-      "Unlimited pricing plans",
-      "5 team members",
-      "Email support",
-    ],
-  },
-  {
-    name: "Professional",
-    description: "For studios ready to scale.",
-    monthlyPrice: 99,
-    yearlyPrice: 79,
-    highlight: false,
-    features: [
-      "200 Active clients",
-      "Unlimited services",
-      "Unlimited pricing plans",
-      "Unlimited team members",
-      "Priority email support",
-    ],
-  },
-  {
-    name: "Business",
-    description: "For large studios.",
-    monthlyPrice: 199,
-    yearlyPrice: 159,
-    highlight: false,
-    features: [
-      "Unlimited active clients",
-      "Unlimited services",
-      "Unlimited pricing plans",
-      "Unlimited team members",
-      "Priority email support",
-    ],
-  },
-]
+import { useTranslations } from "next-intl"
 
 function PricingSection() {
+  const t = useTranslations('landing.pricing')
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly")
+  
+  const plans = [
+    {
+      name: t('plans.starter.name'),
+      description: t('plans.starter.description'),
+      monthlyPrice: 29,
+      yearlyPrice: 19,
+      highlight: false,
+      features: [
+        t('plans.starter.features.clients'),
+        t('plans.starter.features.services'),
+        t('plans.starter.features.pricingPlans'),
+        t('plans.starter.features.teamMembers'),
+        t('plans.starter.features.support'),
+      ],
+    },
+    {
+      name: t('plans.growth.name'),
+      description: t('plans.growth.description'),
+      monthlyPrice: 59,
+      yearlyPrice: 49,
+      highlight: true,
+      features: [
+        t('plans.growth.features.clients'),
+        t('plans.growth.features.services'),
+        t('plans.growth.features.pricingPlans'),
+        t('plans.growth.features.teamMembers'),
+        t('plans.growth.features.support'),
+      ],
+    },
+    {
+      name: t('plans.professional.name'),
+      description: t('plans.professional.description'),
+      monthlyPrice: 99,
+      yearlyPrice: 79,
+      highlight: false,
+      features: [
+        t('plans.professional.features.clients'),
+        t('plans.professional.features.services'),
+        t('plans.professional.features.pricingPlans'),
+        t('plans.professional.features.teamMembers'),
+        t('plans.professional.features.support'),
+      ],
+    },
+    {
+      name: t('plans.business.name'),
+      description: t('plans.business.description'),
+      monthlyPrice: 199,
+      yearlyPrice: 159,
+      highlight: false,
+      features: [
+        t('plans.business.features.clients'),
+        t('plans.business.features.services'),
+        t('plans.business.features.pricingPlans'),
+        t('plans.business.features.teamMembers'),
+        t('plans.business.features.support'),
+      ],
+    },
+  ]
 
   return (
     <section className="bg-background py-24" id="pricing">
@@ -113,7 +115,7 @@ function PricingSection() {
             <Card key={plan.name} className="border-border/60 bg-background p-6">
               <div className="mb-3">
                 {plan.highlight ? (
-                  <Badge variant="success">Most popular</Badge>
+                  <Badge variant="success">{t('mostPopular')}</Badge>
                 ) : (
                   <div className="h-5" />
                 )}
@@ -143,12 +145,12 @@ function PricingSection() {
                     transition={{ duration: 0.25, ease: "easeInOut" }}
                   >
                     {billingCycle === "yearly"
-                      ? "Per month, billed yearly"
-                      : "Per month, billed monthly"}
+                      ? t('perMonthBilledYearly')
+                      : t('perMonthBilledMonthly')}
                   </motion.div>
                 </AnimatePresence>
               </div>
-              <Button className="mt-5 w-full">Start free trial</Button>
+              <Button className="mt-5 w-full">{t('startFreeTrial')}</Button>
               <ul className="mt-5 space-y-2 text-xs text-foreground/90">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">

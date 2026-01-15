@@ -1,38 +1,40 @@
  "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 import { ChevronDown, Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const productLinks = [
-  {
-    label: "Class scheduling",
-    description: "Set up services and schedule.",
-  },
-  {
-    label: "Payments",
-    description: "Sell memberships, packs, and drop-ins.",
-  },
-]
-
-const businessLinks = [
-  { label: "Pilates", description: "For pilates studios and trainers." },
-  { label: "Yoga", description: "For yoga studios and yoga teachers." },
-  { label: "Gym", description: "For gyms, fitness businesses, and facilities." },
-  { label: "CrossFit", description: "For CrossFit gyms and fitness coaches." },
-  { label: "Boxing", description: "For boxing gyms, trainers, and fight clubs." },
-  { label: "Dance", description: "For dance studios and choreographers." },
-  { label: "Martial arts", description: "For martial arts studios and dojos." },
-  { label: "Group training", description: "For bootcamps and fitness teams." },
-  { label: "Spin", description: "For spin studios and cycling clubs." },
-]
-
 function HeaderNav() {
+  const t = useTranslations('landing.header')
+  
+  const productLinks = [
+    {
+      label: t('productLinks.classScheduling.label'),
+      description: t('productLinks.classScheduling.description'),
+    },
+    {
+      label: t('productLinks.payments.label'),
+      description: t('productLinks.payments.description'),
+    },
+  ]
+
+  const businessLinks = [
+    { label: t('businessLinks.pilates.label'), description: t('businessLinks.pilates.description') },
+    { label: t('businessLinks.yoga.label'), description: t('businessLinks.yoga.description') },
+    { label: t('businessLinks.gym.label'), description: t('businessLinks.gym.description') },
+    { label: t('businessLinks.crossfit.label'), description: t('businessLinks.crossfit.description') },
+    { label: t('businessLinks.boxing.label'), description: t('businessLinks.boxing.description') },
+    { label: t('businessLinks.dance.label'), description: t('businessLinks.dance.description') },
+    { label: t('businessLinks.martialArts.label'), description: t('businessLinks.martialArts.description') },
+    { label: t('businessLinks.groupTraining.label'), description: t('businessLinks.groupTraining.description') },
+    { label: t('businessLinks.spin.label'), description: t('businessLinks.spin.description') },
+  ]
   const [activeMenu, setActiveMenu] = useState<"product" | "business" | null>(
     null
   )
@@ -89,7 +91,7 @@ function HeaderNav() {
               onMouseEnter={() => setActiveMenu("product")}
               className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
-              Product
+              {t('product')}
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform",
@@ -105,7 +107,7 @@ function HeaderNav() {
               onMouseEnter={() => setActiveMenu("business")}
               className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
-              Business
+              {t('business')}
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform",
@@ -116,13 +118,13 @@ function HeaderNav() {
             </button>
 
             <Link href="#pricing" className="hover:text-foreground">
-              Pricing
+              {t('pricing')}
             </Link>
             <Link href="#faq" className="hover:text-foreground">
-              Help
+              {t('help')}
             </Link>
             <Link href="#cta" className="hover:text-foreground">
-              Refer &amp; Earn
+              {t('referEarn')}
             </Link>
           </nav>
 
@@ -130,11 +132,11 @@ function HeaderNav() {
           <div className="hidden items-center gap-2 md:flex">
             <Link href="/auth/signin">
               <Button variant="secondary" size="default">
-                Sign in
+                {t('signIn')}
               </Button>
             </Link>
             <Link href="/auth/signup">
-              <Button size="default">Sign up</Button>
+              <Button size="default">{t('signUp')}</Button>
             </Link>
           </div>
 
@@ -213,7 +215,7 @@ function HeaderNav() {
                 onClick={() => setMobileSubmenu(mobileSubmenu === "product" ? null : "product")}
                 className="flex items-center justify-between py-3 text-left text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >
-                Product
+                {t('product')}
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 transition-transform",
@@ -242,7 +244,7 @@ function HeaderNav() {
                 onClick={() => setMobileSubmenu(mobileSubmenu === "business" ? null : "business")}
                 className="flex items-center justify-between py-3 text-left text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >
-                Business
+                {t('business')}
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 transition-transform",
@@ -270,33 +272,33 @@ function HeaderNav() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >
-                Pricing
+                {t('pricing')}
               </Link>
               <Link
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >
-                Help
+                {t('help')}
               </Link>
               <Link
                 href="#cta"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >
-                Refer &amp; Earn
+                {t('referEarn')}
               </Link>
 
               {/* Mobile Buttons */}
               <div className="flex flex-col gap-2 pt-4">
                 <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="default" className="w-full">
-                    Sign in
+                    {t('signIn')}
                   </Button>
                 </Link>
                 <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
                   <Button size="default" className="w-full">
-                    Sign up
+                    {t('signUp')}
                   </Button>
                 </Link>
               </div>

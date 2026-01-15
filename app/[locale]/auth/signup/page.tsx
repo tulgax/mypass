@@ -16,17 +16,20 @@ import {
 type ProfileUpdate = { role: 'studio_owner' | 'student'; full_name: string }
 
 export default async function SignUpPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>
   searchParams: { message?: string }
 }) {
+  const { locale } = await params
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (user) {
-    redirect('/dashboard')
+    redirect(`/${locale}/dashboard`)
   }
 
   async function signUp(formData: FormData) {
@@ -36,6 +39,7 @@ export default async function SignUpPage({
     const password = formData.get('password') as string
     const role = formData.get('role') as 'studio_owner' | 'student'
     const fullName = formData.get('full_name') as string
+    const currentLocale = formData.get('locale') as string
 
     const supabase = await createClient()
 
@@ -43,9 +47,9 @@ export default async function SignUpPage({
       email,
       password,
     })
-
+    
     if (authError) {
-      redirect('/auth/signup?message=Could not create account')
+      redirect(`/${currentLocale}/auth/signup?message=Could not create account`)
     }
 
     if (authData.user) {
@@ -58,13 +62,13 @@ export default async function SignUpPage({
         .eq('id', authData.user.id)
 
       if (profileError) {
-        redirect('/auth/signup?message=Could not create profile')
+        redirect(`/${currentLocale}/auth/signup?message=Could not create profile`)
       }
 
       if (role === 'studio_owner') {
-        redirect('/dashboard')
+        redirect(`/${currentLocale}/dashboard`)
       } else {
-        redirect('/student')
+        redirect(`/${currentLocale}/student`)
       }
     }
   }
@@ -78,6 +82,7 @@ export default async function SignUpPage({
         </CardHeader>
         <CardContent>
           <form action={signUp} className="space-y-4">
+            <input type="hidden" name="locale" value={locale} />
             <div className="space-y-2">
               <Label htmlFor="full_name">Full Name</Label>
               <Input id="full_name" name="full_name" type="text" placeholder="John Doe" required />

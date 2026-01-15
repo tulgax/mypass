@@ -1,0 +1,389 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "continue": "Continue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "required": "Required",
+    "optional": "Optional",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "landing": {
+    "hero": {
+      "title": "Scheduling software for fitness studios and individual instructors",
+      "ctaPrimary": "Start free trial",
+      "ctaSecondary": "Book a demo"
+    },
+    "header": {
+      "product": "Product",
+      "business": "Business",
+      "pricing": "Pricing",
+      "help": "Help",
+      "referEarn": "Refer & Earn",
+      "signIn": "Sign in",
+      "signUp": "Sign up",
+      "productLinks": {
+        "classScheduling": {
+          "label": "Class scheduling",
+          "description": "Set up services and schedule."
+        },
+        "payments": {
+          "label": "Payments",
+          "description": "Sell memberships, packs, and drop-ins."
+        }
+      },
+      "businessLinks": {
+        "pilates": {
+          "label": "Pilates",
+          "description": "For pilates studios and trainers."
+        },
+        "yoga": {
+          "label": "Yoga",
+          "description": "For yoga studios and yoga teachers."
+        },
+        "gym": {
+          "label": "Gym",
+          "description": "For gyms, fitness businesses, and facilities."
+        },
+        "crossfit": {
+          "label": "CrossFit",
+          "description": "For CrossFit gyms and fitness coaches."
+        },
+        "boxing": {
+          "label": "Boxing",
+          "description": "For boxing gyms, trainers, and fight clubs."
+        },
+        "dance": {
+          "label": "Dance",
+          "description": "For dance studios and choreographers."
+        },
+        "martialArts": {
+          "label": "Martial arts",
+          "description": "For martial arts studios and dojos."
+        },
+        "groupTraining": {
+          "label": "Group training",
+          "description": "For bootcamps and fitness teams."
+        },
+        "spin": {
+          "label": "Spin",
+          "description": "For spin studios and cycling clubs."
+        }
+      }
+    },
+    "features": {
+      "purchaseOfferings": {
+        "title": "Let clients purchase your offerings in seconds",
+        "description": "We've designed a checkout flow your clients will love—quick, intuitive, and built for conversions.",
+        "bullets": {
+          "sellMemberships": "Sell memberships, packs, and drop-in sessions",
+          "acceptPayments": "Accept payments online or in person",
+          "trackPurchases": "Track client purchases and payment history"
+        },
+        "cta": "Accept Payments"
+      },
+      "businessSchedule": {
+        "title": "A clear view of your business schedule",
+        "description": "Keep everything organized in one place. View upcoming classes and appointments, see who's booked, and track payments.",
+        "cta": "Explore Class Scheduling"
+      },
+      "manageClients": {
+        "title": "Manage clients seamlessly",
+        "description": "Easily manage all your clients in one place. See their contact details, track purchased plans, and review visits.",
+        "bullets": {
+          "memberships": "See their memberships and class packs",
+          "appointments": "View upcoming and past appointments",
+          "paymentHistory": "Track full payment history"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Our pricing is built to support every stage of your studio's journey—from your first bookings to fully booked weeks.",
+      "payMonthly": "Pay monthly",
+      "payYearly": "Pay yearly",
+      "yearlyDiscount": "-20%",
+      "saveYearly": "Save up to 34% paying yearly",
+      "perMonthBilledYearly": "Per month, billed yearly",
+      "perMonthBilledMonthly": "Per month, billed monthly",
+      "mostPopular": "Most popular",
+      "startFreeTrial": "Start free trial",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "description": "For solo trainers.",
+          "features": {
+            "clients": "50 Active clients",
+            "services": "5 Services",
+            "pricingPlans": "5 Pricing plans",
+            "teamMembers": "Team members",
+            "support": "Email support"
+          }
+        },
+        "growth": {
+          "name": "Growth",
+          "description": "For growing studios.",
+          "features": {
+            "clients": "100 Active clients",
+            "services": "Unlimited services",
+            "pricingPlans": "Unlimited pricing plans",
+            "teamMembers": "5 team members",
+            "support": "Email support"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "For studios ready to scale.",
+          "features": {
+            "clients": "200 Active clients",
+            "services": "Unlimited services",
+            "pricingPlans": "Unlimited pricing plans",
+            "teamMembers": "Unlimited team members",
+            "support": "Priority email support"
+          }
+        },
+        "business": {
+          "name": "Business",
+          "description": "For large studios.",
+          "features": {
+            "clients": "Unlimited active clients",
+            "services": "Unlimited services",
+            "pricingPlans": "Unlimited pricing plans",
+            "teamMembers": "Unlimited team members",
+            "support": "Priority email support"
+          }
+        }
+      }
+    },
+    "faq": {
+      "title": "FAQ",
+      "subtitle": "Quick answers to common questions.",
+      "questions": {
+        "appInstall": {
+          "question": "Do I need to install an app for my clients?",
+          "answer": "No installation required. Your clients can book classes directly from your public studio page using any web browser on their phone, tablet, or computer. The booking experience is optimized for mobile devices, so it feels like a native app without the need to download anything. Clients can manage their bookings, view their class history, and purchase memberships or class packs all from their browser."
+        },
+        "sellMemberships": {
+          "question": "Can I sell memberships, class packs, and drop-in sessions?",
+          "answer": "Yes, absolutely. MyPass supports flexible pricing models to match your business needs. You can create unlimited membership plans (monthly, annual, or custom billing cycles), class packs with different session counts, and one-time drop-in rates. Set up automatic renewals for memberships, expiration dates for class packs, and customize pricing for different class types or time slots. All payments are processed securely online, and you can also accept in-person payments."
+        },
+        "onlineInPerson": {
+          "question": "Do you support both online and in-person classes?",
+          "answer": "Yes. MyPass is designed to handle both virtual and in-person classes seamlessly. For online classes, you can add video call links (Zoom, Google Meet, etc.) that are automatically sent to clients when they book. For in-person classes, clients receive location details and can check in using QR codes when they arrive. You can even offer hybrid options where clients choose their preferred format when booking."
+        },
+        "getStarted": {
+          "question": "How quickly can I get started?",
+          "answer": "You can start taking bookings in under 30 minutes. Simply create your studio profile, add your classes and services, set up your pricing plans, and share your public booking page. The setup process is straightforward and doesn't require any technical knowledge. If you need help, our support team is available to guide you through the initial setup."
+        },
+        "manageInstructors": {
+          "question": "Can I manage multiple instructors and team members?",
+          "answer": "Yes. MyPass supports team management features that allow you to add multiple instructors, assign them to specific classes, and manage their schedules independently. Each instructor can have their own profile, and clients can filter classes by instructor when booking. You can set different permissions for team members, from full admin access to limited scheduling capabilities."
+        },
+        "paymentMethods": {
+          "question": "What payment methods do you accept?",
+          "answer": "MyPass integrates with major payment processors to accept credit cards, debit cards, and digital wallets. Payments are processed securely and automatically, with funds deposited directly to your account. You can also enable manual payment options for clients who prefer to pay in cash or via other methods. All transactions are PCI-compliant and secure."
+        },
+        "checkIn": {
+          "question": "How do clients check in for classes?",
+          "answer": "Clients receive a unique QR code when they book a class, which they can access from their booking confirmation email or their account dashboard. When they arrive at your studio, simply scan their QR code using any device (phone, tablet, or dedicated scanner) to check them in instantly. This eliminates the need for paper sign-in sheets and helps you track attendance automatically."
+        },
+        "customizePage": {
+          "question": "Can I customize my booking page to match my brand?",
+          "answer": "Yes. Your public booking page can be customized with your studio's branding, including your logo, colors, and imagery. You can add your studio description, photos, and class descriptions to create a professional booking experience that reflects your brand identity. The page is mobile-responsive and optimized for conversions."
+        },
+        "cancellations": {
+          "question": "What happens if a client cancels or doesn't show up?",
+          "answer": "You can set up cancellation policies with automatic refund rules based on how far in advance clients cancel. For no-shows, you can configure automatic charges or mark sessions as used from their class pack. The system sends automatic reminder emails to reduce no-shows, and you can manually adjust bookings or issue refunds as needed from your dashboard."
+        },
+        "limits": {
+          "question": "Is there a limit on how many classes or clients I can have?",
+          "answer": "Pricing plans vary based on your needs. Starter plans are perfect for solo trainers with up to 50 active clients, while Business plans support unlimited clients and classes. All plans include unlimited services and pricing plans, so you can offer as many class types as you want. You can upgrade or downgrade your plan at any time as your studio grows."
+        }
+      }
+    },
+    "cta": {
+      "title": "Manage bookings and payments easier",
+      "button": "Try 14 days for free"
+    },
+    "footer": {
+      "company": {
+        "title": "Company",
+        "contact": "Contact us",
+        "affiliate": "Become an affiliate",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie preferences"
+      },
+      "product": {
+        "title": "Product",
+        "booking": "Booking & Scheduling",
+        "payments": "Payments"
+      },
+      "resources": {
+        "title": "Resources",
+        "help": "Help",
+        "blog": "Blog"
+      },
+      "social": {
+        "title": "Social",
+        "facebook": "Facebook",
+        "linkedin": "LinkedIn",
+        "x": "X",
+        "youtube": "Youtube"
+      },
+      "studioSolutions": {
+        "title": "Studio solutions",
+        "yoga": "Yoga studio",
+        "crossfit": "CrossFit",
+        "pilates": "Pilates",
+        "gym": "Gym",
+        "boxing": "Boxing",
+        "personalCoach": "Personal coach"
+      },
+      "copyright": "2026 © MyPass - All rights reserved.",
+      "language": "Language"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "authError": "Could not authenticate user",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "legalText": "By signing in, you agree to our {terms} and {privacy}",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "poweredBy": "Powered by {mypass}",
+      "mypass": "MyPass"
+    },
+    "signUp": {
+      "title": "Sign Up",
+      "description": "Create an account to get started",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "role": "I am a",
+      "rolePlaceholder": "Select role",
+      "student": "Student",
+      "studioOwner": "Studio Owner",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "createAccountError": "Could not create account",
+      "createProfileError": "Could not create profile"
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "overview": "Overview",
+      "schedule": "Schedule",
+      "catalog": "Catalog",
+      "classes": "Classes",
+      "clients": "Clients",
+      "settings": "Settings",
+      "studioSettings": "Studio Settings",
+      "account": "Account"
+    },
+    "overview": {
+      "title": "Overview",
+      "stats": {
+        "totalRevenue": {
+          "label": "Total Revenue",
+          "description": "From all bookings"
+        },
+        "totalBookings": {
+          "label": "Total Bookings",
+          "description": "All time bookings"
+        },
+        "activeClasses": {
+          "label": "Active Classes",
+          "description": "Classes in your catalog"
+        },
+        "totalCustomers": {
+          "label": "Total Customers",
+          "description": "Unique students"
+        }
+      },
+      "upcomingClasses": {
+        "title": "Upcoming Classes",
+        "description": "Your next scheduled sessions",
+        "noUpcoming": "No upcoming classes scheduled",
+        "booked": "booked",
+        "viewFullSchedule": "View Full Schedule"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "description": "Common tasks and shortcuts",
+        "createClass": "Create New Class",
+        "scheduleSession": "Schedule Class Session",
+        "viewBookings": "View Bookings"
+      },
+      "welcome": {
+        "title": "Welcome to MyPass",
+        "description": "Get started by creating your studio",
+        "createStudio": "Create Your Studio"
+      },
+      "createStudioBanner": {
+        "title": "Create your studio to get started",
+        "button": "Create Studio"
+      }
+    },
+    "header": {
+      "schedule": "Schedule",
+      "classes": "Classes",
+      "clients": "Clients",
+      "createClass": "Create Class",
+      "studioSettings": "Studio Settings",
+      "manageSchedule": "Manage your class schedule",
+      "manageClasses": "Manage your classes",
+      "viewBookings": "View all bookings",
+      "notifications": "Notifications"
+    }
+  },
+  "student": {
+    "navigation": {
+      "overview": "Overview",
+      "exploreStudios": "Explore Studios",
+      "myBookings": "My Bookings"
+    },
+    "shell": {
+      "title": "MyPass",
+      "subtitle": "Student Dashboard",
+      "menu": "Menu",
+      "signOut": "Sign Out",
+      "header": "Student"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Must be no more than {max} characters"
+    }
+  }
+}

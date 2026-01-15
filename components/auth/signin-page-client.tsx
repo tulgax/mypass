@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useLocale } from "next-intl"
+import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +16,9 @@ interface SignInPageClientProps {
 
 export function SignInPageClient({ initialError }: SignInPageClientProps) {
   const router = useRouter()
+  const locale = useLocale()
+  const t = useTranslations('auth.signIn')
+  const tCommon = useTranslations('common')
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(initialError || null)
@@ -24,11 +29,11 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!email) {
-      setEmailError("Email is required")
+      setEmailError(t('emailRequired'))
       return false
     }
     if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address")
+      setEmailError(t('emailInvalid'))
       return false
     }
     setEmailError(null)
@@ -37,11 +42,11 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
 
   const validatePassword = (password: string): boolean => {
     if (!password) {
-      setPasswordError("Password is required")
+      setPasswordError(t('passwordRequired'))
       return false
     }
     if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters")
+      setPasswordError(t('passwordMinLength'))
       return false
     }
     setPasswordError(null)
@@ -70,7 +75,7 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
       })
 
       if (authError) {
-        setError(authError.message || "Could not authenticate user")
+        setError(authError.message || t('authError'))
         setIsLoading(false)
         return
       }
@@ -84,14 +89,14 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
           .single()
 
         if (profile?.role === "studio_owner") {
-          router.push("/dashboard")
+          router.push(`/${locale}/dashboard`)
         } else {
-          router.push("/student")
+          router.push(`/${locale}/student`)
         }
         router.refresh()
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
+      setError(t('unexpectedError'))
       setIsLoading(false)
     }
   }
@@ -185,7 +190,7 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
             name="email"
             type="text"
             inputMode="email"
-            placeholder="Email"
+            placeholder={t('email')}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value)
@@ -208,7 +213,7 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
             id="password"
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder={t('password')}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value)
@@ -235,10 +240,10 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading...
+              {tCommon('loading')}
             </>
           ) : (
-            "Continue"
+            tCommon('continue')
           )}
         </Button>
       </form>

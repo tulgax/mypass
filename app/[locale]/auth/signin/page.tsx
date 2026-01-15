@@ -1,16 +1,21 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { SignInPageClient } from '@/components/auth/signin-page-client'
+import { getTranslations } from 'next-intl/server'
 
 type ProfileRole = { role: 'studio_owner' | 'student' }
 
 export default async function SignInPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>
   searchParams: { message?: string }
 }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth.signIn' })
   const supabase = await createClient()
   const {
     data: { user },
@@ -24,9 +29,9 @@ export default async function SignInPage({
       .single()) as { data: ProfileRole | null }
 
     if (profile?.role === 'studio_owner') {
-      redirect('/dashboard')
+      redirect(`/${locale}/dashboard`)
     } else {
-      redirect('/student')
+      redirect(`/${locale}/student`)
     }
   }
 
@@ -49,7 +54,7 @@ export default async function SignInPage({
 
         {/* Title */}
         <div className="text-center">
-          <h1 className="text-lg font-medium">Sign in to your account</h1>
+          <h1 className="text-lg font-medium">{t('title')}</h1>
         </div>
 
         <SignInPageClient initialError={searchParams?.message} />
@@ -58,11 +63,11 @@ export default async function SignInPage({
         <p className="text-center text-xs text-muted-foreground">
           By signing in, you agree to our{' '}
           <Link href="/terms" className="underline hover:text-foreground">
-            Terms of Service
+            {t('terms')}
           </Link>{' '}
           and{' '}
           <Link href="/privacy" className="underline hover:text-foreground">
-            Privacy Policy
+            {t('privacy')}
           </Link>
         </p>
 
@@ -70,7 +75,7 @@ export default async function SignInPage({
         <p className="text-center text-xs text-muted-foreground">
           Powered by{' '}
           <Link href="/" className="font-medium hover:text-foreground">
-            MyPass
+            {t('mypass')}
           </Link>
         </p>
       </div>
