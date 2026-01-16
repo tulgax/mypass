@@ -109,10 +109,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { DateSelector, type DateItem } from "@/components/custom/DateSelector"
-import { ClassList, type ClassSession } from "@/components/custom/ClassList"
-import { BundleCard } from "@/components/custom/BundleCard"
-import { AnimatedTabs, type TabItem } from "@/components/custom/AnimatedTabs"
 
 const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"] as const
 
@@ -163,7 +159,6 @@ export function BrandingShowcase() {
             <TabsTrigger value="introduction">Introduction</TabsTrigger>
             <TabsTrigger value="foundation">Foundation</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
-            <TabsTrigger value="custom">Custom</TabsTrigger>
           </TabsList>
 
           <TabsContent value="introduction">
@@ -709,153 +704,8 @@ export function BrandingShowcase() {
               </Example>
             </div>
           </TabsContent>
-
-          <TabsContent value="custom">
-            <div className="grid gap-8 md:grid-cols-2">
-              <Example title="Date Selector" containerClassName="md:col-span-2">
-                <DateSelectorExample />
-              </Example>
-
-              <Example title="Class List" containerClassName="md:col-span-2">
-                <ClassListExample />
-              </Example>
-
-              <Example title="Bundle Card" containerClassName="md:col-span-2">
-                <BundleCardExample />
-              </Example>
-
-              <Example title="Animated Tabs" containerClassName="md:col-span-2">
-              </Example>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </ExampleWrapper>
-  )
-}
-
-// Example components for showcase
-function DateSelectorExample() {
-  const [selectedDate, setSelectedDate] = React.useState<number>(1)
-
-  const sampleDates: DateItem[] = [
-    {
-      day: "Mon",
-      date: 29,
-      displayDate: "29",
-      status: "slots",
-      available: true,
-      slotCount: 2,
-    },
-    {
-      day: "Tue",
-      date: 30,
-      displayDate: "30",
-      status: "Unavailable",
-      available: false,
-    },
-    {
-      day: "Wed",
-      date: 1,
-      displayDate: "1",
-      status: "slots",
-      available: true,
-      slotCount: 2,
-    },
-    {
-      day: "Thu",
-      date: 2,
-      displayDate: "2",
-      status: "slots",
-      available: true,
-      slotCount: 2,
-    },
-    {
-      day: "Fri",
-      date: 3,
-      displayDate: "3",
-      status: "slots",
-      available: true,
-      slotCount: 2,
-    },
-    {
-      day: "Sat",
-      date: 4,
-      displayDate: "4",
-      status: "Unavailable",
-      available: false,
-    },
-    {
-      day: "Sun",
-      date: 5,
-      displayDate: "5",
-      status: "Unavailable",
-      available: false,
-    },
-  ]
-
-  return (
-    <DateSelector
-      dates={sampleDates}
-      selectedDate={selectedDate}
-      onDateSelect={setSelectedDate}
-    />
-  )
-}
-
-function ClassListExample() {
-  const sampleClasses: ClassSession[] = [
-    {
-      id: "1",
-      name: "Реформер",
-      time: "09:00 - 10:00",
-      location: "Flow Pilates",
-      spots: "0/20",
-      available: true,
-    },
-    {
-      id: "2",
-      name: "Mat Pilates",
-      time: "17:00 - 18:00",
-      location: "Flow Pilates",
-      spots: "5/20",
-      available: true,
-    },
-  ]
-
-  return (
-    <ClassList
-      classes={sampleClasses}
-      onBook={(classItem) => {
-        console.log("Book:", classItem)
-      }}
-    />
-  )
-}
-
-function BundleCardExample() {
-  return (
-    <div className="space-y-3 md:space-y-4">
-      <BundleCard
-        image="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg"
-        imageAlt="Monthly subscription"
-        title="Сар бүрийн гишүүнчлэл"
-        price="€80.00 сар бүр"
-        description="Бүх йога хичээл. Сар бүр төлбөр авна. Хүссэн үедээ цуцлах боломжтой."
-        onSelect={() => {
-          console.log("Selected monthly subscription")
-        }}
-      />
-      <BundleCard
-        image="https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg"
-        imageAlt="10 Group sessions"
-        title="10 Бүлгийн хичээл"
-        price="€150.00"
-        description="10 удаагийн бүлгийн хичээл. 6 сарын хугацаанд хэрэглэх боломжтой."
-        onSelect={() => {
-          console.log("Selected 10 group sessions")
-        }}
-      />
-    </div>
   )
 }

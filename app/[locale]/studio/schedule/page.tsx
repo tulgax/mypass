@@ -17,12 +17,15 @@ export default async function SchedulePage() {
 
   if (!studio) return null
 
+  // Get all classes for this studio (needed for schedule form)
   const { data: classes } = await supabase
     .from('classes')
     .select('id, name, duration_minutes, is_active')
     .eq('studio_id', studio.id)
     .order('created_at', { ascending: false })
 
+  // Get upcoming class instances (not cancelled, scheduled in the future)
+  const now = new Date().toISOString()
   const { data: instances } = await supabase
     .from('class_instances')
     .select(`
@@ -33,13 +36,10 @@ export default async function SchedulePage() {
         type
       )
     `)
-    .in('class_id', (classes || []).map((c: { id: string }) => c.id))
+    .in('class_id', (classes || []).map((c: { id: number }) => c.id))
+    .eq('is_cancelled', false)
+    .gte('scheduled_at', now)
     .order('scheduled_at', { ascending: true })
 
-  return (
-    <ScheduleClient 
-      classes={classes || []} 
-      instances={instances || []}
-    />
-  )
+  return <ScheduleClient instances={instances || []} classes={classes || []} />
 }

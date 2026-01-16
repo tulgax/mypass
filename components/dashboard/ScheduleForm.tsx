@@ -130,9 +130,14 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
       return
     }
 
-    const selectedClass = activeClasses.find((cls) => cls.id === classId)
+    const selectedClass = classes.find((cls) => cls.id === classId)
     if (!selectedClass) {
       setError('Selected class is not available')
+      return
+    }
+
+    if (!selectedClass.is_active) {
+      setError('Cannot schedule inactive classes. Please activate the class first.')
       return
     }
 
@@ -200,22 +205,26 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
   const formContent = (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label>Service</Label>
+            <Label>Class</Label>
             <Select value={selectedClassId} onValueChange={setSelectedClassId}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a class" />
               </SelectTrigger>
               <SelectContent>
-                {activeClasses.map((cls) => (
-                  <SelectItem key={cls.id} value={String(cls.id)}>
-                    {cls.name} • {cls.duration_minutes} min
+                {classes.map((cls) => (
+                  <SelectItem 
+                    key={cls.id} 
+                    value={String(cls.id)}
+                    disabled={!cls.is_active}
+                  >
+                    {cls.name} • {cls.duration_minutes} min {!cls.is_active && '(Inactive)'}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {activeClasses.length === 0 && (
+            {classes.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                You need an active class before scheduling.
+                You need to create a class before scheduling.
               </p>
             )}
           </div>
@@ -282,7 +291,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           {success && <p className="text-sm text-emerald-600">{success}</p>}
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={loading || activeClasses.length === 0}>
+            <Button type="submit" disabled={loading || classes.length === 0}>
               {loading ? 'Saving...' : 'Add class'}
             </Button>
           </div>
