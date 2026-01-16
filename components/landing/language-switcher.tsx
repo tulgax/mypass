@@ -42,7 +42,7 @@ export function LanguageSwitcher() {
 
   return (
     <Select value={locale} onValueChange={onSelectChange} disabled={isPending}>
-      <SelectTrigger className="w-[140px]">
+      <SelectTrigger variant="mira" className="w-[140px]">
         <SelectValue placeholder="Language" />
       </SelectTrigger>
       <SelectContent>
