@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,6 +24,8 @@ interface ClassOption {
 
 interface ScheduleFormProps {
   classes: ClassOption[]
+  onSuccess?: () => void
+  inSheet?: boolean
 }
 
 type RepeatOption = 'none' | 'weekly'
@@ -37,7 +40,8 @@ const daysOfWeek = [
   { label: 'Sun', value: 0 },
 ]
 
-export function ScheduleForm({ classes }: ScheduleFormProps) {
+export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFormProps) {
+  const router = useRouter()
   const [selectedClassId, setSelectedClassId] = useState<string>('')
   const [startDate, setStartDate] = useState('')
   const [startTime, setStartTime] = useState('')
@@ -180,6 +184,12 @@ export function ScheduleForm({ classes }: ScheduleFormProps) {
       setSelectedDays([])
       setRepeat('none')
       setSelectedClassId('')
+      
+      // Refresh and call onSuccess if provided
+      router.refresh()
+      if (onSuccess) {
+        setTimeout(() => onSuccess(), 100)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create schedule')
     } finally {
@@ -187,12 +197,7 @@ export function ScheduleForm({ classes }: ScheduleFormProps) {
     }
   }
 
-  return (
-    <Card className="max-w-2xl">
-      <CardHeader>
-        <CardTitle>Add to schedule</CardTitle>
-      </CardHeader>
-      <CardContent>
+  const formContent = (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label>Service</Label>
@@ -282,6 +287,19 @@ export function ScheduleForm({ classes }: ScheduleFormProps) {
             </Button>
           </div>
         </form>
+  )
+
+  if (inSheet) {
+    return formContent
+  }
+
+  return (
+    <Card className="max-w-2xl">
+      <CardHeader>
+        <CardTitle>Add to schedule</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {formContent}
       </CardContent>
     </Card>
   )

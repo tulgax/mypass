@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { ScheduleForm } from '@/components/dashboard/ScheduleForm'
+import { ScheduleClient } from './ScheduleClient'
 
 export default async function SchedulePage() {
   const supabase = await createClient()
@@ -15,19 +15,31 @@ export default async function SchedulePage() {
     .eq('owner_id', user.id)
     .single()
 
+  if (!studio) return null
+
   const { data: classes } = await supabase
     .from('classes')
     .select('id, name, duration_minutes, is_active')
-    .eq('studio_id', studio?.id)
+    .eq('studio_id', studio.id)
     .order('created_at', { ascending: false })
 
+  const { data: instances } = await supabase
+    .from('class_instances')
+    .select(`
+      *,
+      classes (
+        name,
+        capacity,
+        type
+      )
+    `)
+    .in('class_id', (classes || []).map((c: { id: string }) => c.id))
+    .order('scheduled_at', { ascending: true })
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Schedule</h1>
-        <p className="text-muted-foreground">Add class sessions for students to book</p>
-      </div>
-      <ScheduleForm classes={classes || []} />
-    </div>
+    <ScheduleClient 
+      classes={classes || []} 
+      instances={instances || []}
+    />
   )
 }

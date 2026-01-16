@@ -723,6 +723,9 @@ export function BrandingShowcase() {
               <Example title="Bundle Card" containerClassName="md:col-span-2">
                 <BundleCardExample />
               </Example>
+
+              <Example title="Animated Tabs" containerClassName="md:col-span-2">
+              </Example>
             </div>
           </TabsContent>
         </Tabs>
@@ -853,29 +856,6 @@ function BundleCardExample() {
           console.log("Selected 10 group sessions")
         }}
       />
-    </div>
-  )
-}
-
-function AnimatedTabsExample() {
-  const [activeTab, setActiveTab] = React.useState<"schedule" | "pricing" | "contact">("schedule")
-
-  const tabs: TabItem[] = [
-    { id: "schedule", label: "Хуваарь" },
-    { id: "pricing", label: "Үнэ" },
-    { id: "contact", label: "Холбогдох" },
-  ]
-
-  return (
-    <div className="space-y-4">
-      <AnimatedTabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-      <div className="mt-4 text-sm text-muted-foreground">
-        Active tab: <span className="font-medium text-foreground">{activeTab}</span>
-      </div>
     </div>
   )
 }
