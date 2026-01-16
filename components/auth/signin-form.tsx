@@ -83,7 +83,7 @@ export function SignInForm({ initialError }: SignInFormProps) {
           .single()
 
         if (profile?.role === "studio_owner") {
-          router.push("/dashboard")
+          router.push("/studio")
         } else {
           router.push("/student")
         }

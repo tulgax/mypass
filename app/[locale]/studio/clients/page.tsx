@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDateTime } from '@/lib/utils'
 
-export default async function BookingsPage() {
+export default async function ClientsPage() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -50,7 +50,7 @@ export default async function BookingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Bookings</h1>
+        <h1 className="text-3xl font-bold">Clients</h1>
         <p className="text-muted-foreground">Manage all bookings for your classes</p>
       </div>
 

@@ -62,7 +62,7 @@ export function StudioForm() {
         return
       }
 
-      router.push('/dashboard')
+      router.push('/studio')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create studio')
     } finally {

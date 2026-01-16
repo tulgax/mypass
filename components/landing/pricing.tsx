@@ -76,10 +76,9 @@ function PricingSection() {
     <section className="bg-background py-24" id="pricing">
       <div className="mx-auto w-full max-w-[1440px] px-6 md:px-8">
         <div className="mx-auto max-w-[490px] text-center">
-          <h2 className="text-3xl font-medium tracking-[-0.05em]">Pricing</h2>
+          <h2 className="text-3xl font-medium tracking-[-0.05em]">{t('title')}</h2>
           <p className="mt-4 text-muted-foreground">
-            Our pricing is built to support every stage of your studio’s
-            journey—from your first bookings to fully booked weeks.
+            {t('description')}
           </p>
           <div className="mt-6 inline-flex items-center justify-center gap-1 rounded-full bg-muted p-1 text-sm">
             <button
@@ -91,7 +90,7 @@ function PricingSection() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Pay monthly
+              {t('payMonthly')}
             </button>
             <button
               onClick={() => setBillingCycle("yearly")}
@@ -102,11 +101,11 @@ function PricingSection() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Pay yearly <span className="text-[10px]">-20%</span>
+              {t('payYearly')} <span className="text-[10px]">{t('yearlyDiscount')}</span>
             </button>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            Save up to 34% paying yearly
+            {t('saveYearly')}
           </p>
         </div>
 

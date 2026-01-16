@@ -89,7 +89,7 @@ export function ClassForm() {
         throw classError
       }
 
-      router.push('/dashboard/classes')
+      router.push('/studio/catalog/classes')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create class')
     } finally {

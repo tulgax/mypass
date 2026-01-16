@@ -29,7 +29,7 @@ export default async function SignUpPage({
   } = await supabase.auth.getUser()
 
   if (user) {
-    redirect(`/${locale}/dashboard`)
+    redirect(`/${locale}/studio`)
   }
 
   async function signUp(formData: FormData) {
@@ -53,20 +53,30 @@ export default async function SignUpPage({
     }
 
     if (authData.user) {
-      // Update user profile with role and name
+      // Upsert user profile with role and name
+      // Use upsert to create or update the profile (handles both cases)
       // NOTE: Supabase typed table inference is currently failing (infers `never`)
       // during Next build. Cast to avoid blocking compilation.
       const { error: profileError } = await (supabase as any)
         .from('user_profiles')
-        .update({ role, full_name: fullName } as ProfileUpdate)
-        .eq('id', authData.user.id)
+        .upsert(
+          {
+            id: authData.user.id,
+            role,
+            full_name: fullName,
+          },
+          {
+            onConflict: 'id',
+          }
+        )
 
       if (profileError) {
+        console.error('Profile upsert error:', profileError)
         redirect(`/${currentLocale}/auth/signup?message=Could not create profile`)
       }
 
       if (role === 'studio_owner') {
-        redirect(`/${currentLocale}/dashboard`)
+        redirect(`/${currentLocale}/studio`)
       } else {
         redirect(`/${currentLocale}/student`)
       }

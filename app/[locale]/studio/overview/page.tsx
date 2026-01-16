@@ -6,7 +6,7 @@ import { Users, Calendar, DollarSign, BookOpen, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
-export default async function DashboardPage() {
+export default async function OverviewPage() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <Button asChild className="w-full">
-              <Link href="/dashboard/studio/new">Create Your Studio</Link>
+              <Link href="/studio/settings/studio">Create Your Studio</Link>
             </Button>
           </CardContent>
         </Card>
@@ -201,7 +201,7 @@ export default async function DashboardPage() {
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full" asChild>
-              <Link href="/dashboard/schedule">View Full Schedule</Link>
+              <Link href="/studio/schedule">View Full Schedule</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -213,19 +213,19 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <Button variant="outline" className="w-full justify-start" asChild>
-              <Link href="/dashboard/classes/new">
+              <Link href="/studio/catalog/classes/new">
                 <Calendar className="mr-2 h-4 w-4" />
                 Create New Class
               </Link>
             </Button>
             <Button variant="outline" className="w-full justify-start" asChild>
-              <Link href="/dashboard/schedule">
+              <Link href="/studio/schedule">
                 <Clock className="mr-2 h-4 w-4" />
                 Schedule Class Session
               </Link>
             </Button>
             <Button variant="outline" className="w-full justify-start" asChild>
-              <Link href="/dashboard/bookings">
+              <Link href="/studio/clients">
                 <Users className="mr-2 h-4 w-4" />
                 View Bookings
               </Link>

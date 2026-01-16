@@ -89,7 +89,7 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
           .single()
 
         if (profile?.role === "studio_owner") {
-          router.push(`/${locale}/dashboard`)
+          router.push(`/${locale}/studio`)
         } else {
           router.push(`/${locale}/student`)
         }

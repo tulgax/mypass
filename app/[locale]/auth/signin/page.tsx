@@ -29,7 +29,7 @@ export default async function SignInPage({
       .single()) as { data: ProfileRole | null }
 
     if (profile?.role === 'studio_owner') {
-      redirect(`/${locale}/dashboard`)
+      redirect(`/${locale}/studio`)
     } else {
       redirect(`/${locale}/student`)
     }
