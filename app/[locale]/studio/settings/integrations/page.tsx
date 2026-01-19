@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,7 +10,9 @@ export default async function IntegrationsSettingsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) {
+    notFound()
+  }
 
   // TODO: Fetch integrations from database when integrations table is created
   const integrations = [

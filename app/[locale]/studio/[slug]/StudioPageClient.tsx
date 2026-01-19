@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'motion/react'
 import { ChevronRight, ChevronLeft, Calendar, Clock, MapPin, Phone, Mail, Users } from 'lucide-react'
 import { BookingForm } from '@/components/studio/BookingForm'
-import { formatTime, formatAmount } from '@/lib/utils'
+import { formatTime, formatAmount, isToday } from '@/lib/utils'
 import type { Tables } from '@/lib/types/database'
 
 type Studio = Tables<'studios'>
@@ -18,6 +18,7 @@ type ClassInstance = Tables<'class_instances'> & {
 interface StudioPageClientProps {
   studio: Studio
   classInstances: ClassInstance[]
+  locale: string
 }
 
 type ScheduleDay = {
@@ -38,9 +39,10 @@ type ScheduleDay = {
   }>
 }
 
-export function StudioPageClient({ studio, classInstances }: StudioPageClientProps) {
+export function StudioPageClient({ studio, classInstances, locale }: StudioPageClientProps) {
   const t = useTranslations('landing.bookingPage')
-  const locale = useLocale()
+  const defaultCoverUrl =
+    'https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg'
   const [activeTab, setActiveTab] = useState<'schedule' | 'pricing' | 'contact'>('schedule')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedInstance, setSelectedInstance] = useState<number | null>(null)
@@ -194,42 +196,40 @@ export function StudioPageClient({ studio, classInstances }: StudioPageClientPro
           <div
             className="relative h-48 md:h-64 w-full bg-muted bg-cover bg-center"
             style={{
-              backgroundImage: studio.cover_image_url
-                ? `url(${studio.cover_image_url})`
-                : undefined,
+              backgroundImage: `url(${studio.cover_image_url || defaultCoverUrl})`,
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
           </div>
 
           {/* Content */}
-          <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+          <div className="bg-background rounded-t-lg -mt-8 px-4 md:px-6 lg:px-8 py-6 md:py-8 space-y-6">
             {/* Studio Profile */}
-            <div className="flex items-start gap-4 -mt-16 md:-mt-20 relative z-10">
-                  <div className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-lg bg-background border-2 border-background overflow-hidden shadow-lg shrink-0">
-                    {studio.logo_url ? (
-                      <Image
-                        src={studio.logo_url}
-                        alt={studio.name}
-                        width={80}
-                        height={80}
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-muted flex items-center justify-center">
-                        <span className="text-2xl md:text-3xl font-bold">{studio.name.charAt(0)}</span>
-                      </div>
-                    )}
+            <div className="relative z-10 -mt-10 md:-mt-12 space-y-4">
+              {/* Avatar above text */}
+              <div className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-lg bg-background border-2 border-background overflow-hidden shadow-lg">
+                {studio.logo_url ? (
+                  <Image
+                    src={studio.logo_url}
+                    alt={studio.name}
+                    width={80}
+                    height={80}
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-muted flex items-center justify-center">
+                    <span className="text-2xl md:text-3xl font-bold">{studio.name.charAt(0)}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-2xl md:text-3xl font-semibold">{studio.name}</h1>
-                    </div>
-                    {studio.description && (
-                      <p className="mt-2 text-sm md:text-base text-muted-foreground">{studio.description}</p>
-                    )}
-                  </div>
-                </div>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <h1 className="text-2xl md:text-3xl font-semibold leading-tight">{studio.name}</h1>
+                {studio.description && (
+                  <p className="text-sm md:text-base text-muted-foreground">{studio.description}</p>
+                )}
+              </div>
+            </div>
 
             {/* Navigation Tabs */}
             <div className="flex gap-6 border-b border-border relative">
@@ -267,7 +267,7 @@ export function StudioPageClient({ studio, classInstances }: StudioPageClientPro
                               transition={{ duration: 0.2 }}
                             >
                               <div className="mb-4 flex items-center justify-between">
-                                <h4 className="text-sm font-medium">{formatDateRange()}</h4>
+                                <h4 className="text-sm font-medium" suppressHydrationWarning>{formatDateRange()}</h4>
                                 <div className="flex items-center gap-1 text-muted-foreground">
                                   <button
                                     onClick={handlePreviousWeek}
@@ -289,11 +289,13 @@ export function StudioPageClient({ studio, classInstances }: StudioPageClientPro
 
                               {/* Weekly Schedule */}
                               <div className="mb-6 overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
-                                <div className="grid grid-cols-7 gap-2 min-w-[500px] md:min-w-0">
+                                <div className="grid grid-cols-7 gap-2 min-w-[600px] md:min-w-0">
                                   {scheduleData.map((item, i) => {
                                     const isSelected =
                                       (selectedDate || firstSelectedDate)?.toISOString().split('T')[0] ===
                                       item.dateObj.toISOString().split('T')[0]
+                                    const isCurrentDay = isToday(item.dateObj)
+                                    
                                     return (
                                       <motion.div
                                         key={`${item.day}-${item.date}`}
@@ -301,26 +303,32 @@ export function StudioPageClient({ studio, classInstances }: StudioPageClientPro
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: i * 0.05 }}
                                         onClick={() => setSelectedDate(item.dateObj)}
-                                        className={`rounded-lg border p-1.5 md:p-2 text-center cursor-pointer transition-colors ${
+                                        className={`flex flex-col items-center justify-center py-4 rounded-md border text-center cursor-pointer transition-all relative ${
                                           isSelected
-                                            ? 'border-transparent bg-muted'
-                                            : 'border-border/50 hover:bg-muted/50'
+                                            ? 'border-foreground bg-foreground text-background shadow-md'
+                                            : 'border-transparent hover:bg-muted/50'
                                         }`}
                                       >
-                                        <div className="text-[10px] md:text-xs text-muted-foreground">
+                                        <div className={`text-xs font-medium uppercase tracking-wider ${isSelected ? 'text-background/80' : 'text-muted-foreground'}`}>
                                           {item.day}
                                         </div>
-                                        <div className="mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
+                                        <div className="mt-1 text-lg font-semibold flex items-center gap-1">
                                           {item.displayDate}
+                                          {isCurrentDay && !isSelected && (
+                                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                          )}
+                                          {isCurrentDay && isSelected && (
+                                            <div className="h-1.5 w-1.5 rounded-full bg-background" />
+                                          )}
                                         </div>
-                                        <div className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
+                                        <div className={`mt-1 text-[10px] font-medium ${isSelected ? 'text-background/80' : 'text-muted-foreground'}`}>
                                           {!item.available ? (
-                                            <span className="text-muted-foreground/60">
+                                            <span>
                                               {t('status.unavailable')}
                                             </span>
                                           ) : (
-                                            <span className="flex items-center justify-center gap-0.5 md:gap-1">
-                                              <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-green-500"></span>
+                                            <span className="flex items-center justify-center gap-1">
+                                              <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-background' : 'bg-green-500'}`}></span>
                                               <span className="hidden sm:inline">
                                                 {item.slotCount > 0 ? `${item.slotCount} ${t('status.slots')}` : item.status}
                                               </span>
@@ -351,50 +359,45 @@ export function StudioPageClient({ studio, classInstances }: StudioPageClientPro
                                           initial={{ opacity: 0, x: -10 }}
                                           animate={{ opacity: 1, x: 0 }}
                                           transition={{ delay: index * 0.1 }}
-                                          className="group"
+                                          className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border"
                                         >
-                                          <div className="flex items-center justify-between gap-2 md:gap-4">
-                                            <div className="flex-1 space-y-1 md:space-y-2 min-w-0">
-                                              <h4 className="text-xs md:text-sm font-medium leading-none">
-                                                {session.name}
-                                              </h4>
+                                          <div className="flex-1 space-y-2 min-w-0">
+                                            <h4 className="text-base font-semibold leading-none">
+                                              {session.name}
+                                            </h4>
 
-                                              <div className="flex items-center gap-3 md:gap-6 text-[10px] md:text-xs text-muted-foreground flex-wrap">
-                                                <div className="flex items-center gap-1 md:gap-1.5">
-                                                  <Clock className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                                                  <span>{session.time}</span>
+                                            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                                              <div className="flex items-center gap-1.5">
+                                                <Clock className="h-3.5 w-3.5" />
+                                                <span>{session.time}</span>
+                                              </div>
+
+                                              {studio.address && (
+                                                <div className="flex items-center gap-1.5">
+                                                  <MapPin className="h-3.5 w-3.5" />
+                                                  <span className="hidden sm:inline">{studio.name}</span>
+                                                  <span className="sm:hidden">
+                                                    {studio.name.split(' ')[0]}
+                                                  </span>
                                                 </div>
+                                              )}
 
-                                                {studio.address && (
-                                                  <div className="flex items-center gap-1 md:gap-1.5">
-                                                    <MapPin className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                                                    <span className="hidden sm:inline">{studio.name}</span>
-                                                    <span className="sm:hidden">
-                                                      {studio.name.split(' ')[0]}
-                                                    </span>
-                                                  </div>
-                                                )}
-
-                                                <div className="flex items-center gap-1 md:gap-1.5">
-                                                  <Users className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                                                  <span>{session.spots}</span>
-                                                </div>
+                                              <div className="flex items-center gap-1.5">
+                                                <Users className="h-3.5 w-3.5" />
+                                                <span>{session.spots}</span>
                                               </div>
                                             </div>
-
-                                            <motion.button
-                                              whileHover={{ scale: 1.05 }}
-                                              whileTap={{ scale: 0.95 }}
-                                              onClick={() => setSelectedInstance(session.id)}
-                                              disabled={!session.available}
-                                              className="h-7 md:h-8 rounded-full bg-muted px-3 md:px-5 text-[10px] md:text-xs font-medium transition-colors hover:bg-foreground hover:text-background shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                              {t('book')}
-                                            </motion.button>
                                           </div>
-                                          {index < selectedDayData.sessions.length - 1 && (
-                                            <div className="mt-4 md:mt-6 h-px w-full bg-border/50" />
-                                          )}
+
+                                          <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() => setSelectedInstance(session.id)}
+                                            disabled={!session.available}
+                                            className="h-9 px-6 rounded-full bg-foreground text-background text-sm font-medium transition-colors hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed self-start md:self-center"
+                                          >
+                                            {t('book')}
+                                          </motion.button>
                                         </motion.div>
                                       ))}
                                     </motion.div>

@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ClassesClient } from './ClassesClient'
 
@@ -7,13 +8,19 @@ export default async function ClassesPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) {
+    notFound()
+  }
 
   const { data: studio } = await supabase
     .from('studios')
     .select('id')
     .eq('owner_id', user.id)
     .single()
+
+  if (!studio) {
+    notFound()
+  }
 
   const { data: classes } = await supabase
     .from('classes')

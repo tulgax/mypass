@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ScheduleClient } from './ScheduleClient'
 
@@ -7,7 +8,9 @@ export default async function SchedulePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) {
+    notFound()
+  }
 
   const { data: studio } = await supabase
     .from('studios')
@@ -15,7 +18,9 @@ export default async function SchedulePage() {
     .eq('owner_id', user.id)
     .single()
 
-  if (!studio) return null
+  if (!studio) {
+    notFound()
+  }
 
   // Get all classes for this studio (needed for schedule form)
   const { data: classes } = await supabase

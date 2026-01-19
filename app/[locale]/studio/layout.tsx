@@ -118,17 +118,6 @@ export default async function DashboardLayout({
       onSignOut={signOut}
       user={userData}
     >
-      {!studio && (
-        <div className="mb-4 rounded-lg border bg-muted p-4">
-          <p className="mb-2 font-medium">Create your studio to get started</p>
-          <Link
-            href="/studio/settings/studio"
-            className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent hover:text-accent-foreground"
-          >
-            Create Studio
-          </Link>
-        </div>
-      )}
       {children}
     </DashboardShell>
   )

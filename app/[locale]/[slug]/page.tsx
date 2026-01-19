@@ -70,5 +70,5 @@ export default async function PublicStudioPage({
     (inst: any) => inst.classes && inst.classes.is_active
   ) as ClassInstance[]
 
-  return <StudioPageClient studio={studio} classInstances={validInstances} />
+  return <StudioPageClient studio={studio} classInstances={validInstances} locale={locale} />
 }

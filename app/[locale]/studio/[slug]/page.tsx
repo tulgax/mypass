@@ -58,8 +58,8 @@ export default async function StudioPage({
 
   // Filter instances where class exists and is active
   const validInstances: ClassInstance[] = (instances || []).filter(
-    (inst: any) => inst.classes && inst.classes.is_active
+    (inst: { classes: Tables<'classes'> | null }) => inst.classes && inst.classes.is_active
   ) as ClassInstance[]
 
-  return <StudioPageClient studio={studio} classInstances={validInstances} />
+  return <StudioPageClient studio={studio} classInstances={validInstances} locale={locale} />
 }

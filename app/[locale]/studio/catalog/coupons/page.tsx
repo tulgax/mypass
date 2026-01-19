@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,13 +11,19 @@ export default async function CouponsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) {
+    notFound()
+  }
 
   const { data: studio } = await supabase
     .from('studios')
     .select('id')
     .eq('owner_id', user.id)
     .single()
+
+  if (!studio) {
+    notFound()
+  }
 
   // TODO: Fetch coupons from database when coupons table is created
   const coupons: any[] = []

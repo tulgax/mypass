@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +13,9 @@ export default async function OverviewPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) {
+    notFound()
+  }
 
   const { data: studio } = await supabase
     .from('studios')
@@ -21,21 +24,7 @@ export default async function OverviewPage() {
     .single()
 
   if (!studio) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Welcome to MyPass</CardTitle>
-            <CardDescription>Get started by creating your studio</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild className="w-full">
-              <Link href="/studio/settings/studio">Create Your Studio</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    notFound()
   }
 
   // Get all classes for this studio
