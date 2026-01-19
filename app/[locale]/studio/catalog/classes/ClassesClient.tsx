@@ -84,7 +84,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
-      
+
       const { error } = await supabase
         .from('classes')
         .delete()
@@ -155,7 +155,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => handleDelete(cls.id)}
                               className="text-destructive focus:text-destructive"
                             >
@@ -186,7 +186,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
           <div className="p-6 border-b">
             <SheetHeader>
               <div className="flex items-center justify-between">
-                <SheetTitle>Add service</SheetTitle>
+                <SheetTitle>Add class</SheetTitle>
                 <SheetClose asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <X className="h-4 w-4" />
@@ -230,7 +230,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
               <div className="p-6 border-b">
                 <SheetHeader>
                   <div className="flex items-center justify-between">
-                    <SheetTitle>Edit service</SheetTitle>
+                    <SheetTitle>Edit class</SheetTitle>
                     <SheetClose asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <X className="h-4 w-4" />
@@ -241,9 +241,9 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                 </SheetHeader>
               </div>
               <div className="flex-1 overflow-y-auto p-6">
-                <ClassFormSheetContent 
+                <ClassFormSheetContent
                   classData={selectedClass}
-                  onSuccess={handleSuccess} 
+                  onSuccess={handleSuccess}
                   onCancel={() => setEditOpen(false)}
                   isEdit
                 />
@@ -330,12 +330,12 @@ function ClassViewSheetContent({ classData }: { classData: Class }) {
   )
 }
 
-function ClassFormSheetContent({ 
-  onSuccess, 
-  onCancel, 
+function ClassFormSheetContent({
+  onSuccess,
+  onCancel,
   classData,
-  isEdit = false 
-}: { 
+  isEdit = false
+}: {
   onSuccess: () => void
   onCancel: () => void
   classData?: Class | null
@@ -344,6 +344,7 @@ function ClassFormSheetContent({
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [classType, setClassType] = useState<'online' | 'offline'>(
     (classData?.type as 'online' | 'offline') || 'offline'
   )
@@ -353,17 +354,51 @@ function ClassFormSheetContent({
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setFieldErrors({})
 
     try {
       const formData = new FormData(e.currentTarget)
       const name = formData.get('name') as string
       const description = formData.get('description') as string
-      const duration_minutes = parseInt(formData.get('duration_minutes') as string, 10)
-      const capacity = parseInt(formData.get('capacity') as string, 10)
+      const duration_minutes_str = formData.get('duration_minutes') as string
+      const capacity_str = formData.get('capacity') as string
+      const price_str = formData.get('price') as string
       const type = classType as 'online' | 'offline'
       const zoom_link = formData.get('zoom_link') as string
-      const price = parseFloat(formData.get('price') as string)
       const is_active = formData.get('is_active') === 'on'
+
+      // Validation
+      const errors: Record<string, string> = {}
+
+      if (!name || name.trim() === '') {
+        errors.name = 'Name is required'
+      }
+
+      if (!price_str || price_str.trim() === '' || isNaN(parseFloat(price_str))) {
+        errors.price = 'Price is required and must be a valid number'
+      }
+
+      if (!capacity_str || capacity_str.trim() === '' || isNaN(parseInt(capacity_str, 10)) || parseInt(capacity_str, 10) < 1) {
+        errors.capacity = 'Capacity is required and must be at least 1'
+      }
+
+      if (!duration_minutes_str || duration_minutes_str.trim() === '' || isNaN(parseInt(duration_minutes_str, 10)) || parseInt(duration_minutes_str, 10) < 1) {
+        errors.duration_minutes = 'Duration is required and must be at least 1 minute'
+      }
+
+      if (type === 'online' && (!zoom_link || zoom_link.trim() === '')) {
+        errors.zoom_link = 'Zoom link is required for online classes'
+      }
+
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors)
+        setLoading(false)
+        return
+      }
+
+      const duration_minutes = parseInt(duration_minutes_str, 10)
+      const capacity = parseInt(capacity_str, 10)
+      const price = parseFloat(price_str)
 
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
@@ -439,16 +474,15 @@ function ClassFormSheetContent({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium mb-3 block text-muted-foreground">Class type</label>
           <div className="grid grid-cols-2 gap-3">
-            <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-              classType === 'online' 
-                ? 'border-foreground bg-muted/50' 
-                : 'border-border hover:bg-muted/30'
-            }`}>
+            <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${classType === 'online'
+              ? 'border-foreground bg-muted/50'
+              : 'border-border hover:bg-muted/30'
+              }`}>
               <input
                 type="radio"
                 name="class_type"
@@ -464,11 +498,10 @@ function ClassFormSheetContent({
                 </div>
               </div>
             </label>
-            <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-              classType === 'offline' 
-                ? 'border-foreground bg-muted/50' 
-                : 'border-border hover:bg-muted/30'
-            }`}>
+            <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${classType === 'offline'
+              ? 'border-foreground bg-muted/50'
+              : 'border-border hover:bg-muted/30'
+              }`}>
               <input
                 type="radio"
                 name="class_type"
@@ -493,10 +526,13 @@ function ClassFormSheetContent({
             <Input
               id="name"
               name="name"
-              required
               defaultValue={classData?.name || ''}
               placeholder="e.g. Pilates in group"
+              className={fieldErrors.name ? 'border-destructive' : ''}
             />
+            {fieldErrors.name && (
+              <p className="text-sm text-destructive">{fieldErrors.name}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -507,8 +543,12 @@ function ClassFormSheetContent({
               defaultValue={classData?.description || ''}
               placeholder="What can clients expect from this service?"
               rows={4}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${fieldErrors.description ? 'border-destructive' : 'border-input'
+                }`}
             />
+            {fieldErrors.description && (
+              <p className="text-sm text-destructive">{fieldErrors.description}</p>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -520,14 +560,16 @@ function ClassFormSheetContent({
                   id="price"
                   name="price"
                   type="number"
-                  required
                   min="0"
                   step="0.01"
                   defaultValue={classData?.price || ''}
                   placeholder="0.00"
-                  className="pl-8"
+                  className={`pl-8 ${fieldErrors.price ? 'border-destructive' : ''}`}
                 />
               </div>
+              {fieldErrors.price && (
+                <p className="text-sm text-destructive">{fieldErrors.price}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -566,12 +608,14 @@ function ClassFormSheetContent({
                 id="capacity"
                 name="capacity"
                 type="number"
-                required
                 min="1"
                 defaultValue={classData?.capacity || 5}
-                className="pl-10"
+                className={`pl-10 ${fieldErrors.capacity ? 'border-destructive' : ''}`}
               />
             </div>
+            {fieldErrors.capacity && (
+              <p className="text-sm text-destructive">{fieldErrors.capacity}</p>
+            )}
           </div>
 
           {classType === 'online' && (
@@ -583,7 +627,11 @@ function ClassFormSheetContent({
                 type="url"
                 defaultValue={classData?.zoom_link || ''}
                 placeholder="https://zoom.us/j/..."
+                className={fieldErrors.zoom_link ? 'border-destructive' : ''}
               />
+              {fieldErrors.zoom_link && (
+                <p className="text-sm text-destructive">{fieldErrors.zoom_link}</p>
+              )}
             </div>
           )}
 
@@ -593,11 +641,14 @@ function ClassFormSheetContent({
               id="duration_minutes"
               name="duration_minutes"
               type="number"
-              required
               min="1"
               defaultValue={classData?.duration_minutes || ''}
               placeholder="60"
+              className={fieldErrors.duration_minutes ? 'border-destructive' : ''}
             />
+            {fieldErrors.duration_minutes && (
+              <p className="text-sm text-destructive">{fieldErrors.duration_minutes}</p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2 pt-2">
@@ -622,7 +673,7 @@ function ClassFormSheetContent({
           Cancel
         </Button>
         <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update service' : 'Add service')}
+          {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update class' : 'Add class')}
         </Button>
       </div>
     </form>

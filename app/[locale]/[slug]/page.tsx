@@ -1,18 +1,27 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { StudioPageClient } from './StudioPageClient'
+import { StudioPageClient } from '../studio/[slug]/StudioPageClient'
 import type { Tables } from '@/lib/types/database'
 
 type ClassInstance = Tables<'class_instances'> & {
   classes: Tables<'classes'>
 }
 
-export default async function StudioPage({
+// Reserved routes that should not be treated as studio slugs
+const RESERVED_ROUTES = ['studio', 'auth', 'student', 'branding', 'contact', 'cookies', 'privacy', 'terms']
+
+export default async function PublicStudioPage({
   params,
 }: {
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
+  
+  // Check if this is a reserved route - if so, 404
+  if (RESERVED_ROUTES.includes(slug)) {
+    notFound()
+  }
+
   const supabase = await createClient()
 
   // Fetch studio

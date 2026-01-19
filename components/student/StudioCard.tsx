@@ -69,7 +69,7 @@ export function StudioCard({ studio }: StudioCardProps) {
         )}
 
         <Button asChild className="w-full">
-          <Link href={`/studio/${studio.slug}`}>View Classes</Link>
+          <Link href={`/${studio.slug}`}>View Classes</Link>
         </Button>
       </CardContent>
     </Card>
