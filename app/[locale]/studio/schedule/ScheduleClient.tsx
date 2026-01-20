@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateTime } from '@/lib/utils'
 import { Tables } from '@/lib/types/database'
 import {
@@ -70,6 +71,7 @@ interface ScheduleClientProps {
 export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [open, setOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -78,8 +80,10 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
 
   const handleSuccess = () => {
     setOpen(false)
-    toast.success('Schedule created successfully')
+    setIsRefreshing(true)
     router.refresh()
+    // Reset refreshing state after data should be loaded (1-2 seconds)
+    setTimeout(() => setIsRefreshing(false), 2000)
   }
 
   const handleView = (instanceId: number) => {
@@ -133,6 +137,9 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           : 'Schedule deleted successfully'
       )
       
+      // Set refreshing state to show skeleton
+      setIsRefreshing(true)
+      
       // Refresh data - this will cause the component to re-render with updated instances
       router.refresh()
       
@@ -142,6 +149,9 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
       
       setDeleteDialogOpen(false)
       setSelectedInstance(null)
+      
+      // Reset refreshing state after data should be loaded (1-2 seconds)
+      setTimeout(() => setIsRefreshing(false), 2000)
     })
   }
 
@@ -156,7 +166,46 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           <Button onClick={() => setOpen(true)}>Create Schedule</Button>
         </div>
 
-      {instances && instances.length > 0 ? (
+      {(isPending || isRefreshing) ? (
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Class</th>
+                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Date & Time</th>
+                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Bookings</th>
+                  <th className="h-10 px-4 text-right align-middle text-xs font-medium text-muted-foreground"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="p-4 align-middle">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-2 w-2 rounded-full shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 align-middle text-center">
+                      <Skeleton className="h-4 w-28 mx-auto" />
+                    </td>
+                    <td className="p-4 align-middle text-center">
+                      <Skeleton className="h-4 w-16 mx-auto" />
+                    </td>
+                    <td className="p-4 align-middle text-right">
+                      <Skeleton className="h-8 w-8 ml-auto" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ) : instances && instances.length > 0 ? (
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

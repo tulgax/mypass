@@ -26,5 +26,12 @@ export default async function StudentLayout({
     redirect(`/${locale}/auth/signin`)
   }
 
-  return <StudentShell onSignOut={signOut}>{children}</StudentShell>
+  // Get user profile data
+  const userData = {
+    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+    email: user.email || '',
+    avatar: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+  }
+
+  return <StudentShell user={userData} onSignOut={signOut}>{children}</StudentShell>
 }

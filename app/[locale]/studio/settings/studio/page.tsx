@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { StudioForm } from '@/components/dashboard/StudioForm'
+import { getStudioByOwnerId } from '@/lib/data/studios'
 
 export default async function StudioSettingsPage() {
   const supabase = await createClient()
@@ -12,24 +13,20 @@ export default async function StudioSettingsPage() {
     redirect('/auth/signin')
   }
 
-  // Check if user already has a studio
-  const { data: existingStudio } = await supabase
-    .from('studios')
-    .select('id, slug')
-    .eq('owner_id', user.id)
-    .single()
-
-  if (existingStudio) {
-    redirect('/studio/overview')
-  }
+  // Fetch existing studio if it exists
+  const studio = await getStudioByOwnerId(user.id)
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Studio Settings</h1>
-        <p className="text-muted-foreground">Set up your studio profile to start taking bookings</p>
+        <p className="text-muted-foreground">
+          {studio
+            ? 'Manage your studio profile and information'
+            : 'Set up your studio profile to start taking bookings'}
+        </p>
       </div>
-      <StudioForm />
+      <StudioForm studio={studio} />
     </div>
   )
 }

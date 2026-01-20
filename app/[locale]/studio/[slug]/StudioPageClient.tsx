@@ -5,18 +5,31 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'motion/react'
 import { ChevronRight, ChevronLeft, Calendar, Clock, MapPin, Phone, Mail, Users } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { BookingForm } from '@/components/studio/BookingForm'
 import { formatTime, formatAmount, isToday } from '@/lib/utils'
+import type { PublicStudioWithInstances } from '@/lib/types/public'
 import type { Tables } from '@/lib/types/database'
 
-type Studio = Tables<'studios'>
+// Dynamically import Map component to avoid SSR issues with Leaflet
+const StudioMap = dynamic(() => import('@/components/ui/map').then((mod) => ({ default: mod.StudioMap })), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full rounded-lg border overflow-hidden bg-muted" style={{ height: '300px' }}>
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading map...</p>
+      </div>
+    </div>
+  ),
+})
+
 type Class = Tables<'classes'>
 type ClassInstance = Tables<'class_instances'> & {
   classes: Class
 }
 
 interface StudioPageClientProps {
-  studio: Studio
+  studio: PublicStudioWithInstances
   classInstances: ClassInstance[]
   locale: string
 }
@@ -482,20 +495,36 @@ export function StudioPageClient({ studio, classInstances, locale }: StudioPageC
                               className="space-y-4 md:space-y-6"
                             >
                               {studio.address && (
-                                <motion.div
-                                  whileHover={{ x: 5 }}
-                                  className="flex items-start gap-2 md:gap-4"
-                                >
-                                  <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                                    <MapPin className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <h4 className="text-xs md:text-sm font-medium">{t('contact.location')}</h4>
-                                    <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
-                                      {studio.address}
-                                    </p>
-                                  </div>
-                                </motion.div>
+                                <>
+                                  <motion.div
+                                    whileHover={{ x: 5 }}
+                                    className="flex items-start gap-2 md:gap-4"
+                                  >
+                                    <div className="flex h-8 w-8 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                                      <MapPin className="h-4 w-4 md:h-5 md:w-5 text-foreground/60" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-xs md:text-sm font-medium">{t('contact.location')}</h4>
+                                      <p className="mt-0.5 md:mt-1 text-[10px] md:text-xs text-muted-foreground">
+                                        <a
+                                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(studio.address)}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="hover:text-foreground transition-colors underline"
+                                        >
+                                          {studio.address}
+                                        </a>
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                  {/* Map Component */}
+                                  <StudioMap
+                                    latitude={studio.latitude ? Number(studio.latitude) : undefined}
+                                    longitude={studio.longitude ? Number(studio.longitude) : undefined}
+                                    address={studio.address || undefined}
+                                    height="300px"
+                                  />
+                                </>
                               )}
 
                               {studio.phone && (

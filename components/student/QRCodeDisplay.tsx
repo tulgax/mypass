@@ -29,19 +29,23 @@ export function QRCodeDisplay({ qrCode, bookingId }: QRCodeDisplayProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-sm">Check-in QR Code</CardTitle>
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-sm sm:text-base">Check-in QR Code</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         {qrDataUrl ? (
-          <div className="flex flex-col items-center gap-4">
-            <img src={qrDataUrl} alt="QR Code" className="rounded-lg border" />
-            <p className="text-muted-foreground text-xs text-center">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <img 
+              src={qrDataUrl} 
+              alt="QR Code" 
+              className="rounded-lg border max-w-[250px] sm:max-w-[300px] w-full h-auto" 
+            />
+            <p className="text-muted-foreground text-xs sm:text-sm text-center">
               Show this QR code at the studio for check-in
             </p>
           </div>
         ) : (
-          <p className="text-muted-foreground text-sm">Generating QR code...</p>
+          <p className="text-muted-foreground text-sm sm:text-base">Generating QR code...</p>
         )}
       </CardContent>
     </Card>

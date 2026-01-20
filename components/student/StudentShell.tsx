@@ -1,7 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link, usePathname } from "@/i18n/routing"
 import { CalendarDaysIcon, CompassIcon, LayoutDashboardIcon } from "lucide-react"
 import {
   Sidebar,
@@ -19,9 +18,32 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import { BottomNav } from "@/components/student/BottomNav"
+import { NavUser } from "@/components/nav-user"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { User, LogOut } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface StudentShellProps {
   children: React.ReactNode
+  user: {
+    name: string
+    email: string
+    avatar?: string
+  }
   onSignOut: () => void
 }
 
@@ -43,12 +65,13 @@ const items = [
   },
 ]
 
-export function StudentShell({ children, onSignOut }: StudentShellProps) {
+export function StudentShell({ children, user, onSignOut }: StudentShellProps) {
   const pathname = usePathname()
+  const isMobile = useIsMobile()
 
   return (
     <SidebarProvider defaultOpen>
-      <Sidebar variant="sidebar" collapsible="none">
+      <Sidebar variant="sidebar" collapsible="offcanvas" className="hidden md:flex">
         <SidebarHeader>
           <div className="flex items-center justify-between px-2 py-1">
             <div>
@@ -65,7 +88,7 @@ export function StudentShell({ children, onSignOut }: StudentShellProps) {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}>
                       <Link href={item.href}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -79,19 +102,69 @@ export function StudentShell({ children, onSignOut }: StudentShellProps) {
         </SidebarContent>
         <SidebarSeparator />
         <SidebarFooter>
-          <form action={onSignOut}>
-            <Button variant="outline" className="w-full justify-start">
-              Sign Out
-            </Button>
-          </form>
+          <NavUser user={{ ...user, avatar: user.avatar ?? "" }} onSignOut={onSignOut} />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 items-center border-b bg-background px-4">
+        <header className="flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6">
           <p className="text-sm text-muted-foreground">Student</p>
+          {/* Mobile Profile Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 rounded-md p-1.5 hover:bg-accent md:hidden"
+                aria-label="User menu"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>
+                    {user.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-56"
+              side="bottom"
+              align="end"
+              sideOffset={8}
+            >
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>
+                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="truncate font-medium">{user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <form action={onSignOut}>
+                <DropdownMenuItem asChild>
+                  <button type="submit" className="w-full text-left text-red-600 focus:text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </DropdownMenuItem>
+              </form>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
-        <div className="flex-1 p-6">{children}</div>
+        <div className="flex-1 p-4 sm:p-6 pb-20 md:pb-6">{children}</div>
       </SidebarInset>
+      <BottomNav />
     </SidebarProvider>
   )
 }

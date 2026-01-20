@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { formatAmount } from '@/lib/utils'
 import { MoreHorizontal, X, Eye, Pencil, Trash2, MapPin, Users } from 'lucide-react'
 import { deleteClass, createClass, updateClass } from '@/lib/actions/classes'
@@ -35,6 +36,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -63,6 +65,7 @@ interface ClassesClientProps {
 export function ClassesClient({ classes }: ClassesClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [open, setOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -72,7 +75,10 @@ export function ClassesClient({ classes }: ClassesClientProps) {
   const handleSuccess = () => {
     setOpen(false)
     setEditOpen(false)
+    setIsRefreshing(true)
     router.refresh()
+    // Reset refreshing state after data should be loaded (1-2 seconds)
+    setTimeout(() => setIsRefreshing(false), 2000)
   }
 
   const handleView = (classId: number) => {
@@ -121,6 +127,9 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       // Show success toast
       toast.success('Class deleted successfully')
       
+      // Set refreshing state to show skeleton
+      setIsRefreshing(true)
+      
       // Refresh data - this will cause the component to re-render with updated classes
       router.refresh()
       
@@ -130,6 +139,9 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       
       setDeleteDialogOpen(false)
       setSelectedClass(null)
+      
+      // Reset refreshing state after data should be loaded (1-2 seconds)
+      setTimeout(() => setIsRefreshing(false), 2000)
     })
   }
 
@@ -144,7 +156,49 @@ export function ClassesClient({ classes }: ClassesClientProps) {
           <Button onClick={() => setOpen(true)}>Create Class</Button>
         </div>
 
-        {classes && classes.length > 0 ? (
+        {(isPending || isRefreshing) ? (
+          <Card>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Name</th>
+                    <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Price</th>
+                    <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Duration</th>
+                    <th className="h-10 px-4 text-right align-middle text-xs font-medium text-muted-foreground"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i} className="border-b">
+                      <td className="p-4 align-middle">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-2 w-2 rounded-full shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-16" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 align-middle text-center">
+                        <Skeleton className="h-4 w-20 mx-auto" />
+                      </td>
+                      <td className="p-4 align-middle text-center">
+                        <Skeleton className="h-4 w-24 mx-auto" />
+                      </td>
+                      <td className="p-4 align-middle text-center">
+                        <Skeleton className="h-5 w-16 mx-auto" />
+                      </td>
+                      <td className="p-4 align-middle text-right">
+                        <Skeleton className="h-8 w-8 ml-auto" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        ) : classes && classes.length > 0 ? (
           <Card>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -170,6 +224,14 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                       </td>
                       <td className="p-4 align-middle text-center text-sm">{formatAmount(cls.price, cls.currency)}</td>
                       <td className="p-4 align-middle text-center text-sm">{cls.duration_minutes} minutes</td>
+                      <td className="p-4 align-middle text-center">
+                        <Badge
+                          variant={cls.is_active ? 'default' : 'secondary'}
+                          className={cls.is_active ? 'bg-green-500 hover:bg-green-600' : ''}
+                        >
+                          {cls.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </td>
                       <td className="p-4 align-middle text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

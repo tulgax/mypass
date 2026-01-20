@@ -18,7 +18,7 @@ export async function getStudioByOwnerId(ownerId: string): Promise<Studio | null
   
   const { data, error } = await supabase
     .from('studios')
-    .select('id, slug, name, owner_id, description, address, phone, email, logo_url, cover_image_url, created_at, updated_at')
+    .select('id, slug, name, owner_id, description, address, phone, email, logo_url, cover_image_url, latitude, longitude, created_at, updated_at')
     .eq('owner_id', ownerId)
     .single()
 
@@ -41,7 +41,7 @@ export async function getStudioBySlug(slug: string): Promise<Studio | null> {
   
   const { data, error } = await supabase
     .from('studios')
-    .select('id, slug, name, owner_id, description, address, phone, email, logo_url, cover_image_url, created_at, updated_at')
+    .select('id, slug, name, owner_id, description, address, phone, email, logo_url, cover_image_url, latitude, longitude, created_at, updated_at')
     .eq('slug', slug)
     .single()
 

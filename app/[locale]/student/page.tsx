@@ -1,9 +1,12 @@
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { Button } from '@/components/ui/button'
+import { getStudentBookingsCounts } from '@/lib/data/student-bookings'
+import StudentLoading from './loading'
 
-export default async function StudentPage() {
+async function BookingStats() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -11,76 +14,57 @@ export default async function StudentPage() {
 
   if (!user) return null
 
-  const { count: upcomingCount } = await supabase
-    .from('bookings')
-    .select('*', { count: 'exact', head: true })
-    .eq('student_id', user.id)
-    .eq('status', 'confirmed')
-    .in(
-      'class_instance_id',
-      (
-        await supabase
-          .from('class_instances')
-          .select('id')
-          .gt('scheduled_at', new Date().toISOString())
-      ).data?.map((ci: { id: number }) => ci.id) || []
-    )
-
-  const { count: pastCount } = await supabase
-    .from('bookings')
-    .select('*', { count: 'exact', head: true })
-    .eq('student_id', user.id)
-    .in(
-      'class_instance_id',
-      (
-        await supabase
-          .from('class_instances')
-          .select('id')
-          .lt('scheduled_at', new Date().toISOString())
-      ).data?.map((ci: { id: number }) => ci.id) || []
-    )
+  const counts = await getStudentBookingsCounts(user.id)
 
   return (
-    <div className="space-y-8">
+    <div className="grid gap-4 md:grid-cols-2">
+      <Card>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Upcoming Bookings</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <p className="text-2xl font-bold">{counts.upcoming}</p>
+          <Button variant="outline" className="mt-4 w-full sm:w-auto" asChild>
+            <Link href="/student/bookings">View All</Link>
+          </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Past Bookings</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <p className="text-2xl font-bold">{counts.past}</p>
+          <Button variant="outline" className="mt-4 w-full sm:w-auto" asChild>
+            <Link href="/student/bookings">View All</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export default async function StudentPage() {
+  return (
+    <div className="space-y-4 sm:space-y-6 md:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Welcome Back</h1>
-        <p className="text-muted-foreground">Here's your booking overview</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">Welcome Back</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Here's your booking overview</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Bookings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{upcomingCount || 0}</p>
-            <Button variant="outline" className="mt-4" asChild>
-              <Link href="/student/bookings">View All</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Past Bookings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{pastCount || 0}</p>
-            <Button variant="outline" className="mt-4" asChild>
-              <Link href="/student/bookings">View All</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <Suspense fallback={<StudentLoading />}>
+        <BookingStats />
+      </Suspense>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Explore Studios</CardTitle>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Explore Studios</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">
             Browse available studios and book your next class
           </p>
-          <Button asChild>
+          <Button className="w-full sm:w-auto" asChild>
             <Link href="/student/explore">Browse Studios</Link>
           </Button>
         </CardContent>
