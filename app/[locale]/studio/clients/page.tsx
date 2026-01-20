@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDateTime } from '@/lib/utils'
+import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getClassIdsByStudioId } from '@/lib/data/classes'
+import { getClassInstanceIdsByClassIds } from '@/lib/data/class-instances'
+import { getBookingsForStudio } from '@/lib/data/bookings'
+import type { BookingWithRelations } from '@/lib/data/bookings'
 
 export default async function ClientsPage() {
   const supabase = await createClient()
@@ -14,45 +19,18 @@ export default async function ClientsPage() {
     notFound()
   }
 
-  const { data: studio } = await supabase
-    .from('studios')
-    .select('id')
-    .eq('owner_id', user.id)
-    .single()
+  const studio = await getStudioBasicInfo(user.id)
 
   if (!studio) {
     notFound()
   }
 
-  // Get all class instances for this studio
-  const { data: classInstances } = await supabase
-    .from('class_instances')
-    .select('id')
-    .in(
-      'class_id',
-      studio
-        ? (
-            await supabase.from('classes').select('id').eq('studio_id', studio.id)
-          ).data?.map((c: { id: number }) => c.id) || []
-        : []
-    )
+  // Get class IDs and instance IDs
+  const classIds = await getClassIdsByStudioId(studio.id)
+  const instanceIds = await getClassInstanceIdsByClassIds(classIds)
 
   // Get bookings for these instances
-  const { data: bookings } = await supabase
-    .from('bookings')
-    .select(`
-      *,
-      class_instances (
-        *,
-        classes (*)
-      ),
-      user_profiles (*)
-    `)
-    .in(
-      'class_instance_id',
-      classInstances?.map((ci: { id: number }) => ci.id) || []
-    )
-    .order('created_at', { ascending: false })
+  const bookings = await getBookingsForStudio(instanceIds)
 
   return (
     <div className="space-y-8">
@@ -63,7 +41,7 @@ export default async function ClientsPage() {
 
       {bookings && bookings.length > 0 ? (
         <div className="space-y-4">
-          {bookings.map((booking: any) => (
+          {bookings.map((booking) => (
             <Card key={booking.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -79,10 +57,12 @@ export default async function ClientsPage() {
               <CardContent>
                 <p className="text-sm">
                   <span className="font-medium">Class:</span>{' '}
-                  {booking.class_instances?.classes?.name}
+                  {booking.class_instances?.classes?.name || 'Unknown'}
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  {formatDateTime(booking.class_instances?.scheduled_at)}
+                  {booking.class_instances?.scheduled_at 
+                    ? formatDateTime(booking.class_instances.scheduled_at)
+                    : 'Date not available'}
                 </p>
               </CardContent>
             </Card>

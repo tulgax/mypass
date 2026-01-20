@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ScheduleClient } from './ScheduleClient'
+import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getActiveClassesByStudioId, getClassIdsByStudioId } from '@/lib/data/classes'
+import { getUpcomingClassInstances } from '@/lib/data/class-instances'
 
 export default async function SchedulePage() {
   const supabase = await createClient()
@@ -12,39 +15,19 @@ export default async function SchedulePage() {
     notFound()
   }
 
-  const { data: studio } = await supabase
-    .from('studios')
-    .select('id')
-    .eq('owner_id', user.id)
-    .single()
+  const studio = await getStudioBasicInfo(user.id)
 
   if (!studio) {
     notFound()
   }
 
-  // Get all classes for this studio (needed for schedule form)
-  const { data: classes } = await supabase
-    .from('classes')
-    .select('id, name, duration_minutes, is_active')
-    .eq('studio_id', studio.id)
-    .order('created_at', { ascending: false })
+  // Parallel fetch classes and instances
+  const [classes, classIds] = await Promise.all([
+    getActiveClassesByStudioId(studio.id),
+    getClassIdsByStudioId(studio.id),
+  ])
 
-  // Get upcoming class instances (not cancelled, scheduled in the future)
-  const now = new Date().toISOString()
-  const { data: instances } = await supabase
-    .from('class_instances')
-    .select(`
-      *,
-      classes (
-        name,
-        capacity,
-        type
-      )
-    `)
-    .in('class_id', (classes || []).map((c: { id: number }) => c.id))
-    .eq('is_cancelled', false)
-    .gte('scheduled_at', now)
-    .order('scheduled_at', { ascending: true })
+  const instances = await getUpcomingClassInstances(classIds)
 
-  return <ScheduleClient instances={instances || []} classes={classes || []} />
+  return <ScheduleClient instances={instances} classes={classes} />
 }

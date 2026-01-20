@@ -1,91 +1,57 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatAmount } from '@/lib/utils'
 import { Users, Calendar, DollarSign, BookOpen, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getClassIdsByStudioId } from '@/lib/data/classes'
+import { getClassInstanceIdsByClassIds } from '@/lib/data/class-instances'
+import { getBookingsByInstanceIds, getPaymentsByBookingIds } from '@/lib/data/bookings'
+import { getUpcomingClassInstances } from '@/lib/data/class-instances'
+import type { BookingWithRelations } from '@/lib/data/bookings'
 
-export default async function OverviewPage() {
+async function OverviewStats() {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    notFound()
+    return null
   }
 
-  const { data: studio } = await supabase
-    .from('studios')
-    .select('id, name')
-    .eq('owner_id', user.id)
-    .single()
-
+  const studio = await getStudioBasicInfo(user.id)
   if (!studio) {
-    notFound()
+    return null
   }
 
-  // Get all classes for this studio
-  const { data: classes } = await supabase
-    .from('classes')
-    .select('id')
-    .eq('studio_id', studio.id)
+  // Parallel queries for better performance
+  const classIds = await getClassIdsByStudioId(studio.id)
+  
+  const [instanceIds, upcomingClasses] = await Promise.all([
+    getClassInstanceIdsByClassIds(classIds),
+    getUpcomingClassInstances(classIds, 5),
+  ])
 
-  const classIds = classes?.map((c: any) => c.id) || []
+  // Fetch bookings and payments in parallel
+  const bookings = await getBookingsByInstanceIds(instanceIds)
+  const bookingIds = bookings.map((b) => b.id)
+  const payments = await getPaymentsByBookingIds(bookingIds)
 
-  // Get all class instances (only if we have classes)
-  const { data: classInstances } = classIds.length > 0
-    ? await supabase
-        .from('class_instances')
-        .select('id')
-        .in('class_id', classIds)
-    : { data: [] }
-
-  const instanceIds = classInstances?.map((ci: any) => ci.id) || []
-
-  // Get all bookings (only if we have instances)
-  const { data: bookings } = instanceIds.length > 0
-    ? await supabase
-        .from('bookings')
-        .select('*, payments(amount, currency)')
-        .in('class_instance_id', instanceIds)
-    : { data: [] }
-
-  // Get upcoming classes (only if we have classes)
-  const { data: upcomingClasses } = classIds.length > 0
-    ? await supabase
-        .from('class_instances')
-        .select('*, classes(name)')
-        .in('class_id', classIds)
-        .gte('scheduled_at', new Date().toISOString())
-        .eq('is_cancelled', false)
-        .order('scheduled_at', { ascending: true })
-        .limit(5)
-    : { data: [] }
-
-  // Calculate stats
-  const totalRevenue = bookings?.reduce((sum: number, booking: any) => {
-    const payment = Array.isArray(booking.payments) ? booking.payments[0] : booking.payments
-    return sum + (payment?.amount || 0)
-  }, 0) || 0
-
-  const totalBookings = bookings?.length || 0
-  const activeClasses = classes?.length || 0
-  const uniqueCustomers = new Set(bookings?.map((b: any) => b.student_id) || []).size
-
-  // Get revenue from payments table
-  const { data: payments } = await supabase
-    .from('payments')
-    .select('amount, currency')
-    .in('id', bookings?.map((b: any) => b.payment_id).filter(Boolean) || [])
-
-  const actualRevenue = payments?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0
-  const currency = payments?.[0]?.currency || 'USD'
+  // Calculate stats with proper typing
+  const actualRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+  const currency = payments[0]?.currency || 'USD'
+  const totalBookings = bookings.length
+  const activeClasses = classIds.length
+  const uniqueCustomers = new Set(bookings.map((b) => b.student_id)).size
 
   return (
-    <div className="flex flex-1 flex-col gap-6">
+    <>
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -152,8 +118,8 @@ export default async function OverviewPage() {
             {upcomingClasses && upcomingClasses.length > 0 ? (
               <div className="space-y-4">
                 {upcomingClasses
-                  .filter((instance: any) => instance.classes?.name) // Only show instances with class names
-                  .map((instance: any) => (
+                  .filter((instance) => instance.classes?.name)
+                  .map((instance) => (
                     <div key={instance.id} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">
@@ -176,7 +142,7 @@ export default async function OverviewPage() {
                       </Badge>
                     </div>
                   ))}
-                {upcomingClasses.filter((instance: any) => instance.classes?.name).length === 0 && (
+                {upcomingClasses.filter((instance) => instance.classes?.name).length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     No upcoming classes scheduled
                   </p>
@@ -222,6 +188,50 @@ export default async function OverviewPage() {
           </CardContent>
         </Card>
       </div>
+    </>
+  )
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Card key={i}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-4 rounded" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-3 w-40" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+export default async function OverviewPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    notFound()
+  }
+
+  const studio = await getStudioBasicInfo(user.id)
+
+  if (!studio) {
+    notFound()
+  }
+
+  return (
+    <div className="flex flex-1 flex-col gap-6">
+      <Suspense fallback={<StatsSkeleton />}>
+        <OverviewStats />
+      </Suspense>
     </div>
   )
 }

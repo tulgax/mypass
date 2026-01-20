@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { createScheduleWithRepeat } from '@/lib/actions/class-instances'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -148,39 +148,22 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
     }
 
     setLoading(true)
+    setError(null)
+    setSuccess(null)
+
     try {
-      const supabase = createClient()
-      const { error: instancesError } = await supabase.from('class_instances').insert(
-        instances.map((instance) => ({
-          class_id: classId,
-          scheduled_at: instance.scheduled_at,
-          ends_at: instance.ends_at,
-        }))
-      )
+      const result = await createScheduleWithRepeat({
+        class_id: classId,
+        start_date: startDate,
+        start_time: startTime,
+        repeat,
+        selected_days: repeat === 'weekly' ? selectedDays : undefined,
+      })
 
-      if (instancesError) throw instancesError
-
-      if (repeat === 'weekly') {
-        const endTime = new Date(
-          buildDateTime(startDate, startTime).getTime() +
-            selectedClass.duration_minutes * 60 * 1000
-        )
-        const endTimeString = `${endTime.getHours().toString().padStart(2, '0')}:${endTime
-          .getMinutes()
-          .toString()
-          .padStart(2, '0')}`
-
-        const { error: scheduleError } = await supabase.from('class_schedules').insert(
-          selectedDays.map((day) => ({
-            class_id: classId,
-            day_of_week: day,
-            start_time: startTime,
-            end_time: endTimeString,
-            is_active: true,
-          }))
-        )
-
-        if (scheduleError) throw scheduleError
+      if (!result.success) {
+        setError(result.error)
+        setLoading(false)
+        return
       }
 
       setSuccess('Schedule created successfully')

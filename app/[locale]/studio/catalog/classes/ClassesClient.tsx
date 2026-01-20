@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatAmount } from '@/lib/utils'
 import { MoreHorizontal, X, Eye, Pencil, Trash2, MapPin, Users } from 'lucide-react'
+import { deleteClass, createClass, updateClass } from '@/lib/actions/classes'
+import { createClassSchema, updateClassSchema } from '@/lib/validation/classes'
 import {
   Sheet,
   SheetContent,
@@ -81,23 +83,14 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       return
     }
 
-    try {
-      const { createClient } = await import('@/lib/supabase/client')
-      const supabase = createClient()
+    const result = await deleteClass({ id: classId })
 
-      const { error } = await supabase
-        .from('classes')
-        .delete()
-        .eq('id', classId)
-
-      if (error) {
-        throw error
-      }
-
-      router.refresh()
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete class')
+    if (!result.success) {
+      alert(result.error)
+      return
     }
+
+    router.refresh()
   }
 
   return (
@@ -367,108 +360,74 @@ function ClassFormSheetContent({
       const zoom_link = formData.get('zoom_link') as string
       const is_active = formData.get('is_active') === 'on'
 
-      // Validation
-      const errors: Record<string, string> = {}
-
-      if (!name || name.trim() === '') {
-        errors.name = 'Name is required'
-      }
-
-      if (!price_str || price_str.trim() === '' || isNaN(parseFloat(price_str))) {
-        errors.price = 'Price is required and must be a valid number'
-      }
-
-      if (!capacity_str || capacity_str.trim() === '' || isNaN(parseInt(capacity_str, 10)) || parseInt(capacity_str, 10) < 1) {
-        errors.capacity = 'Capacity is required and must be at least 1'
-      }
-
-      if (!duration_minutes_str || duration_minutes_str.trim() === '' || isNaN(parseInt(duration_minutes_str, 10)) || parseInt(duration_minutes_str, 10) < 1) {
-        errors.duration_minutes = 'Duration is required and must be at least 1 minute'
-      }
-
-      if (type === 'online' && (!zoom_link || zoom_link.trim() === '')) {
-        errors.zoom_link = 'Zoom link is required for online classes'
-      }
-
-      if (Object.keys(errors).length > 0) {
-        setFieldErrors(errors)
-        setLoading(false)
-        return
-      }
-
+      // Parse values
       const duration_minutes = parseInt(duration_minutes_str, 10)
       const capacity = parseInt(capacity_str, 10)
       const price = parseFloat(price_str)
 
-      const { createClient } = await import('@/lib/supabase/client')
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        router.push('/auth/signin')
-        return
+      // Prepare input for validation
+      const input = {
+        name,
+        description: description || null,
+        type,
+        price,
+        currency,
+        capacity,
+        duration_minutes,
+        zoom_link: type === 'online' ? (zoom_link || null) : null,
+        is_active,
       }
 
-      // Get studio_id
-      const { data: studio, error: studioError } = await supabase
-        .from('studios')
-        .select('id')
-        .eq('owner_id', user.id)
-        .single()
-
-      if (studioError || !studio) {
-        setError('Studio not found. Please create a studio first.')
-        return
-      }
-
+      // Validate and execute server action
+      let result
       if (isEdit && classData) {
-        // Update class
-        const { error: classError } = await supabase
-          .from('classes')
-          .update({
-            name,
-            description: description || null,
-            duration_minutes,
-            capacity,
-            type,
-            zoom_link: type === 'online' ? (zoom_link || null) : null,
-            price,
-            currency,
-            is_active,
+        const updateInput = { ...input, id: classData.id }
+        const validationResult = updateClassSchema.safeParse(updateInput)
+        
+        if (!validationResult.success) {
+          const zodErrors = validationResult.error.flatten().fieldErrors
+          const errors: Record<string, string> = {}
+          Object.keys(zodErrors).forEach((key) => {
+            const errorMessages = zodErrors[key as keyof typeof zodErrors]
+            if (errorMessages && errorMessages.length > 0) {
+              errors[key] = errorMessages[0]
+            }
           })
-          .eq('id', classData.id)
-
-        if (classError) {
-          throw classError
+          setFieldErrors(errors)
+          setLoading(false)
+          return
         }
+
+        result = await updateClass(validationResult.data)
       } else {
-        // Create class
-        const { error: classError } = await supabase
-          .from('classes')
-          .insert({
-            studio_id: studio.id,
-            name,
-            description: description || null,
-            duration_minutes,
-            capacity,
-            type,
-            zoom_link: type === 'online' ? (zoom_link || null) : null,
-            price,
-            currency,
-            is_active,
+        const validationResult = createClassSchema.safeParse(input)
+        
+        if (!validationResult.success) {
+          const zodErrors = validationResult.error.flatten().fieldErrors
+          const errors: Record<string, string> = {}
+          Object.keys(zodErrors).forEach((key) => {
+            const errorMessages = zodErrors[key as keyof typeof zodErrors]
+            if (errorMessages && errorMessages.length > 0) {
+              errors[key] = errorMessages[0]
+            }
           })
-
-        if (classError) {
-          throw classError
+          setFieldErrors(errors)
+          setLoading(false)
+          return
         }
+
+        result = await createClass(validationResult.data)
+      }
+
+      if (!result.success) {
+        setError(result.error)
+        setLoading(false)
+        return
       }
 
       onSuccess()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create class')
-    } finally {
+      setError(err instanceof Error ? err.message : 'Failed to save class')
       setLoading(false)
     }
   }

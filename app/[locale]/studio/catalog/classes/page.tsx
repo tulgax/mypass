@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ClassesClient } from './ClassesClient'
+import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getClassesByStudioId } from '@/lib/data/classes'
 
 export default async function ClassesPage() {
   const supabase = await createClient()
@@ -12,21 +14,13 @@ export default async function ClassesPage() {
     notFound()
   }
 
-  const { data: studio } = await supabase
-    .from('studios')
-    .select('id')
-    .eq('owner_id', user.id)
-    .single()
+  const studio = await getStudioBasicInfo(user.id)
 
   if (!studio) {
     notFound()
   }
 
-  const { data: classes } = await supabase
-    .from('classes')
-    .select('*')
-    .eq('studio_id', studio?.id)
-    .order('created_at', { ascending: false })
+  const classes = await getClassesByStudioId(studio.id)
 
-  return <ClassesClient classes={classes || []} />
+  return <ClassesClient classes={classes} />
 }
