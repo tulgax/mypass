@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatAmount } from '@/lib/utils'
@@ -22,6 +23,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -51,9 +62,11 @@ interface ClassesClientProps {
 
 export function ClassesClient({ classes }: ClassesClientProps) {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const [open, setOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
 
   const handleSuccess = () => {
@@ -78,19 +91,46 @@ export function ClassesClient({ classes }: ClassesClientProps) {
     }
   }
 
-  const handleDelete = async (classId: number) => {
-    if (!confirm('Are you sure you want to delete this class? This action cannot be undone.')) {
-      return
+  const handleDeleteClick = (classId: number) => {
+    const classData = classes.find((c) => c.id === classId)
+    if (classData) {
+      setSelectedClass(classData)
+      setDeleteDialogOpen(true)
     }
+  }
 
-    const result = await deleteClass({ id: classId })
-
-    if (!result.success) {
-      alert(result.error)
-      return
+  const handleDeleteConfirm = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
     }
+    
+    if (!selectedClass || isPending) return
 
-    router.refresh()
+    const classIdToDelete = selectedClass.id
+
+    startTransition(async () => {
+      const result = await deleteClass({ id: classIdToDelete })
+
+      if (!result.success) {
+        // Keep dialog open on error
+        toast.error(result.error)
+        return
+      }
+
+      // Show success toast
+      toast.success('Class deleted successfully')
+      
+      // Refresh data - this will cause the component to re-render with updated classes
+      router.refresh()
+      
+      // Wait for the refresh to complete and UI to update, then close dialog
+      // We wait a bit longer to ensure the item is removed from the table
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      setDeleteDialogOpen(false)
+      setSelectedClass(null)
+    })
   }
 
   return (
@@ -149,7 +189,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              onClick={() => handleDelete(cls.id)}
+                              onClick={() => handleDeleteClick(cls.id)}
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -245,6 +285,36 @@ export function ClassesClient({ classes }: ClassesClientProps) {
           </Sheet>
         </>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog 
+        open={deleteDialogOpen} 
+        onOpenChange={(open) => {
+          // Prevent closing while deleting
+          if (!isPending) {
+            setDeleteDialogOpen(open)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Class?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this class? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isPending}
+            >
+              {isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
@@ -335,7 +405,7 @@ function ClassFormSheetContent({
   isEdit?: boolean
 }) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [classType, setClassType] = useState<'online' | 'offline'>(
@@ -345,91 +415,96 @@ function ClassFormSheetContent({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
     setFieldErrors({})
 
-    try {
-      const formData = new FormData(e.currentTarget)
-      const name = formData.get('name') as string
-      const description = formData.get('description') as string
-      const duration_minutes_str = formData.get('duration_minutes') as string
-      const capacity_str = formData.get('capacity') as string
-      const price_str = formData.get('price') as string
-      const type = classType as 'online' | 'offline'
-      const zoom_link = formData.get('zoom_link') as string
-      const is_active = formData.get('is_active') === 'on'
+    const formData = new FormData(e.currentTarget)
+    const name = formData.get('name') as string
+    const description = formData.get('description') as string
+    const duration_minutes_str = formData.get('duration_minutes') as string
+    const capacity_str = formData.get('capacity') as string
+    const price_str = formData.get('price') as string
+    const type = classType as 'online' | 'offline'
+    const zoom_link = formData.get('zoom_link') as string
+    const is_active = formData.get('is_active') === 'on'
 
-      // Parse values
-      const duration_minutes = parseInt(duration_minutes_str, 10)
-      const capacity = parseInt(capacity_str, 10)
-      const price = parseFloat(price_str)
+    // Parse values
+    const duration_minutes = parseInt(duration_minutes_str, 10)
+    const capacity = parseInt(capacity_str, 10)
+    const price = parseFloat(price_str)
 
-      // Prepare input for validation
-      const input = {
-        name,
-        description: description || null,
-        type,
-        price,
-        currency,
-        capacity,
-        duration_minutes,
-        zoom_link: type === 'online' ? (zoom_link || null) : null,
-        is_active,
-      }
+    // Prepare input for validation
+    const input = {
+      name,
+      description: description || null,
+      type,
+      price,
+      currency,
+      capacity,
+      duration_minutes,
+      zoom_link: type === 'online' ? (zoom_link || null) : null,
+      is_active,
+    }
 
-      // Validate and execute server action
-      let result
-      if (isEdit && classData) {
-        const updateInput = { ...input, id: classData.id }
-        const validationResult = updateClassSchema.safeParse(updateInput)
-        
-        if (!validationResult.success) {
-          const zodErrors = validationResult.error.flatten().fieldErrors
-          const errors: Record<string, string> = {}
-          Object.keys(zodErrors).forEach((key) => {
-            const errorMessages = zodErrors[key as keyof typeof zodErrors]
-            if (errorMessages && errorMessages.length > 0) {
-              errors[key] = errorMessages[0]
-            }
-          })
-          setFieldErrors(errors)
-          setLoading(false)
-          return
-        }
-
-        result = await updateClass(validationResult.data)
-      } else {
-        const validationResult = createClassSchema.safeParse(input)
-        
-        if (!validationResult.success) {
-          const zodErrors = validationResult.error.flatten().fieldErrors
-          const errors: Record<string, string> = {}
-          Object.keys(zodErrors).forEach((key) => {
-            const errorMessages = zodErrors[key as keyof typeof zodErrors]
-            if (errorMessages && errorMessages.length > 0) {
-              errors[key] = errorMessages[0]
-            }
-          })
-          setFieldErrors(errors)
-          setLoading(false)
-          return
-        }
-
-        result = await createClass(validationResult.data)
-      }
-
-      if (!result.success) {
-        setError(result.error)
-        setLoading(false)
+    // Validate first
+    let validationResult
+    if (isEdit && classData) {
+      const updateInput = { ...input, id: classData.id }
+      validationResult = updateClassSchema.safeParse(updateInput)
+      
+      if (!validationResult.success) {
+        const zodErrors = validationResult.error.flatten().fieldErrors
+        const errors: Record<string, string> = {}
+        Object.keys(zodErrors).forEach((key) => {
+          const errorMessages = zodErrors[key as keyof typeof zodErrors]
+          if (errorMessages && errorMessages.length > 0) {
+            errors[key] = errorMessages[0]
+          }
+        })
+        setFieldErrors(errors)
         return
       }
-
-      onSuccess()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save class')
-      setLoading(false)
+    } else {
+      validationResult = createClassSchema.safeParse(input)
+      
+      if (!validationResult.success) {
+        const zodErrors = validationResult.error.flatten().fieldErrors
+        const errors: Record<string, string> = {}
+        Object.keys(zodErrors).forEach((key) => {
+          const errorMessages = zodErrors[key as keyof typeof zodErrors]
+          if (errorMessages && errorMessages.length > 0) {
+            errors[key] = errorMessages[0]
+          }
+        })
+        setFieldErrors(errors)
+        return
+      }
     }
+
+    // Execute server action
+    startTransition(async () => {
+      try {
+        let result
+        if (isEdit && classData) {
+          result = await updateClass(validationResult.data)
+        } else {
+          result = await createClass(validationResult.data)
+        }
+
+        if (!result.success) {
+          setError(result.error)
+          toast.error(result.error)
+          return
+        }
+
+        toast.success(isEdit ? 'Class updated successfully' : 'Class created successfully')
+        onSuccess()
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to save class'
+        setError(errorMessage)
+        toast.error(errorMessage)
+      }
+    })
   }
 
   return (
@@ -628,11 +703,11 @@ function ClassFormSheetContent({
       {error && <p className="text-destructive text-sm">{error}</p>}
 
       <div className="flex gap-2 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isPending}>
           Cancel
         </Button>
-        <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update class' : 'Add class')}
+        <Button type="submit" disabled={isPending} className="flex-1">
+          {isPending ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update class' : 'Add class')}
         </Button>
       </div>
     </form>

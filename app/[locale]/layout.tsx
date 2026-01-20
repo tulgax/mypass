@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Toaster } from 'sonner';
 import "../globals.css";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -48,6 +49,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           {children}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

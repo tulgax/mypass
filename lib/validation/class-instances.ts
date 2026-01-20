@@ -27,6 +27,38 @@ export const createScheduleWithRepeatSchema = z.object({
   selected_days: z.array(z.number().int().min(0).max(6)).optional(),
 })
 
+export const updateClassInstanceSchema = z.object({
+  id: z.number().int().positive(),
+  scheduled_at: z.string().datetime('Invalid date/time format'),
+  ends_at: z.string().datetime('Invalid date/time format'),
+}).refine(
+  (data) => {
+    const scheduledAt = new Date(data.scheduled_at)
+    const endsAt = new Date(data.ends_at)
+    return endsAt > scheduledAt
+  },
+  {
+    message: 'End time must be after start time',
+    path: ['ends_at'],
+  }
+).refine(
+  (data) => {
+    const scheduledAt = new Date(data.scheduled_at)
+    const now = new Date()
+    return scheduledAt > now
+  },
+  {
+    message: 'Scheduled time must be in the future',
+    path: ['scheduled_at'],
+  }
+)
+
+export const deleteClassInstanceSchema = z.object({
+  id: z.number().int().positive(),
+})
+
 export type CreateClassInstanceInput = z.infer<typeof createClassInstanceSchema>
 export type CreateClassInstancesInput = z.infer<typeof createClassInstancesSchema>
 export type CreateScheduleWithRepeatInput = z.infer<typeof createScheduleWithRepeatSchema>
+export type UpdateClassInstanceInput = z.infer<typeof updateClassInstanceSchema>
+export type DeleteClassInstanceInput = z.infer<typeof deleteClassInstanceSchema>

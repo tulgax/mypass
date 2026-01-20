@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { createScheduleWithRepeat } from '@/lib/actions/class-instances'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Clock } from 'lucide-react'
 
 interface ClassOption {
   id: number
@@ -42,14 +44,13 @@ const daysOfWeek = [
 
 export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFormProps) {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const [selectedClassId, setSelectedClassId] = useState<string>('')
   const [startDate, setStartDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [repeat, setRepeat] = useState<RepeatOption>('none')
   const [selectedDays, setSelectedDays] = useState<number[]>([])
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   const activeClasses = useMemo(
     () => classes.filter((cls) => cls.is_active),
@@ -112,77 +113,129 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
-    setSuccess(null)
 
     const classId = Number(selectedClassId)
     if (!classId) {
       setError('Please choose a class')
+      toast.error('Please choose a class')
       return
     }
 
     if (!startDate || !startTime) {
       setError('Please select a start date and time')
+      toast.error('Please select a start date and time')
       return
     }
 
     if (repeat === 'weekly' && selectedDays.length === 0) {
       setError('Please select at least one day for weekly repeats')
+      toast.error('Please select at least one day for weekly repeats')
       return
     }
 
     const selectedClass = classes.find((cls) => cls.id === classId)
     if (!selectedClass) {
       setError('Selected class is not available')
+      toast.error('Selected class is not available')
       return
     }
 
     if (!selectedClass.is_active) {
       setError('Cannot schedule inactive classes. Please activate the class first.')
+      toast.error('Cannot schedule inactive classes. Please activate the class first.')
       return
     }
 
     const instances = buildInstances(selectedClass.duration_minutes)
     if (instances.length === 0) {
       setError('No upcoming sessions generated')
+      toast.error('No upcoming sessions generated')
       return
     }
 
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+    startTransition(async () => {
+      try {
+        const result = await createScheduleWithRepeat({
+          class_id: classId,
+          start_date: startDate,
+          start_time: startTime,
+          repeat,
+          selected_days: repeat === 'weekly' ? selectedDays : undefined,
+        })
 
-    try {
-      const result = await createScheduleWithRepeat({
-        class_id: classId,
-        start_date: startDate,
-        start_time: startTime,
-        repeat,
-        selected_days: repeat === 'weekly' ? selectedDays : undefined,
-      })
+        if (!result.success) {
+          setError(result.error)
+          toast.error(result.error)
+          return
+        }
 
-      if (!result.success) {
-        setError(result.error)
-        setLoading(false)
-        return
+        toast.success('Schedule created successfully')
+        setStartDate('')
+        setStartTime('')
+        setSelectedDays([])
+        setRepeat('none')
+        setSelectedClassId('')
+        
+        // Refresh and call onSuccess if provided
+        router.refresh()
+        if (onSuccess) {
+          setTimeout(() => onSuccess(), 100)
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to create schedule'
+        setError(errorMessage)
+        toast.error(errorMessage)
       }
+    })
+  }
 
-      setSuccess('Schedule created successfully')
-      setStartDate('')
-      setStartTime('')
-      setSelectedDays([])
-      setRepeat('none')
-      setSelectedClassId('')
-      
-      // Refresh and call onSuccess if provided
-      router.refresh()
-      if (onSuccess) {
-        setTimeout(() => onSuccess(), 100)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create schedule')
-    } finally {
-      setLoading(false)
+  // Time picker component
+  const TimePicker = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+    const [hours, minutes] = value ? value.split(':') : ['09', '00']
+    
+    const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'))
+    // Common minute intervals: 00, 15, 30, 45
+    const minuteOptions = ['00', '15', '30', '45']
+
+    const handleHourChange = (h: string) => {
+      onChange(`${h}:${minutes}`)
     }
+
+    const handleMinuteChange = (m: string) => {
+      onChange(`${hours}:${m}`)
+    }
+
+    return (
+      <div className="flex gap-2">
+        <Select value={hours} onValueChange={handleHourChange}>
+          <SelectTrigger>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <SelectValue placeholder="Hour" />
+            </div>
+          </SelectTrigger>
+          <SelectContent className="max-h-[200px]">
+            {hourOptions.map((hour) => (
+              <SelectItem key={hour} value={hour}>
+                {hour}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={minutes} onValueChange={handleMinuteChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Min" />
+          </SelectTrigger>
+          <SelectContent>
+            {minuteOptions.map((minute) => (
+              <SelectItem key={minute} value={minute}>
+                {minute}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    )
   }
 
   const formContent = (
@@ -213,19 +266,17 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           </div>
 
           <div className="space-y-2">
-            <Label>Start time</Label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <Input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </div>
+            <Label>Start Date</Label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Start Time</Label>
+            <TimePicker value={startTime} onChange={setStartTime} />
           </div>
 
           <div className="space-y-2">
@@ -271,11 +322,10 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-emerald-600">{success}</p>}
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={loading || classes.length === 0}>
-              {loading ? 'Saving...' : 'Add class'}
+            <Button type="submit" disabled={isPending || classes.length === 0}>
+              {isPending ? 'Saving...' : 'Add class'}
             </Button>
           </div>
         </form>

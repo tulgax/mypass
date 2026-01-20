@@ -10,7 +10,7 @@ const getSupabaseClient = cache(() => createClient())
 type ClassInstance = Tables<'class_instances'>
 
 export type ClassInstanceWithClass = ClassInstance & {
-  classes: Pick<Tables<'classes'>, 'name' | 'capacity' | 'type'> | null
+  classes: Pick<Tables<'classes'>, 'name' | 'capacity' | 'type' | 'duration_minutes' | 'studio_id'> | null
 }
 
 /**
@@ -58,7 +58,9 @@ export async function getUpcomingClassInstances(classIds: number[], limit?: numb
       classes (
         name,
         capacity,
-        type
+        type,
+        duration_minutes,
+        studio_id
       )
     `)
     .in('class_id', classIds)
@@ -99,4 +101,40 @@ export async function getClassInstanceIdsByClassIds(classIds: number[]): Promise
   }
 
   return (data || []).map((ci: { id: number }) => ci.id)
+}
+
+/**
+ * Get class instance by ID with full class details
+ */
+export async function getClassInstanceById(instanceId: number): Promise<ClassInstanceWithClass | null> {
+  const supabase = await getSupabaseClient()
+  
+  const { data, error } = await supabase
+    .from('class_instances')
+    .select(`
+      id,
+      class_id,
+      scheduled_at,
+      ends_at,
+      current_bookings,
+      is_cancelled,
+      classes (
+        name,
+        capacity,
+        type,
+        duration_minutes,
+        studio_id
+      )
+    `)
+    .eq('id', instanceId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return null
+    }
+    throw new Error(`Failed to fetch class instance: ${error.message}`)
+  }
+
+  return (data || null) as ClassInstanceWithClass | null
 }
