@@ -57,8 +57,21 @@ export const deleteClassInstanceSchema = z.object({
   id: z.number().int().positive(),
 })
 
+export const updateClassInstanceInstructorSchema = z.object({
+  id: z.number().int().positive(),
+  instructor_id: z.string().uuid().nullable(),
+})
+
+export const createManualBookingSchema = z.object({
+  class_instance_id: z.number().int().positive(),
+  student_id: z.string().uuid(),
+  status: z.enum(['confirmed', 'pending']).default('confirmed'),
+})
+
 export type CreateClassInstanceInput = z.infer<typeof createClassInstanceSchema>
 export type CreateClassInstancesInput = z.infer<typeof createClassInstancesSchema>
 export type CreateScheduleWithRepeatInput = z.infer<typeof createScheduleWithRepeatSchema>
 export type UpdateClassInstanceInput = z.infer<typeof updateClassInstanceSchema>
 export type DeleteClassInstanceInput = z.infer<typeof deleteClassInstanceSchema>
+export type UpdateClassInstanceInstructorInput = z.infer<typeof updateClassInstanceInstructorSchema>
+export type CreateManualBookingInput = z.infer<typeof createManualBookingSchema>

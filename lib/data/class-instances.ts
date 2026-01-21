@@ -54,6 +54,7 @@ export async function getUpcomingClassInstances(classIds: number[], limit?: numb
       scheduled_at,
       ends_at,
       current_bookings,
+      instructor_id,
       is_cancelled,
       classes (
         name,
@@ -117,6 +118,7 @@ export async function getClassInstanceById(instanceId: number): Promise<ClassIns
       scheduled_at,
       ends_at,
       current_bookings,
+      instructor_id,
       is_cancelled,
       classes (
         name,

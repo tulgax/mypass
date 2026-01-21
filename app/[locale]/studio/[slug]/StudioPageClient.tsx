@@ -189,6 +189,17 @@ export function StudioPageClient({ studio, classInstances, locale }: StudioPageC
     setSelectedDate(null)
   }
 
+  const handleCurrentWeek = () => {
+    const today = new Date()
+    const day = today.getDay()
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1) // Monday as first day
+    const monday = new Date(today)
+    monday.setDate(diff)
+    monday.setHours(0, 0, 0, 0)
+    setCurrentWeekStart(monday)
+    setSelectedDate(null)
+  }
+
   const formatDateRange = () => {
     const start = scheduleData[0]?.dateObj
     const end = scheduleData[6]?.dateObj
@@ -288,7 +299,11 @@ export function StudioPageClient({ studio, classInstances, locale }: StudioPageC
                                   >
                                     <ChevronLeft className="h-4 w-4" />
                                   </button>
-                                  <button className="rounded-full p-1 hover:bg-muted hover:text-foreground transition-colors">
+                                  <button
+                                    onClick={handleCurrentWeek}
+                                    className="rounded-full p-1 hover:bg-muted hover:text-foreground transition-colors"
+                                    title="Go to current week"
+                                  >
                                     <Calendar className="h-4 w-4" />
                                   </button>
                                   <button

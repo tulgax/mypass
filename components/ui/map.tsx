@@ -10,6 +10,7 @@ let MapContainer: any
 let TileLayer: any
 let Marker: any
 let Popup: any
+let useMap: any
 let L: any
 let isLeafletLoaded = false
 
@@ -24,6 +25,7 @@ function loadLeaflet() {
     TileLayer = leaflet.TileLayer
     Marker = leaflet.Marker
     Popup = leaflet.Popup
+    useMap = leaflet.useMap
     L = leafletCore.default || leafletCore
 
     // Fix for default marker icons in Next.js
@@ -39,6 +41,23 @@ function loadLeaflet() {
     isLeafletLoaded = true
   } catch (error) {
     console.error('Failed to load Leaflet:', error)
+  }
+}
+
+// Component to update map center when coordinates change
+function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
+  if (typeof window === 'undefined' || !useMap || !isLeafletLoaded) return null
+  
+  try {
+    const map = useMap()
+    useEffect(() => {
+      if (map) {
+        map.setView(center, zoom, { animate: false })
+      }
+    }, [map, center[0], center[1], zoom])
+    return null
+  } catch (error) {
+    return null
   }
 }
 
@@ -59,9 +78,13 @@ export function StudioMap({
   height = '300px',
   zoom = 15,
 }: MapProps) {
-  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(
-    latitude && longitude ? { lat: latitude, lng: longitude } : null
-  )
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(() => {
+    // Initialize with props if available
+    if (latitude != null && longitude != null && !isNaN(Number(latitude)) && !isNaN(Number(longitude))) {
+      return { lat: Number(latitude), lng: Number(longitude) }
+    }
+    return null
+  })
   const [isGeocoding, setIsGeocoding] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -73,18 +96,27 @@ export function StudioMap({
     }
   }, [])
 
+  // Update coordinates when props change - ensure they're numbers
   useEffect(() => {
-    // Only run geocoding after component is mounted
-    if (!isMounted) return
-
-    // If we have coordinates, use them
-    if (latitude && longitude) {
-      setCoordinates({ lat: latitude, lng: longitude })
-      return
+    if (latitude != null && longitude != null && !isNaN(Number(latitude)) && !isNaN(Number(longitude))) {
+      const lat = Number(latitude)
+      const lng = Number(longitude)
+      setCoordinates((prev) => {
+        // Only update if values actually changed
+        if (!prev || prev.lat !== lat || prev.lng !== lng) {
+          return { lat, lng }
+        }
+        return prev
+      })
+    } else if (latitude == null || longitude == null || isNaN(Number(latitude)) || isNaN(Number(longitude))) {
+      // Clear coordinates if props are invalid
+      setCoordinates(null)
     }
+  }, [latitude, longitude])
 
-    // If we only have an address, geocode it
-    if (address && !coordinates && isMounted) {
+  // Geocode address on mount if we have address but no coordinates
+  useEffect(() => {
+    if (address && !coordinates && typeof window !== 'undefined' && isMounted) {
       setIsGeocoding(true)
       geocodeAddress(address)
         .then((coords) => {
@@ -92,53 +124,22 @@ export function StudioMap({
             setCoordinates({ lat: coords.latitude, lng: coords.longitude })
           }
         })
-        .catch((error) => {
-          console.error('Geocoding failed:', error)
-          // Keep coordinates as null to show fallback
+        .catch(() => {
+          // Silently fail - will show map with default center
         })
         .finally(() => {
           setIsGeocoding(false)
         })
     }
-  }, [address, latitude, longitude, isMounted, coordinates])
+  }, [address, isMounted, coordinates])
+
+  // Default center (Ulaanbaatar, Mongolia)
+  const defaultCenter: [number, number] = [47.8864, 106.9057]
+  const center: [number, number] = coordinates
+    ? [coordinates.lat, coordinates.lng]
+    : defaultCenter
 
   if (isGeocoding) {
-    return (
-      <div className={cn('w-full rounded-lg border overflow-hidden', className)} style={{ height }}>
-        <Skeleton className="h-full w-full" />
-      </div>
-    )
-  }
-
-  // Show fallback if geocoding failed or no coordinates
-  if (!coordinates && !isGeocoding && isMounted) {
-    return (
-      <div
-        className={cn(
-          'w-full rounded-lg border overflow-hidden bg-muted flex items-center justify-center',
-          className
-        )}
-        style={{ height }}
-      >
-        <div className="text-center space-y-2 p-4">
-          <p className="text-sm text-muted-foreground">Unable to load map</p>
-          {address && (
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-primary hover:underline"
-            >
-              View on Google Maps
-            </a>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // Still loading or geocoding
-  if (!coordinates || !isMounted) {
     return (
       <div className={cn('w-full rounded-lg border overflow-hidden', className)} style={{ height }}>
         <Skeleton className="h-full w-full" />
@@ -158,23 +159,27 @@ export function StudioMap({
   return (
     <div className={cn('w-full rounded-lg border overflow-hidden', className)} style={{ height }}>
       <MapContainer
-        center={[coordinates.lat, coordinates.lng]}
+        key={`${center[0]}-${center[1]}`}
+        center={center}
         zoom={zoom}
         scrollWheelZoom={false}
         className="h-full w-full z-0"
         style={{ height: '100%', width: '100%' }}
       >
+        <ChangeView center={center} zoom={zoom} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[coordinates.lat, coordinates.lng]}>
-          {address && (
-            <Popup>
-              <div className="text-sm font-medium">{address}</div>
-            </Popup>
-          )}
-        </Marker>
+        {coordinates && (
+          <Marker position={[coordinates.lat, coordinates.lng]}>
+            {address && (
+              <Popup>
+                <div className="text-sm font-medium">{address}</div>
+              </Popup>
+            )}
+          </Marker>
+        )}
       </MapContainer>
     </div>
   )

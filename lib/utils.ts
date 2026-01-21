@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Re-export utility functions
-export { formatDateTime, formatDate, formatTime, isToday } from './utils/date'
+export { formatDateTime, formatDate, formatTime, isToday, getDayName } from './utils/date'
 export { formatAmount } from './utils/payments'

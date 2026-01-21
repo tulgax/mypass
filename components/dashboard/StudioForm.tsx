@@ -48,15 +48,30 @@ export function StudioForm({ studio }: StudioFormProps) {
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadingCover, setUploadingCover] = useState(false)
   
-  // Location states
-  const [latitude, setLatitude] = useState<number | null>(null)
-  const [longitude, setLongitude] = useState<number | null>(null)
+  // Location states - initialize from studio if available
+  const [latitude, setLatitude] = useState<number | null>(
+    studio?.latitude != null ? Number(studio.latitude) : null
+  )
+  const [longitude, setLongitude] = useState<number | null>(
+    studio?.longitude != null ? Number(studio.longitude) : null
+  )
   const [isReverseGeocoding, setIsReverseGeocoding] = useState(false)
   const [isGeocoding, setIsGeocoding] = useState(false)
 
   const isEditMode = !!studio
 
-  // Geocode address when it changes (for initial load or manual entry)
+  // Initialize coordinates from studio prop when it changes
+  useEffect(() => {
+    if (studio?.latitude != null && studio?.longitude != null) {
+      const lat = Number(studio.latitude)
+      const lng = Number(studio.longitude)
+      // Only update if values are different to avoid unnecessary re-renders
+      setLatitude((prev) => (prev !== lat ? lat : prev))
+      setLongitude((prev) => (prev !== lng ? lng : prev))
+    }
+  }, [studio?.latitude, studio?.longitude])
+
+  // Geocode address when it changes (for initial load or manual entry) - only if no coordinates exist
   useEffect(() => {
     if (isEditMode && studio?.address && !latitude && !longitude) {
       setIsGeocoding(true)
@@ -75,7 +90,7 @@ export function StudioForm({ studio }: StudioFormProps) {
           setIsGeocoding(false)
         })
     }
-  }, [isEditMode, studio?.address])
+  }, [isEditMode, studio?.address, latitude, longitude])
 
   // Handle logo file selection
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -131,6 +146,7 @@ export function StudioForm({ studio }: StudioFormProps) {
   async function handleLocationSelect(lat: number, lng: number) {
     setLatitude(lat)
     setLongitude(lng)
+    toast.success(`Location set: ${lat.toFixed(6)}, ${lng.toFixed(6)}. Click "Update Studio" to save.`)
     
     // Optionally reverse geocode to suggest address (but don't force it)
     setIsReverseGeocoding(true)
@@ -208,8 +224,8 @@ export function StudioForm({ studio }: StudioFormProps) {
             email: email || null,
             logo_url: logoUrl,
             cover_image_url: coverImageUrl,
-            latitude: latitude || null,
-            longitude: longitude || null,
+            latitude: latitude != null ? latitude : null,
+            longitude: longitude != null ? longitude : null,
           })
 
           if (!result.success) {
@@ -245,6 +261,8 @@ export function StudioForm({ studio }: StudioFormProps) {
               email: email || null,
               logo_url: logoUrl,
               cover_image_url: coverImageUrl,
+              latitude: latitude != null ? latitude : null,
+              longitude: longitude != null ? longitude : null,
             })
             .select()
             .single()

@@ -1,15 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDateTime } from '@/lib/utils'
+import { getDayName, formatDate } from '@/lib/utils'
 import { Tables } from '@/lib/types/database'
 import {
   Sheet,
@@ -19,15 +16,7 @@ import {
   SheetClose,
 } from '@/components/ui/sheet'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -35,17 +24,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { ScheduleForm } from '@/components/dashboard/ScheduleForm'
-import { updateClassInstance, deleteClassInstance } from '@/lib/actions/class-instances'
-import { updateClassInstanceSchema } from '@/lib/validation/class-instances'
-import { MoreHorizontal, X, Eye, Pencil, Trash2, Clock } from 'lucide-react'
+import { deleteClassInstance } from '@/lib/actions/class-instances'
+import { AnimatedTabs } from '@/components/custom/AnimatedTabs'
+import type { BookingWithRelations } from '@/lib/data/bookings'
+import { createClient } from '@/lib/supabase/client'
+import { X, Clock, MapPin, Users, Ban, Calendar } from 'lucide-react'
 
 type ClassInstanceWithClass = Tables<'class_instances'> & {
   classes: {
@@ -74,9 +58,11 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [open, setOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedInstance, setSelectedInstance] = useState<ClassInstanceWithClass | null>(null)
+  const [bookings, setBookings] = useState<BookingWithRelations[]>([])
+  const [loadingBookings, setLoadingBookings] = useState(false)
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming')
 
   const handleSuccess = () => {
     setOpen(false)
@@ -86,27 +72,74 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
     setTimeout(() => setIsRefreshing(false), 2000)
   }
 
-  const handleView = (instanceId: number) => {
+  const handleView = async (instanceId: number) => {
     const instance = instances.find((i) => i.id === instanceId)
     if (instance) {
       setSelectedInstance(instance)
       setViewOpen(true)
-    }
-  }
+      setLoadingBookings(true)
+      try {
+        const supabase = createClient()
 
-  const handleEdit = (instanceId: number) => {
-    const instance = instances.find((i) => i.id === instanceId)
-    if (instance) {
-      setSelectedInstance(instance)
-      setEditOpen(true)
-    }
-  }
+        // Fetch bookings
+        const { data: bookingsData, error: bookingsError } = await supabase
+          .from('bookings')
+          .select(`
+            id,
+            student_id,
+            class_instance_id,
+            status,
+            payment_status,
+            payment_id,
+            qr_code,
+            checked_in_at,
+            created_at,
+            updated_at
+          `)
+          .eq('class_instance_id', instanceId)
+          .order('created_at', { ascending: false })
 
-  const handleDeleteClick = (instanceId: number) => {
-    const instance = instances.find((i) => i.id === instanceId)
-    if (instance) {
-      setSelectedInstance(instance)
-      setDeleteDialogOpen(true)
+        if (bookingsError) {
+          console.error('Failed to fetch bookings:', bookingsError)
+          throw new Error(bookingsError.message || 'Failed to fetch bookings')
+        }
+
+        if (!bookingsData || bookingsData.length === 0) {
+          setBookings([])
+          return
+        }
+
+        // Fetch user profiles for all student IDs
+        const studentIds = [...new Set(bookingsData.map((b: { student_id: string }) => b.student_id))]
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('id, full_name')
+          .in('id', studentIds)
+
+        if (profilesError) {
+          console.error('Failed to fetch user profiles:', profilesError)
+          // Continue without profiles rather than failing completely
+        }
+
+        // Merge bookings with user profiles
+        const profilesMap = new Map(
+          (profilesData || []).map((p: { id: string; full_name: string | null }) => [p.id, p])
+        )
+
+        const bookingsWithProfiles = bookingsData.map((booking: { student_id: string;[key: string]: unknown }) => ({
+          ...booking,
+          user_profiles: profilesMap.get(booking.student_id) || null,
+        })) as BookingWithRelations[]
+
+        setBookings(bookingsWithProfiles)
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load bookings'
+        console.error('Failed to fetch bookings:', errorMessage, error)
+        toast.error(errorMessage)
+        setBookings([])
+      } finally {
+        setLoadingBookings(false)
+      }
     }
   }
 
@@ -115,7 +148,7 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
       e.preventDefault()
       e.stopPropagation()
     }
-    
+
     if (!selectedInstance || isPending) return
 
     const instanceIdToDelete = selectedInstance.id
@@ -136,23 +169,93 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           ? 'Schedule cancelled successfully'
           : 'Schedule deleted successfully'
       )
-      
+
       // Set refreshing state to show skeleton
       setIsRefreshing(true)
-      
+
       // Refresh data - this will cause the component to re-render with updated instances
       router.refresh()
-      
+
       // Wait for the refresh to complete and UI to update, then close dialog
       // We wait a bit longer to ensure the item is removed from the table
       await new Promise(resolve => setTimeout(resolve, 300))
-      
+
       setDeleteDialogOpen(false)
       setSelectedInstance(null)
-      
+
       // Reset refreshing state after data should be loaded (1-2 seconds)
       setTimeout(() => setIsRefreshing(false), 2000)
     })
+  }
+
+  // Filter instances into upcoming and past
+  const { upcomingInstances, pastInstances } = useMemo(() => {
+    const now = new Date()
+    const upcoming = instances.filter(i => {
+      const scheduledDate = new Date(i.scheduled_at)
+      return scheduledDate >= now && !i.is_cancelled
+    })
+    const past = instances.filter(i => {
+      const scheduledDate = new Date(i.scheduled_at)
+      return scheduledDate < now || i.is_cancelled
+    })
+    return { upcomingInstances: upcoming, pastInstances: past }
+  }, [instances])
+
+  // Group instances by date
+  const groupInstancesByDate = (instancesList: ClassInstanceWithClass[]) => {
+    const grouped = new Map<string, ClassInstanceWithClass[]>()
+
+    instancesList.forEach(instance => {
+      const date = new Date(instance.scheduled_at)
+      const dateKey = date.toISOString().split('T')[0]
+
+      if (!grouped.has(dateKey)) {
+        grouped.set(dateKey, [])
+      }
+      grouped.get(dateKey)!.push(instance)
+    })
+
+    // Sort dates chronologically
+    const sortedDates = Array.from(grouped.keys()).sort((a, b) => {
+      return new Date(a).getTime() - new Date(b).getTime()
+    })
+
+    return sortedDates.map(dateKey => ({
+      dateKey,
+      date: new Date(dateKey),
+      instances: grouped.get(dateKey)!.sort((a, b) => {
+        return new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
+      })
+    }))
+  }
+
+  const displayedInstances = activeTab === 'upcoming' ? upcomingInstances : pastInstances
+  const groupedInstances = groupInstancesByDate(displayedInstances)
+
+  // Format date header (e.g., "Monday Jan 26")
+  const formatDateHeader = (date: Date) => {
+    const dayName = getDayName(date)
+    const dateStr = formatDate(date)
+    // Extract "Jan 26" from "Jan 26, 2024"
+    const datePart = dateStr.split(',')[0]
+    return `${dayName} ${datePart}`
+  }
+
+  // Format time in 24-hour format (e.g., "09:00")
+  const formatTime24 = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date
+    const hours = d.getHours().toString().padStart(2, '0')
+    const minutes = d.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+  }
+
+  // Format time in 24-hour format helper (for use in ScheduleInstanceView)
+  const formatTime24Helper = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date
+    const hours = d.getHours().toString().padStart(2, '0')
+    const minutes = d.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
   }
 
   return (
@@ -166,126 +269,102 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           <Button onClick={() => setOpen(true)}>Create Schedule</Button>
         </div>
 
-      {(isPending || isRefreshing) ? (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Class</th>
-                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Date & Time</th>
-                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Bookings</th>
-                  <th className="h-10 px-4 text-right align-middle text-xs font-medium text-muted-foreground"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-b">
-                    <td className="p-4 align-middle">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-2 w-2 rounded-full shrink-0" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 align-middle text-center">
-                      <Skeleton className="h-4 w-28 mx-auto" />
-                    </td>
-                    <td className="p-4 align-middle text-center">
-                      <Skeleton className="h-4 w-16 mx-auto" />
-                    </td>
-                    <td className="p-4 align-middle text-right">
-                      <Skeleton className="h-8 w-8 ml-auto" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      ) : instances && instances.length > 0 ? (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Class</th>
-                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Date & Time</th>
-                  <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Bookings</th>
-                  <th className="h-10 px-4 text-right align-middle text-xs font-medium text-muted-foreground"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {instances.map((instance) => {
-                  const classData = instance.classes
-                  if (!classData) return null
+        {/* Tabs */}
+        <AnimatedTabs
+          tabs={[
+            { id: 'upcoming', label: 'Upcoming' },
+            { id: 'past', label: 'Past' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as 'upcoming' | 'past')}
+        />
 
-                  return (
-                    <tr key={instance.id} className="border-b transition-colors hover:bg-muted/50">
-                      <td className="p-4 align-middle">
-                        <div className="flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
-                          <div>
-                            <div className="font-medium text-sm">{classData.name}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              <Badge variant="outline" className="text-xs">
-                                {classData.type === 'online' ? 'Online' : 'Offline'}
-                              </Badge>
+        {/* List View */}
+        {(isPending || isRefreshing) ? (
+          <Card className="border-0 shadow-none">
+            <CardContent className="p-0">
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-20 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ) : groupedInstances.length > 0 ? (
+          <Card className="border-0 shadow-none">
+            <CardContent className="p-0">
+              <div className="space-y-6">
+                {groupedInstances.map(({ dateKey, date, instances: dateInstances }) => (
+                  <div key={dateKey} className="space-y-3">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      {formatDateHeader(date)}
+                    </h3>
+                    <div className="space-y-2">
+                      {dateInstances.map((instance) => {
+                        const classData = instance.classes
+                        if (!classData) return null
+
+                        const scheduledDate = new Date(instance.scheduled_at)
+                        const endDate = new Date(instance.ends_at)
+                        const timeRange = `${formatTime24(scheduledDate)} — ${formatTime24(endDate)}`
+                        const location = 'Ulaanbaatar Mongolia' // Default location, can be enhanced later
+                        const participants = `${instance.current_bookings || 0}/${classData.capacity}`
+
+                        return (
+                          <div
+                            key={instance.id}
+                            onClick={() => handleView(instance.id)}
+                            className="relative rounded-lg bg-blue-50 dark:bg-blue-950/20 cursor-pointer transition-all hover:bg-blue-100 dark:hover:bg-blue-950/30"
+                          >
+                            <div className="flex items-start justify-between gap-4 p-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-sm mb-2">
+                                  {classData.name}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1.5">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span>{timeRange}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <MapPin className="h-3.5 w-3.5" />
+                                    <span>{location}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <Users className="h-3.5 w-3.5" />
+                                    <span>{participants}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="p-4 align-middle text-center text-sm">
-                        {formatDateTime(instance.scheduled_at)}
-                      </td>
-                      <td className="p-4 align-middle text-center text-sm">
-                        {instance.current_bookings || 0} / {classData.capacity}
-                      </td>
-                      <td className="p-4 align-middle text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">More options</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={() => handleView(instance.id)}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(instance.id)}>
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteClick(instance.id)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              {instance.current_bookings > 0 ? 'Cancel' : 'Delete'}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">No upcoming classes scheduled</p>
-            <Button onClick={() => setOpen(true)}>Create your first schedule</Button>
-          </CardContent>
-        </Card>
-      )}
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-0 shadow-none">
+            <CardContent className="p-0 py-12 text-center">
+              <p className="text-muted-foreground mb-4">
+                {activeTab === 'upcoming'
+                  ? 'No upcoming classes scheduled'
+                  : 'No past classes'}
+              </p>
+              {activeTab === 'upcoming' && (
+                <Button onClick={() => setOpen(true)}>Create your first schedule</Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
@@ -310,63 +389,47 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
       </Sheet>
 
       {selectedInstance && (
-        <>
-          {/* View Sheet */}
-          <Sheet open={viewOpen} onOpenChange={setViewOpen}>
-            <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0 [&>button]:hidden">
-              <div className="p-6 border-b">
-                <SheetHeader>
-                  <div className="flex items-center justify-between">
-                    <SheetTitle>View Schedule</SheetTitle>
-                    <SheetClose asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
-                      </Button>
-                    </SheetClose>
-                  </div>
-                </SheetHeader>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6">
-                <ScheduleInstanceView instance={selectedInstance} />
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          {/* Edit Sheet */}
-          <Sheet open={editOpen} onOpenChange={setEditOpen}>
-            <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0 [&>button]:hidden">
-              <div className="p-6 border-b">
-                <SheetHeader>
-                  <div className="flex items-center justify-between">
-                    <SheetTitle>Edit Schedule</SheetTitle>
-                    <SheetClose asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
-                      </Button>
-                    </SheetClose>
-                  </div>
-                </SheetHeader>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6">
-                <ScheduleInstanceEdit
-                  instance={selectedInstance}
-                  onSuccess={() => {
-                    setEditOpen(false)
-                    router.refresh()
-                  }}
-                  onCancel={() => setEditOpen(false)}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-        </>
+        <Sheet open={viewOpen} onOpenChange={setViewOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0 [&>button]:hidden">
+            <div className="p-6 border-b">
+              <SheetHeader>
+                <div className="flex items-center justify-between">
+                  <SheetTitle>Booking details</SheetTitle>
+                  <SheetClose asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  </SheetClose>
+                </div>
+              </SheetHeader>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <ScheduleInstanceView
+                instance={selectedInstance}
+                bookings={bookings}
+                loadingBookings={loadingBookings}
+                onRefresh={() => {
+                  router.refresh()
+                  if (selectedInstance) {
+                    handleView(selectedInstance.id)
+                  }
+                }}
+                onCancel={() => {
+                  setViewOpen(false)
+                  setSelectedInstance(null)
+                  router.refresh()
+                }}
+                formatTime24={formatTime24Helper}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog 
-        open={deleteDialogOpen} 
+      <AlertDialog
+        open={deleteDialogOpen}
         onOpenChange={(open) => {
           // Prevent closing while deleting
           if (!isPending) {
@@ -403,277 +466,165 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
   )
 }
 
-function ScheduleInstanceView({ instance }: { instance: ClassInstanceWithClass }) {
+function ScheduleInstanceView({
+  instance,
+  bookings,
+  loadingBookings,
+  onRefresh,
+  onCancel,
+  formatTime24
+}: {
+  instance: ClassInstanceWithClass
+  bookings: BookingWithRelations[]
+  loadingBookings: boolean
+  onRefresh: () => void
+  onCancel: () => void
+  formatTime24: (date: Date | string) => string
+}) {
+  const [isPending, startTransition] = useTransition()
+  const [clientTab, setClientTab] = useState<'attending' | 'cancelled'>('attending')
+
   const classData = instance.classes
 
   if (!classData) {
     return <p className="text-sm text-muted-foreground">Class information not available</p>
   }
 
+  const handleCancelBooking = () => {
+    startTransition(async () => {
+      const result = await deleteClassInstance({ id: instance.id })
+
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      toast.success('Booking cancelled successfully')
+      onCancel()
+    })
+  }
+
+  // Format date and time separately
+  const scheduledDate = new Date(instance.scheduled_at)
+  const endDate = new Date(instance.ends_at)
+  // Format date as "Monday, Jan 26" (day name, month day)
+  const dayName = getDayName(scheduledDate)
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const month = monthNames[scheduledDate.getMonth()]
+  const day = scheduledDate.getDate()
+  const dateDisplay = `${dayName}, ${month} ${day}`
+  const timeDisplay = `${formatTime24(scheduledDate)} — ${formatTime24(endDate)}`
+  const location = 'Ulaanbaatar Mongolia' // Default location
+
+  // Filter bookings by status
+  const attendingBookings = bookings.filter(b => b.status === 'confirmed')
+  const cancelledBookings = bookings.filter(b => b.status === 'cancelled')
+
+  const displayedBookings = clientTab === 'attending' ? attendingBookings : cancelledBookings
+
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium mb-3 block text-muted-foreground">Class</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            <div className="font-medium">{classData.name}</div>
-            <div className="mt-1">
-              <Badge variant="outline" className="text-xs">
-                {classData.type === 'online' ? 'Online' : 'Offline'}
-              </Badge>
+      {/* Service Section (Read-only) */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-muted-foreground">Service</label>
+        <div className="relative rounded-lg bg-blue-50 dark:bg-blue-950/20 border-l-4 border-l-blue-500 p-4">
+          <div className="text-sm font-semibold mb-2">{classData.name}</div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              <span>{classData.duration_minutes || 'N/A'} min</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" />
+              <span>{location}</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Scheduled Date & Time</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            {formatDateTime(instance.scheduled_at)}
+      {/* Date & Time Section (Read-only) */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-muted-foreground">Date & Time</label>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-1.5 text-sm">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span>{dateDisplay}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span>{timeDisplay}</span>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">End Time</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            {formatDateTime(instance.ends_at)}
-          </div>
-        </div>
+      {/* Clients Section */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-muted-foreground">Clients</label>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Duration</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            {classData.duration_minutes || 'N/A'} minutes
-          </div>
-        </div>
+        <AnimatedTabs
+          tabs={[
+            { id: 'attending', label: `Attending ${attendingBookings.length}` },
+            { id: 'cancelled', label: `Cancelled ${cancelledBookings.length}` },
+          ]}
+          activeTab={clientTab}
+          onTabChange={(tab) => setClientTab(tab as 'attending' | 'cancelled')}
+        />
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Bookings</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            {instance.current_bookings || 0} / {classData.capacity}
-          </div>
-        </div>
-
-        {instance.is_cancelled && (
+        {loadingBookings ? (
           <div className="space-y-2">
-            <label className="text-sm font-medium">Status</label>
-            <div className="p-3 rounded-md border bg-muted/50 text-sm">
-              <Badge variant="destructive">Cancelled</Badge>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : displayedBookings.length > 0 ? (
+          <div className="space-y-2">
+            {displayedBookings.map((booking) => (
+              <div
+                key={booking.id}
+                className="flex items-center justify-between p-3 rounded-md border bg-muted/50"
+              >
+                <div className="text-sm">
+                  {booking.user_profiles?.full_name || 'Unknown Client'}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="relative">
+                <Users className="h-16 w-16 text-muted-foreground/20" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                {clientTab === 'attending'
+                  ? 'No participants yet'
+                  : 'No cancelled bookings'}
+              </p>
+              {clientTab === 'attending' && (
+                <p className="text-xs text-muted-foreground">
+                  Clients join by booking online on your public profile.
+                </p>
+              )}
             </div>
           </div>
         )}
+      </div>
+
+      {/* Cancel Booking Button */}
+      <div className="pt-4 border-t">
+        <Button
+          variant="destructive"
+          className="w-full"
+          onClick={handleCancelBooking}
+          disabled={isPending}
+        >
+          <Ban className="h-4 w-4 mr-2" />
+          Cancel booking
+        </Button>
       </div>
     </div>
   )
 }
 
-function ScheduleInstanceEdit({
-  instance,
-  onSuccess,
-  onCancel,
-}: {
-  instance: ClassInstanceWithClass
-  onSuccess: () => void
-  onCancel: () => void
-}) {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-
-  const classData = instance.classes
-  if (!classData) {
-    return <p className="text-sm text-muted-foreground">Class information not available</p>
-  }
-
-  const durationMinutes = classData.duration_minutes || 60
-
-  // Parse current scheduled time
-  const scheduledDate = new Date(instance.scheduled_at)
-  const startDate = scheduledDate.toISOString().split('T')[0]
-  const startTime = `${scheduledDate.getHours().toString().padStart(2, '0')}:${scheduledDate.getMinutes().toString().padStart(2, '0')}`
-
-  const [date, setDate] = useState(startDate)
-  const [time, setTime] = useState(startTime)
-
-  // Calculate end time based on duration
-  const calculateEndTime = (dateStr: string, timeStr: string) => {
-    if (!dateStr || !timeStr) return ''
-    const [year, month, day] = dateStr.split('-').map(Number)
-    const [hours, minutes] = timeStr.split(':').map(Number)
-    const start = new Date(year, month - 1, day, hours, minutes)
-    const end = new Date(start.getTime() + durationMinutes * 60 * 1000)
-    return end.toISOString()
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setFieldErrors({})
-
-    if (!date || !time) {
-      setError('Please select both date and time')
-      return
-    }
-
-    // Build datetime strings
-    const [year, month, day] = date.split('-').map(Number)
-    const [hours, minutes] = time.split(':').map(Number)
-    const scheduledAt = new Date(year, month - 1, day, hours, minutes)
-    const endsAt = new Date(scheduledAt.getTime() + durationMinutes * 60 * 1000)
-
-    // Validate with Zod
-    const input = {
-      id: instance.id,
-      scheduled_at: scheduledAt.toISOString(),
-      ends_at: endsAt.toISOString(),
-    }
-
-    const validationResult = updateClassInstanceSchema.safeParse(input)
-
-    if (!validationResult.success) {
-      const zodErrors = validationResult.error.flatten().fieldErrors
-      const errors: Record<string, string> = {}
-      Object.keys(zodErrors).forEach((key) => {
-        const errorMessages = zodErrors[key as keyof typeof zodErrors]
-        if (errorMessages && errorMessages.length > 0) {
-          errors[key] = errorMessages[0]
-        }
-      })
-      setFieldErrors(errors)
-      return
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await updateClassInstance(validationResult.data)
-
-        if (!result.success) {
-          setError(result.error)
-          toast.error(result.error)
-          return
-        }
-
-        toast.success('Schedule updated successfully')
-        onSuccess()
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to update schedule'
-        setError(errorMessage)
-        toast.error(errorMessage)
-      }
-    })
-  }
-
-  const endTimeDisplay = calculateEndTime(date, time)
-    ? formatDateTime(calculateEndTime(date, time))
-    : 'N/A'
-
-  // Time picker component
-  const TimePicker = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
-    const [hours, minutes] = value ? value.split(':') : ['09', '00']
-    
-    const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'))
-    // Common minute intervals: 00, 15, 30, 45
-    const minuteOptions = ['00', '15', '30', '45']
-
-    const handleHourChange = (h: string) => {
-      onChange(`${h}:${minutes}`)
-    }
-
-    const handleMinuteChange = (m: string) => {
-      onChange(`${hours}:${m}`)
-    }
-
-    return (
-      <div className="flex gap-2">
-        <Select value={hours} onValueChange={handleHourChange}>
-          <SelectTrigger>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <SelectValue placeholder="Hour" />
-            </div>
-          </SelectTrigger>
-          <SelectContent className="max-h-[200px]">
-            {hourOptions.map((hour) => (
-              <SelectItem key={hour} value={hour}>
-                {hour}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={minutes} onValueChange={handleMinuteChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Min" />
-          </SelectTrigger>
-          <SelectContent>
-            {minuteOptions.map((minute) => (
-              <SelectItem key={minute} value={minute}>
-                {minute}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    )
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-      <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium mb-3 block text-muted-foreground">Class</label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm">
-            <div className="font-medium">{classData.name}</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Duration: {classData.duration_minutes || 'N/A'} minutes
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="date">Scheduled Date</Label>
-          <Input
-            id="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className={fieldErrors.scheduled_at ? 'border-destructive' : ''}
-            required
-          />
-          {fieldErrors.scheduled_at && (
-            <p className="text-sm text-destructive">{fieldErrors.scheduled_at}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="time">Scheduled Time</Label>
-          <TimePicker value={time} onChange={setTime} />
-          {fieldErrors.scheduled_at && (
-            <p className="text-sm text-destructive">{fieldErrors.scheduled_at}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label>End Time (auto-calculated)</Label>
-          <div className="p-3 rounded-md border bg-muted/50 text-sm flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            {endTimeDisplay}
-          </div>
-        </div>
-
-        {error && <p className="text-destructive text-sm">{error}</p>}
-        {fieldErrors.ends_at && (
-          <p className="text-sm text-destructive">{fieldErrors.ends_at}</p>
-        )}
-
-        <div className="flex gap-2 pt-4 border-t">
-          <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isPending}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isPending} className="flex-1">
-            {isPending ? 'Updating...' : 'Update Schedule'}
-          </Button>
-        </div>
-      </div>
-    </form>
-  )
-}

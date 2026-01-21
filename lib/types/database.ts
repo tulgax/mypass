@@ -74,6 +74,7 @@ export type Database = {
           current_bookings: number
           ends_at: string
           id: number
+          instructor_id: string | null
           is_cancelled: boolean
           scheduled_at: string
         }
@@ -82,6 +83,7 @@ export type Database = {
           current_bookings?: number
           ends_at: string
           id?: never
+          instructor_id?: string | null
           is_cancelled?: boolean
           scheduled_at: string
         }
@@ -90,6 +92,7 @@ export type Database = {
           current_bookings?: number
           ends_at?: string
           id?: never
+          instructor_id?: string | null
           is_cancelled?: boolean
           scheduled_at?: string
         }
@@ -246,7 +249,9 @@ export type Database = {
           description: string | null
           email: string | null
           id: number
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
           owner_id: string
           phone: string | null
@@ -260,7 +265,9 @@ export type Database = {
           description?: string | null
           email?: string | null
           id?: never
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name: string
           owner_id: string
           phone?: string | null
@@ -274,7 +281,9 @@ export type Database = {
           description?: string | null
           email?: string | null
           id?: never
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           owner_id?: string
           phone?: string | null

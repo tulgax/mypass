@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { createScheduleWithRepeatSchema, updateClassInstanceSchema, deleteClassInstanceSchema } from '@/lib/validation/class-instances'
+import { createScheduleWithRepeatSchema, updateClassInstanceSchema, deleteClassInstanceSchema, updateClassInstanceInstructorSchema, createManualBookingSchema } from '@/lib/validation/class-instances'
 import { getStudioBasicInfo } from '@/lib/data/studios'
 import { getActiveClassesByStudioId } from '@/lib/data/classes'
 import { getClassInstanceById } from '@/lib/data/class-instances'
@@ -305,5 +305,137 @@ export async function deleteClassInstance(input: unknown): Promise<ActionResult>
       return { success: false, error: error.message }
     }
     return { success: false, error: 'Failed to delete class instance' }
+  }
+}
+
+/**
+ * Update instructor for a class instance
+ */
+export async function updateClassInstanceInstructor(input: unknown): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const validated = updateClassInstanceInstructorSchema.parse(input)
+    const { id, instructor_id } = validated
+
+    // Verify the instance belongs to the user's studio
+    const studio = await getStudioBasicInfo(user.id)
+    if (!studio) {
+      return { success: false, error: 'Studio not found' }
+    }
+
+    // Get instance and verify ownership
+    const instance = await getClassInstanceById(id)
+    if (!instance) {
+      return { success: false, error: 'Class instance not found' }
+    }
+
+    if (!instance.classes || instance.classes.studio_id !== studio.id) {
+      return { success: false, error: 'Unauthorized: Instance does not belong to your studio' }
+    }
+
+    // Update the instructor
+    const { error: updateError } = await supabase
+      .from('class_instances')
+      .update({ instructor_id })
+      .eq('id', id)
+
+    if (updateError) {
+      return { success: false, error: `Failed to update instructor: ${updateError.message}` }
+    }
+
+    revalidatePath('/studio/schedule')
+    revalidatePath('/studio/overview')
+
+    return { success: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    }
+    return { success: false, error: 'Failed to update instructor' }
+  }
+}
+
+/**
+ * Create a manual booking (add client to class instance)
+ */
+export async function createManualBooking(input: unknown): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const validated = createManualBookingSchema.parse(input)
+    const { class_instance_id, student_id, status } = validated
+
+    // Verify the instance belongs to the user's studio
+    const studio = await getStudioBasicInfo(user.id)
+    if (!studio) {
+      return { success: false, error: 'Studio not found' }
+    }
+
+    // Get instance and verify ownership
+    const instance = await getClassInstanceById(class_instance_id)
+    if (!instance) {
+      return { success: false, error: 'Class instance not found' }
+    }
+
+    if (!instance.classes || instance.classes.studio_id !== studio.id) {
+      return { success: false, error: 'Unauthorized: Instance does not belong to your studio' }
+    }
+
+    // Check capacity
+    if (instance.current_bookings >= instance.classes.capacity) {
+      return { success: false, error: 'Class is at full capacity' }
+    }
+
+    // Check if booking already exists
+    const { data: existingBooking } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('class_instance_id', class_instance_id)
+      .eq('student_id', student_id)
+      .single()
+
+    if (existingBooking) {
+      return { success: false, error: 'Student already has a booking for this class' }
+    }
+
+    // Create booking
+    const { error: bookingError } = await supabase
+      .from('bookings')
+      .insert({
+        student_id,
+        class_instance_id,
+        status,
+        payment_status: 'paid', // Manual bookings are considered paid
+      })
+
+    if (bookingError) {
+      return { success: false, error: `Failed to create booking: ${bookingError.message}` }
+    }
+
+    // Update booking count
+    await supabase.rpc('check_booking_capacity', {
+      class_instance_id_param: class_instance_id,
+    })
+
+    revalidatePath('/studio/schedule')
+    revalidatePath('/studio/overview')
+
+    return { success: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    }
+    return { success: false, error: 'Failed to create booking' }
   }
 }

@@ -139,3 +139,37 @@ export async function getPaymentsByBookingIds(bookingIds: number[]): Promise<Pay
 
   return payments || []
 }
+
+/**
+ * Get bookings for a specific class instance with user profiles
+ */
+export async function getBookingsByInstanceId(instanceId: number): Promise<BookingWithRelations[]> {
+  const supabase = await getSupabaseClient()
+  
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(`
+      id,
+      student_id,
+      class_instance_id,
+      status,
+      payment_status,
+      payment_id,
+      qr_code,
+      checked_in_at,
+      created_at,
+      updated_at,
+      user_profiles (
+        id,
+        full_name
+      )
+    `)
+    .eq('class_instance_id', instanceId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw new Error(`Failed to fetch bookings: ${error.message}`)
+  }
+
+  return (data || []) as BookingWithRelations[]
+}
