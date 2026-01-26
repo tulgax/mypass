@@ -80,7 +80,7 @@ export function AppSidebar({
       <SidebarFooter>
         <NavUser user={{ ...user, avatar: user.avatar ?? "" }} onSignOut={onSignOut} />
       </SidebarFooter>
-      <SidebarRail />
+      {/* <SidebarRail /> */}
     </Sidebar>
   )
 }

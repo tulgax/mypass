@@ -197,6 +197,152 @@ export type Database = {
           },
         ]
       }
+      membership_check_ins: {
+        Row: {
+          check_in_method: string
+          checked_by: string | null
+          checked_in_at: string
+          created_at: string
+          id: number
+          membership_id: number
+        }
+        Insert: {
+          check_in_method: string
+          checked_by?: string | null
+          checked_in_at?: string
+          created_at?: string
+          id?: never
+          membership_id: number
+        }
+        Update: {
+          check_in_method?: string
+          checked_by?: string | null
+          checked_in_at?: string
+          created_at?: string
+          id?: never
+          membership_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_check_ins_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_plans: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          duration_months: number
+          id: number
+          is_active: boolean
+          name: string
+          price: number
+          studio_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_months: number
+          id?: never
+          is_active?: boolean
+          name: string
+          price: number
+          studio_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_months?: number
+          id?: never
+          is_active?: boolean
+          name?: string
+          price?: number
+          studio_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_plans_studio_id_fkey"
+            columns: ["studio_id"]
+            isOneToOne: false
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memberships: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: number
+          membership_plan_id: number
+          payment_id: number | null
+          purchased_at: string
+          qr_code: string | null
+          status: string
+          student_id: string
+          studio_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: never
+          membership_plan_id: number
+          payment_id?: number | null
+          purchased_at?: string
+          qr_code?: string | null
+          status?: string
+          student_id: string
+          studio_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: never
+          membership_plan_id?: number
+          payment_id?: number | null
+          purchased_at?: string
+          qr_code?: string | null
+          status?: string
+          student_id?: string
+          studio_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_membership_plan_id_fkey"
+            columns: ["membership_plan_id"]
+            isOneToOne: false
+            referencedRelation: "membership_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_studio_id_fkey"
+            columns: ["studio_id"]
+            isOneToOne: false
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -330,6 +476,18 @@ export type Database = {
       check_booking_capacity: {
         Args: { class_instance_id_param: number }
         Returns: boolean
+      }
+      check_membership_validity: {
+        Args: { membership_id_param: number }
+        Returns: boolean
+      }
+      expire_memberships: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      generate_membership_qr_code: {
+        Args: { membership_id_param: number }
+        Returns: string
       }
       generate_qr_code: { Args: { booking_id_param: number }; Returns: string }
       update_user_role: {

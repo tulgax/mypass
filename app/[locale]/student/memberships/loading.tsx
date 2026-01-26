@@ -1,0 +1,28 @@
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent } from '@/components/ui/card'
+
+export default function Loading() {
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-32 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-32" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <Skeleton className="h-6 w-32 mb-2" />
+              <Skeleton className="h-4 w-24 mb-4" />
+              <Skeleton className="h-8 w-20 mb-2" />
+              <Skeleton className="h-3 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import { Link, usePathname } from "@/i18n/routing"
-import { CalendarDaysIcon, CompassIcon, LayoutDashboardIcon } from "lucide-react"
+import { CalendarDaysIcon, CompassIcon, LayoutDashboardIcon, CreditCardIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -62,6 +62,11 @@ const items = [
     title: "My Bookings",
     href: "/student/bookings",
     icon: CalendarDaysIcon,
+  },
+  {
+    title: "My Memberships",
+    href: "/student/memberships",
+    icon: CreditCardIcon,
   },
 ]
 

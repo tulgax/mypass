@@ -32,3 +32,12 @@ export function parseQRCodeString(qrString: string): number | null {
   if (!match) return null
   return parseInt(match[1], 10)
 }
+
+/**
+ * Parse membership QR code string to extract membership ID
+ */
+export function parseMembershipQRCodeString(qrString: string): number | null {
+  const match = qrString.match(/^membership-(\d+)-/)
+  if (!match) return null
+  return parseInt(match[1], 10)
+}

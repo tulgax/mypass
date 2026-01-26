@@ -192,6 +192,11 @@ export function DashboardShell({
           isActive: pathname === "/studio/catalog/plans",
         },
         {
+          title: "Membership",
+          url: "/studio/catalog/membership",
+          isActive: pathname === "/studio/catalog/membership" || pathname.startsWith("/studio/catalog/membership/"),
+        },
+        {
           title: "Coupons",
           url: "/studio/catalog/coupons",
           isActive: pathname === "/studio/catalog/coupons",
@@ -269,9 +274,9 @@ export function DashboardShell({
         onSignOut={onSignOut}
       />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="h-9 w-9" />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"

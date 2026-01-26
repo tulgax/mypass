@@ -1,0 +1,151 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { formatAmount, formatDate } from '@/lib/utils'
+import { Search, Users, Calendar, Clock } from 'lucide-react'
+import type { MembershipWithRelations } from '@/lib/data/memberships'
+
+interface MembershipsClientProps {
+  memberships: MembershipWithRelations[]
+}
+
+export function MembershipsClient({ memberships: initialMemberships }: MembershipsClientProps) {
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired'>('all')
+
+  // Filter memberships
+  const filteredMemberships = initialMemberships.filter((membership) => {
+    const matchesSearch =
+      membership.user_profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      membership.membership_plans?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && membership.status === 'active') ||
+      (statusFilter === 'expired' && membership.status === 'expired')
+
+    return matchesSearch && matchesStatus
+  })
+
+  const activeCount = initialMemberships.filter((m) => m.status === 'active').length
+  const expiredCount = initialMemberships.filter((m) => m.status === 'expired').length
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Active Memberships</h1>
+          <p className="text-sm text-muted-foreground">View and manage gym memberships</p>
+        </div>
+        <Button onClick={() => router.push('/studio/memberships/checkin')}>
+          Check In
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name or plan..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant={statusFilter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setStatusFilter('all')}
+          >
+            All ({initialMemberships.length})
+          </Button>
+          <Button
+            variant={statusFilter === 'active' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setStatusFilter('active')}
+          >
+            Active ({activeCount})
+          </Button>
+          <Button
+            variant={statusFilter === 'expired' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setStatusFilter('expired')}
+          >
+            Expired ({expiredCount})
+          </Button>
+        </div>
+      </div>
+
+      {/* Memberships List */}
+      {filteredMemberships.length > 0 ? (
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {filteredMemberships.map((membership) => {
+                const isExpired = new Date(membership.expires_at) < new Date()
+                const isActive = membership.status === 'active' && !isExpired
+
+                return (
+                  <div
+                    key={membership.id}
+                    className="p-6 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold">
+                            {membership.user_profiles?.full_name || 'Unknown Member'}
+                          </h3>
+                          <Badge variant={isActive ? 'default' : 'secondary'}>
+                            {isActive ? 'Active' : 'Expired'}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <Users className="h-3.5 w-3.5" />
+                            <span>{membership.membership_plans?.name || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span>Expires: {formatDate(new Date(membership.expires_at))}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5" />
+                            <span>
+                              {formatAmount(
+                                membership.membership_plans?.price || 0,
+                                membership.membership_plans?.currency || 'MNT'
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">
+              {searchQuery || statusFilter !== 'all'
+                ? 'No memberships match your filters'
+                : 'No memberships yet'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
