@@ -1,12 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import { formatAmount } from '@/lib/utils'
 
 export default async function OrdersPage() {
+  const t = await getTranslations('studio.catalog.orders')
   const supabase = await createClient()
   const {
     data: { user },
@@ -33,8 +36,8 @@ export default async function OrdersPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-muted-foreground">View and manage all orders</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -44,7 +47,7 @@ export default async function OrdersPage() {
             <Card key={order.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Order #{order.id}</CardTitle>
+                  <CardTitle>{t('orderNumber', { id: order.id })}</CardTitle>
                   <Badge variant={order.status === 'completed' ? 'default' : 'outline'}>
                     {order.status}
                   </Badge>
@@ -61,7 +64,7 @@ export default async function OrdersPage() {
                     </p>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/studio/catalog/orders/${order.id}`}>View Details</Link>
+                    <Link href={`/studio/catalog/orders/${order.id}`}>{t('viewDetails')}</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -70,8 +73,12 @@ export default async function OrdersPage() {
         </div>
       ) : (
         <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">No orders yet</p>
+          <CardContent className="p-0">
+            <StudioEmptyState
+              variant="orders"
+              title={t('noOrders')}
+              embedded
+            />
           </CardContent>
         </Card>
       )}

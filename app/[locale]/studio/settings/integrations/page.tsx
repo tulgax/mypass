@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 export default async function IntegrationsSettingsPage() {
+  const t = await getTranslations('studio.settings.integrations')
   const supabase = await createClient()
   const {
     data: { user },
@@ -24,8 +26,8 @@ export default async function IntegrationsSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Integrations</h1>
-        <p className="text-muted-foreground">Connect with third-party services</p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -35,14 +37,14 @@ export default async function IntegrationsSettingsPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">{integration.name}</CardTitle>
                 <Badge variant={integration.connected ? 'default' : 'outline'}>
-                  {integration.connected ? 'Connected' : 'Not Connected'}
+                  {integration.connected ? t('connected') : t('notConnected')}
                 </Badge>
               </div>
               <CardDescription>{integration.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant={integration.connected ? 'outline' : 'default'} className="w-full">
-                {integration.connected ? 'Disconnect' : 'Connect'}
+                {integration.connected ? t('disconnect') : t('connect')}
               </Button>
             </CardContent>
           </Card>

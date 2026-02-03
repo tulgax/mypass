@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 export default async function BillingSettingsPage() {
+  const t = await getTranslations('studio.settings.billing')
   const supabase = await createClient()
   const {
     data: { user },
@@ -17,35 +19,35 @@ export default async function BillingSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Plan & Billing</h1>
-        <p className="text-muted-foreground">Manage your subscription and billing</p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Current Plan</CardTitle>
-              <CardDescription>Your active subscription plan</CardDescription>
+              <CardTitle>{t('currentPlan')}</CardTitle>
+              <CardDescription>{t('activeSubscription')}</CardDescription>
             </div>
-            <Badge>Free Trial</Badge>
+            <Badge>{t('freeTrial')}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className="text-sm text-muted-foreground">Plan expires in 12 days</p>
+            <p className="text-sm text-muted-foreground">{t('planExpires', { days: 12 })}</p>
           </div>
-          <Button>Upgrade Plan</Button>
+          <Button>{t('upgradePlan')}</Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-          <CardDescription>View your past invoices and payments</CardDescription>
+          <CardTitle>{t('billingHistory')}</CardTitle>
+          <CardDescription>{t('viewInvoices')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">No billing history available</p>
+          <p className="text-muted-foreground">{t('noHistory')}</p>
         </CardContent>
       </Card>
     </div>

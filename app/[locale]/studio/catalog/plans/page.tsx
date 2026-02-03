@@ -1,10 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 
 export default async function PlansPage() {
+  const t = await getTranslations('studio.catalog.plans')
   const supabase = await createClient()
   const {
     data: { user },
@@ -31,10 +34,10 @@ export default async function PlansPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Plans</h1>
-          <p className="text-muted-foreground">Manage your subscription plans</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button>Create Plan</Button>
+        <Button>{t('createPlan')}</Button>
       </div>
 
       {plans && plans.length > 0 ? (
@@ -52,9 +55,13 @@ export default async function PlansPage() {
         </div>
       ) : (
         <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">No plans yet</p>
-            <Button>Create your first plan</Button>
+          <CardContent className="p-0">
+            <StudioEmptyState
+              variant="plans"
+              title={t('noPlans')}
+              action={<Button>{t('createFirst')}</Button>}
+              embedded
+            />
           </CardContent>
         </Card>
       )}

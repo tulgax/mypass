@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { StudioForm } from '@/components/dashboard/StudioForm'
 import { getStudioByOwnerId } from '@/lib/data/studios'
 
 export default async function StudioSettingsPage() {
+  const t = await getTranslations('studio.settings.studio')
   const supabase = await createClient()
   const {
     data: { user },
@@ -19,11 +21,11 @@ export default async function StudioSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Studio Settings</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
           {studio
-            ? 'Manage your studio profile and information'
-            : 'Set up your studio profile to start taking bookings'}
+            ? t('subtitle')
+            : t('subtitleNew')}
         </p>
       </div>
       <StudioForm studio={studio} />

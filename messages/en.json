@@ -317,6 +317,8 @@
   },
   "auth": {
     "signIn": {
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
       "title": "Sign in to your account",
       "email": "Email",
       "password": "Password",
@@ -333,22 +335,46 @@
       "mypass": "MyPass"
     },
     "signUp": {
-      "title": "Sign Up",
+      "title": "Sign up",
       "description": "Create an account to get started",
-      "fullName": "Full Name",
+      "student": "Student",
+      "studio": "Studio",
+      "studentDescription": "I'm looking to book classes and/or appointments.",
+      "studioDescription": "I'm looking to use MyPass to run my business.",
+      "fullName": "Full name",
       "fullNamePlaceholder": "John Doe",
+      "phone": "Phone number",
+      "phonePlaceholder": "+1 650 123 4567",
       "email": "Email",
       "emailPlaceholder": "you@example.com",
       "password": "Password",
       "passwordPlaceholder": "••••••••",
-      "role": "I am a",
-      "rolePlaceholder": "Select role",
-      "student": "Student",
-      "studioOwner": "Studio Owner",
+      "businessName": "Business name",
+      "businessNamePlaceholder": "AS Design Studio",
+      "country": "Country",
+      "countryPlaceholder": "Select country",
+      "profilePhoto": "Profile photo",
+      "profilePhotoDescription": "Upload a photo that represents your business.",
+      "coverPhoto": "Cover photo",
+      "coverPhotoDescription": "Add a welcoming banner for your profile.",
+      "urlSlug": "URL slug",
+      "urlSlugDescription": "Create a unique URL for your public profile.",
+      "urlSlugPrefix": "mypass.me/",
       "alreadyHaveAccount": "Already have an account?",
       "signInLink": "Sign in",
       "createAccountError": "Could not create account",
-      "createProfileError": "Could not create profile"
+      "createProfileError": "Could not create profile",
+      "createStudioError": "Could not create studio",
+      "slugTaken": "This URL is already taken. Please choose another.",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "step1Title": "Set up your account",
+      "step2Title": "Customize your profile",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithFacebook": "Continue with Facebook",
+      "or": "or"
     }
   },
   "dashboard": {
@@ -360,7 +386,26 @@
       "clients": "Clients",
       "settings": "Settings",
       "studioSettings": "Studio Settings",
-      "account": "Account"
+      "account": "Account",
+      "plans": "Plans",
+      "membership": "Membership",
+      "coupons": "Coupons",
+      "orders": "Orders",
+      "payments": "Payments",
+      "policies": "Policies",
+      "availability": "Availability",
+      "planBilling": "Plan & Billing",
+      "team": "Team",
+      "integrations": "Integrations",
+      "studio": "Studio",
+      "createClass": "Create Class"
+    },
+    "sidebar": {
+      "studioDashboard": "Studio Dashboard",
+      "toggleSidebar": "Toggle Sidebar"
+    },
+    "header": {
+      "notifications": "Notifications"
     },
     "overview": {
       "title": "Overview",
@@ -438,6 +483,449 @@
       "email": "Please enter a valid email address",
       "minLength": "Must be at least {min} characters",
       "maxLength": "Must be no more than {max} characters"
+    }
+  },
+  "studio": {
+    "schedule": {
+      "title": "Schedule",
+      "subtitle": "View your upcoming classes",
+      "createSchedule": "Create Schedule",
+      "tabs": {
+        "upcoming": "Upcoming",
+        "past": "Past"
+      },
+      "empty": {
+        "upcoming": "No upcoming classes scheduled",
+        "past": "No past classes",
+        "createFirst": "Create your first schedule"
+      },
+      "sheet": {
+        "addToSchedule": "Add to schedule",
+        "bookingDetails": "Booking details"
+      },
+      "dialog": {
+        "cancelSchedule": "Cancel Schedule?",
+        "deleteSchedule": "Delete Schedule?",
+        "cancelScheduleDescription": "This instance has {count} booking(s). It will be cancelled but not deleted. This action cannot be undone.",
+        "deleteScheduleDescription": "Are you sure you want to delete this scheduled class? This action cannot be undone.",
+        "deleting": "Deleting...",
+        "cancelScheduleButton": "Cancel Schedule",
+        "deleteButton": "Delete",
+        "cancelClassTitle": "You're cancelling a class",
+        "cancelClassDescription": "Do you want to cancel all occurrences of this class, or only the selected occurrence? If someone has booked any classes, they will be able to rebook for the future date.",
+        "cancelThisClass": "Cancel only this class",
+        "cancelAllFuture": "Cancel all future classes",
+        "dismiss": "Dismiss"
+      },
+      "toast": {
+        "scheduleCancelled": "Schedule cancelled successfully",
+        "scheduleDeleted": "Schedule deleted successfully",
+        "classCancelled": "Class cancelled successfully",
+        "allFutureCancelled": "All future classes cancelled successfully"
+      },
+      "instanceView": {
+        "service": "Service",
+        "dateTime": "Date & Time",
+        "clients": "Clients",
+        "attending": "Attending",
+        "cancelled": "Cancelled",
+        "noParticipants": "No participants yet",
+        "noCancelledBookings": "No cancelled bookings",
+        "clientsJoinInfo": "Clients join by booking online on your public profile.",
+        "cancelBooking": "Cancel booking",
+        "classInfoNotAvailable": "Class information not available",
+        "unknownClient": "Unknown Client",
+        "min": "min",
+        "weeklyOn": "Weekly on {day} at {time}"
+      }
+    },
+    "overview": {
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "totalRevenueDesc": "From all bookings",
+        "totalBookings": "Total Bookings",
+        "totalBookingsDesc": "All time bookings",
+        "activeClasses": "Active Classes",
+        "activeClassesDesc": "Classes in your catalog",
+        "totalCustomers": "Total Customers",
+        "totalCustomersDesc": "Unique students"
+      },
+      "upcomingClasses": {
+        "title": "Upcoming Classes",
+        "description": "Your next scheduled sessions",
+        "noUpcoming": "No upcoming classes scheduled",
+        "booked": "booked",
+        "viewFullSchedule": "View Full Schedule",
+        "unnamedClass": "Unnamed Class"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "description": "Common tasks and shortcuts",
+        "createClass": "Create New Class",
+        "scheduleSession": "Schedule Class Session",
+        "viewBookings": "View Bookings"
+      }
+    },
+    "clients": {
+      "title": "Clients",
+      "subtitle": "Manage all bookings for your classes",
+      "student": "Student",
+      "class": "Class:",
+      "dateNotAvailable": "Date not available",
+      "noBookings": "No bookings yet",
+      "unknown": "Unknown"
+    },
+    "classes": {
+      "title": "Classes",
+      "subtitle": "Manage your studio classes",
+      "createClass": "Create Class",
+      "table": {
+        "name": "Name",
+        "price": "Price",
+        "duration": "Duration",
+        "minutes": "minutes"
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete",
+        "moreOptions": "More options"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "empty": {
+        "noClasses": "No classes yet",
+        "createFirst": "Create your first class"
+      },
+      "sheet": {
+        "addClass": "Add class",
+        "viewClass": "View Class",
+        "editClass": "Edit class"
+      },
+      "form": {
+        "classType": "Class type",
+        "online": "Online",
+        "onlineDescription": "A virtual class that clients can join remotely.",
+        "offline": "Offline",
+        "offlineDescription": "An in-person class at your studio location.",
+        "name": "Name",
+        "namePlaceholder": "e.g. Pilates in group",
+        "description": "Description",
+        "descriptionPlaceholder": "What can clients expect from this service?",
+        "price": "Price",
+        "currency": "Currency",
+        "currencyMNT": "MNT (Mongolian Tugrik)",
+        "currencyUSD": "USD (US Dollar)",
+        "location": "Location",
+        "locationPlaceholder": "Enter location",
+        "capacity": "Capacity",
+        "zoomLink": "Zoom Link",
+        "zoomLinkPlaceholder": "https://zoom.us/j/...",
+        "durationMinutes": "Duration (minutes)",
+        "durationPlaceholder": "60",
+        "isActive": "Active (class is available for booking)",
+        "creating": "Creating...",
+        "updating": "Updating...",
+        "addClassButton": "Add class",
+        "updateClassButton": "Update class"
+      },
+      "view": {
+        "name": "Name",
+        "description": "Description",
+        "price": "Price",
+        "capacity": "Capacity",
+        "person": "person",
+        "people": "people",
+        "minute": "minute",
+        "minutes": "minutes",
+        "status": "Status"
+      },
+      "dialog": {
+        "deleteTitle": "Delete Class?",
+        "deleteDescription": "Are you sure you want to delete this class? This action cannot be undone.",
+        "deleting": "Deleting..."
+      },
+      "toast": {
+        "deleted": "Class deleted successfully",
+        "created": "Class created successfully",
+        "updated": "Class updated successfully"
+      }
+    },
+    "memberships": {
+      "plans": {
+        "title": "Membership Plans",
+        "subtitle": "Create and manage membership plans for your gym",
+        "createPlan": "Create Plan",
+        "empty": {
+          "noPlans": "No membership plans yet",
+          "createFirst": "Create your first plan"
+        },
+        "card": {
+          "month": "month",
+          "months": "months",
+          "active": "active",
+          "activeBadge": "Active",
+          "inactiveBadge": "Inactive"
+        },
+        "sheet": {
+          "createTitle": "Create Membership Plan",
+          "editTitle": "Edit Membership Plan"
+        },
+        "form": {
+          "planName": "Plan Name",
+          "planNamePlaceholder": "e.g., Monthly, 3 Months",
+          "durationMonths": "Duration (months)",
+          "price": "Price",
+          "currency": "Currency",
+          "description": "Description (optional)",
+          "descriptionPlaceholder": "Describe what's included in this plan",
+          "isActive": "Active",
+          "saving": "Saving...",
+          "createPlan": "Create Plan",
+          "updatePlan": "Update Plan"
+        },
+        "dialog": {
+          "deleteTitle": "Delete Membership Plan?",
+          "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+          "warning": "Warning: This plan has {count} active members.",
+          "deleting": "Deleting..."
+        },
+        "toast": {
+          "deleted": "Membership plan deleted successfully"
+        }
+      },
+      "active": {
+        "title": "Active Memberships",
+        "subtitle": "View and manage gym memberships",
+        "checkIn": "Check In",
+        "searchPlaceholder": "Search by name or plan...",
+        "filters": {
+          "all": "All",
+          "active": "Active",
+          "expired": "Expired"
+        },
+        "card": {
+          "unknownMember": "Unknown Member",
+          "expires": "Expires:",
+          "activeBadge": "Active",
+          "expiredBadge": "Expired",
+          "na": "N/A"
+        },
+        "empty": {
+          "noMatches": "No memberships match your filters",
+          "noMemberships": "No memberships yet"
+        }
+      },
+      "checkin": {
+        "title": "Check In",
+        "subtitle": "Scan QR codes or manually check in members",
+        "tabs": {
+          "qrScanner": "QR Code Scanner",
+          "manual": "Manual Check-In"
+        },
+        "qr": {
+          "title": "Scan QR Code",
+          "placeholder": "Enter QR code",
+          "button": "Check In",
+          "comingSoon": "Manual check-in feature coming soon",
+          "scanInstruction": "Scan the QR code from the member's phone or enter it manually",
+          "gymQRTitle": "Gym QR Code",
+          "gymQRDescription": "Display this QR code at your gym entrance. Members can scan it to check in.",
+          "gymQRComingSoon": "QR code display coming soon",
+          "member": "Member:",
+          "checkedInAt": "Checked in at",
+          "searchMember": "Search Member",
+          "searchPlaceholder": "Search by name...",
+          "manualDescription": "Manual check-in feature coming soon. For now, use QR code scanning."
+        },
+        "toast": {
+          "qrRequired": "Please enter a QR code",
+          "checkInSuccess": "Check-in successful for {name}",
+          "checkInSuccessGeneric": "Check-in successful"
+        }
+      }
+    },
+    "catalog": {
+      "orders": {
+        "title": "Orders",
+        "subtitle": "View and manage all orders",
+        "orderNumber": "Order #{id}",
+        "viewDetails": "View Details",
+        "noOrders": "No orders yet"
+      },
+      "coupons": {
+        "title": "Coupons",
+        "subtitle": "Manage your discount coupons",
+        "createCoupon": "Create Coupon",
+        "activeBadge": "Active",
+        "inactiveBadge": "Inactive",
+        "noCoupons": "No coupons yet",
+        "createFirst": "Create your first coupon"
+      },
+      "plans": {
+        "title": "Plans",
+        "subtitle": "Manage your subscription plans",
+        "createPlan": "Create Plan",
+        "noPlans": "No plans yet",
+        "createFirst": "Create your first plan"
+      }
+    },
+    "settings": {
+      "studio": {
+        "title": "Studio Settings",
+        "subtitle": "Manage your studio profile and information",
+        "subtitleNew": "Set up your studio profile to start taking bookings"
+      },
+      "account": {
+        "title": "Account Settings",
+        "subtitle": "Manage your account information",
+        "profileInfo": "Profile Information",
+        "updateDetails": "Update your personal details",
+        "fullName": "Full Name",
+        "email": "Email",
+        "saveChanges": "Save Changes"
+      },
+      "billing": {
+        "title": "Plan & Billing",
+        "subtitle": "Manage your subscription and billing",
+        "currentPlan": "Current Plan",
+        "activeSubscription": "Your active subscription plan",
+        "freeTrial": "Free Trial",
+        "planExpires": "Plan expires in {days} days",
+        "upgradePlan": "Upgrade Plan",
+        "billingHistory": "Billing History",
+        "viewInvoices": "View your past invoices and payments",
+        "noHistory": "No billing history available"
+      },
+      "payments": {
+        "title": "Payment Settings",
+        "subtitle": "Manage your payment methods and preferences",
+        "paymentMethods": "Payment Methods",
+        "addRemove": "Add or remove payment methods",
+        "noMethods": "No payment methods added yet",
+        "addMethod": "Add Payment Method"
+      },
+      "policies": {
+        "title": "Policies",
+        "subtitle": "Manage your studio policies and terms",
+        "cancellationPolicy": "Cancellation Policy",
+        "setPolicies": "Set your cancellation and refund policies",
+        "enterPolicy": "Enter your cancellation policy...",
+        "savePolicy": "Save Policy"
+      },
+      "team": {
+        "title": "Team",
+        "subtitle": "Manage your team members",
+        "inviteMember": "Invite Member",
+        "noMembers": "No team members yet",
+        "inviteFirst": "Invite your first team member",
+        "manage": "Manage"
+      },
+      "availability": {
+        "title": "Availability",
+        "subtitle": "Set your working hours and availability",
+        "workingHours": "Working Hours",
+        "configureAvailability": "Configure when your studio is available",
+        "configureSchedule": "Configure your weekly schedule",
+        "setAvailability": "Set Availability"
+      },
+      "integrations": {
+        "title": "Integrations",
+        "subtitle": "Connect with third-party services",
+        "connected": "Connected",
+        "notConnected": "Not Connected",
+        "disconnect": "Disconnect",
+        "connect": "Connect"
+      },
+      "common": {
+        "title": "Settings",
+        "subtitle": "Manage your account and preferences"
+      }
+    },
+    "forms": {
+      "studioForm": {
+        "editTitle": "Edit Studio Information",
+        "createTitle": "Studio Information",
+        "studioLogo": "Studio Logo",
+        "coverPhoto": "Cover Photo",
+        "imageFormat": "JPEG, PNG, or WebP. Max 5MB",
+        "coverFormat": "JPEG, PNG, or WebP. Max 5MB. Recommended: 1200x400px",
+        "studioName": "Studio Name *",
+        "studioNamePlaceholder": "My Fitness Studio",
+        "urlSlug": "URL Slug *",
+        "urlSlugPlaceholder": "my-fitness-studio",
+        "urlSlugHelp": "This will be your studio URL: /studio/your-slug",
+        "slugTaken": "This slug is already taken. Please choose another.",
+        "description": "Description",
+        "descriptionPlaceholder": "Tell students about your studio...",
+        "address": "Address *",
+        "addressPlaceholder": "123 Main St, Ulaanbaatar, Mongolia",
+        "addressHelp": "Enter the official address of your studio. This will be displayed on your public studio page.",
+        "phone": "Phone",
+        "phonePlaceholder": "+976 1234 5678",
+        "email": "Email",
+        "emailPlaceholder": "contact@studio.com",
+        "location": "Location",
+        "locationHelp": "Click on the map to set your studio location",
+        "loadingMap": "Loading map...",
+        "toast": {
+          "updated": "Studio updated successfully",
+          "created": "Studio created successfully",
+          "failed": "Failed to save studio"
+        }
+      },
+      "scheduleForm": {
+        "title": "Add to schedule",
+        "class": "Class",
+        "selectClass": "Select a class",
+        "noClasses": "You need to create a class before scheduling.",
+        "startDate": "Start Date",
+        "startTime": "Start Time",
+        "hour": "Hour",
+        "min": "Min",
+        "repeat": "Repeat",
+        "doesNotRepeat": "Does not repeat",
+        "weekly": "Weekly",
+        "repeatOn": "Repeat on",
+        "repeatHelp": "We'll create sessions for the next 4 weeks.",
+        "saving": "Saving...",
+        "addClass": "Add class",
+        "inactive": "Inactive",
+        "errors": {
+          "chooseClass": "Please choose a class",
+          "selectDateTime": "Please select a start date and time",
+          "selectDays": "Please select at least one day for weekly repeats",
+          "classNotAvailable": "Selected class is not available",
+          "inactiveClass": "Cannot schedule inactive classes. Please activate the class first.",
+          "noSessions": "No upcoming sessions generated"
+        },
+        "toast": {
+          "created": "Schedule created successfully",
+          "failed": "Failed to create schedule"
+        }
+      }
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An error occurred while loading the dashboard. Please try again.",
+      "errorDetails": "Error details:",
+      "tryAgain": "Try again"
+    },
+    "common": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "create": "Create",
+      "update": "Update",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "unknown": "Unknown",
+      "na": "N/A"
     }
   }
 }

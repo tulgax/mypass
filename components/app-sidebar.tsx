@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
 import type { LucideIcon } from "lucide-react"
 import type { Locale } from "@/i18n/routing"
@@ -53,6 +54,7 @@ export function AppSidebar({
   onSignOut,
   ...props
 }: AppSidebarProps) {
+  const t = useTranslations('dashboard.sidebar')
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
@@ -67,7 +69,7 @@ export function AppSidebar({
                   <span className="truncate font-semibold">
                     {studioName || "MyPass"}
                   </span>
-                  <span className="truncate text-xs">Studio Dashboard</span>
+                  <span className="truncate text-xs">{t('studioDashboard')}</span>
                 </div>
               </Link>
             </SidebarMenuButton>

@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default async function TeamSettingsPage() {
+  const t = await getTranslations('studio.settings.team')
   const supabase = await createClient()
   const {
     data: { user },
@@ -21,10 +23,10 @@ export default async function TeamSettingsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Team</h1>
-          <p className="text-muted-foreground">Manage your team members</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button>Invite Member</Button>
+        <Button>{t('inviteMember')}</Button>
       </div>
 
       {teamMembers && teamMembers.length > 0 ? (
@@ -44,7 +46,7 @@ export default async function TeamSettingsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" size="sm" className="w-full">Manage</Button>
+                <Button variant="outline" size="sm" className="w-full">{t('manage')}</Button>
               </CardContent>
             </Card>
           ))}
@@ -52,8 +54,8 @@ export default async function TeamSettingsPage() {
       ) : (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">No team members yet</p>
-            <Button>Invite your first team member</Button>
+            <p className="text-muted-foreground mb-4">{t('noMembers')}</p>
+            <Button>{t('inviteFirst')}</Button>
           </CardContent>
         </Card>
       )}

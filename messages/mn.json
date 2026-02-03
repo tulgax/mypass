@@ -317,6 +317,8 @@
   },
   "auth": {
     "signIn": {
+      "noAccount": "Данс байхгүй юу?",
+      "signUpLink": "Бүртгүүлэх",
       "title": "Данс руу нэвтрэх",
       "email": "Имэйл",
       "password": "Нууц үг",
@@ -335,20 +337,44 @@
     "signUp": {
       "title": "Бүртгүүлэх",
       "description": "Эхлэхийн тулд данс үүсгэх",
+      "student": "Оюутан",
+      "studio": "Студи",
+      "studentDescription": "Би хичээл, цаг захиалахыг хүсч байна.",
+      "studioDescription": "Би MyPass-аар бизнесээ явуулахыг хүсч байна.",
       "fullName": "Бүтэн нэр",
       "fullNamePlaceholder": "Жон Доу",
+      "phone": "Утасны дугаар",
+      "phonePlaceholder": "+976 9911 2233",
       "email": "Имэйл",
       "emailPlaceholder": "та@жишээ.com",
       "password": "Нууц үг",
       "passwordPlaceholder": "••••••••",
-      "role": "Би бол",
-      "rolePlaceholder": "Эрх сонгох",
-      "student": "Оюутан",
-      "studioOwner": "Студийн эзэн",
+      "businessName": "Бизнесийн нэр",
+      "businessNamePlaceholder": "AS Design Studio",
+      "country": "Улс",
+      "countryPlaceholder": "Улс сонгох",
+      "profilePhoto": "Профайл зураг",
+      "profilePhotoDescription": "Бизнесээ төлөөлөх зураг оруулна уу.",
+      "coverPhoto": "Ковер зураг",
+      "coverPhotoDescription": "Профайлдайн тав тухтай баннер нэмнэ үү.",
+      "urlSlug": "URL хаяг",
+      "urlSlugDescription": "Олон нийтийн профайлд зориулсан өвөрмөц URL үүсгэнэ үү.",
+      "urlSlugPrefix": "mypass.me/",
       "alreadyHaveAccount": "Аль хэдийн данстай юу?",
       "signInLink": "Нэвтрэх",
       "createAccountError": "Данс үүсгэх боломжгүй",
-      "createProfileError": "Профайл үүсгэх боломжгүй"
+      "createProfileError": "Профайл үүсгэх боломжгүй",
+      "createStudioError": "Студи үүсгэх боломжгүй",
+      "slugTaken": "Энэ URL аль хэдийн ашиглагдаж байна. Өөр сонгоно уу.",
+      "emailRequired": "Имэйл шаардлагатай",
+      "emailInvalid": "Зөв имэйл хаяг оруулна уу",
+      "passwordRequired": "Нууц үг шаардлагатай",
+      "passwordMinLength": "Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой",
+      "step1Title": "Дансаа тохируулах",
+      "step2Title": "Профайлаа өөрчлөх",
+      "continueWithGoogle": "Google-ээр үргэлжлүүлэх",
+      "continueWithFacebook": "Facebook-ээр үргэлжлүүлэх",
+      "or": "эсвэл"
     }
   },
   "dashboard": {
@@ -360,7 +386,26 @@
       "clients": "Харилцагчид",
       "settings": "Тохиргоо",
       "studioSettings": "Студийн тохиргоо",
-      "account": "Данс"
+      "account": "Данс",
+      "plans": "Төлөвлөгөө",
+      "membership": "Гишүүнчлэл",
+      "coupons": "Купон",
+      "orders": "Захиалга",
+      "payments": "Төлбөр",
+      "policies": "Бодлого",
+      "availability": "Чөлөөт цаг",
+      "planBilling": "Төлөвлөгөө & Төлбөр",
+      "team": "Баг",
+      "integrations": "Интеграци",
+      "studio": "Студи",
+      "createClass": "Хичээл үүсгэх"
+    },
+    "sidebar": {
+      "studioDashboard": "Студийн самбар",
+      "toggleSidebar": "Хажуу цэсийг нээх/хаах"
+    },
+    "header": {
+      "notifications": "Мэдэгдэл"
     },
     "overview": {
       "title": "Тойм",
@@ -438,6 +483,449 @@
       "email": "Зөв имэйл хаяг оруулна уу",
       "minLength": "Хамгийн багадаа {min} тэмдэгт байх ёстой",
       "maxLength": "{max} тэмдэгтээс ихгүй байх ёстой"
+    }
+  },
+  "studio": {
+    "schedule": {
+      "title": "Хуваарь",
+      "subtitle": "Ирэх хичээлүүдээ харах",
+      "createSchedule": "Хуваарь үүсгэх",
+      "tabs": {
+        "upcoming": "Ирэх",
+        "past": "Өмнөх"
+      },
+      "empty": {
+        "upcoming": "Ирэх хичээл төлөвлөгдөөгүй байна",
+        "past": "Өмнөх хичээл байхгүй",
+        "createFirst": "Анхны хуваарь үүсгэх"
+      },
+      "sheet": {
+        "addToSchedule": "Хуваарьд нэмэх",
+        "bookingDetails": "Захиалгын дэлгэрэнгүй"
+      },
+      "dialog": {
+        "cancelSchedule": "Хуваарийг цуцлах уу?",
+        "deleteSchedule": "Хуваарийг устгах уу?",
+        "cancelScheduleDescription": "Энэ хуваарьт {count} захиалга байна. Энэ нь цуцлагдана гэхдээ устгахгүй. Энэ үйлдлийг буцаах боломжгүй.",
+        "deleteScheduleDescription": "Та энэ хуваарьт хичээлийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.",
+        "deleting": "Устгаж байна...",
+        "cancelScheduleButton": "Хуваарийг цуцлах",
+        "deleteButton": "Устгах",
+        "cancelClassTitle": "Та хичээл цуцлаж байна",
+        "cancelClassDescription": "Та энэ хичээлийн бүх хувилбарыг цуцлах уу, эсвэл зөвхөн сонгосон хувилбарыг цуцлах уу? Хэрэв хэн нэгэн захиалга өгсөн бол тэд ирээдүйн огноонд дахин захиалж чадна.",
+        "cancelThisClass": "Зөвхөн энэ хичээлийг цуцлах",
+        "cancelAllFuture": "Ирээдүйн бүх хичээлийг цуцлах",
+        "dismiss": "Хаах"
+      },
+      "toast": {
+        "scheduleCancelled": "Хуваарь амжилттай цуцлагдлаа",
+        "scheduleDeleted": "Хуваарь амжилттай устгагдлаа",
+        "classCancelled": "Хичээл амжилттай цуцлагдлаа",
+        "allFutureCancelled": "Ирээдүйн бүх хичээл амжилттай цуцлагдлаа"
+      },
+      "instanceView": {
+        "service": "Үйлчилгээ",
+        "dateTime": "Огноо & Цаг",
+        "clients": "Харилцагчид",
+        "attending": "Оролцож байгаа",
+        "cancelled": "Цуцлагдсан",
+        "noParticipants": "Оролцогч байхгүй",
+        "noCancelledBookings": "Цуцлагдсан захиалга байхгүй",
+        "clientsJoinInfo": "Харилцагчид таны нийтийн профайлаас онлайн захиалга өгөх замаар нэгддэг.",
+        "cancelBooking": "Захиалга цуцлах",
+        "classInfoNotAvailable": "Хичээлийн мэдээлэл байхгүй",
+        "unknownClient": "Тодорхойгүй харилцагч",
+        "min": "мин",
+        "weeklyOn": "Долоо хоног бүр {day} {time} цагт"
+      }
+    },
+    "overview": {
+      "stats": {
+        "totalRevenue": "Нийт орлого",
+        "totalRevenueDesc": "Бүх захиалгаас",
+        "totalBookings": "Нийт захиалга",
+        "totalBookingsDesc": "Бүх цагийн захиалга",
+        "activeClasses": "Идэвхтэй хичээл",
+        "activeClassesDesc": "Каталог дахь хичээлүүд",
+        "totalCustomers": "Нийт харилцагчид",
+        "totalCustomersDesc": "Өвөрмөц оюутнууд"
+      },
+      "upcomingClasses": {
+        "title": "Ирэх хичээлүүд",
+        "description": "Таны дараагийн хуваарьт хичээлүүд",
+        "noUpcoming": "Ирэх хичээл төлөвлөгдөөгүй байна",
+        "booked": "захиалга өгсөн",
+        "viewFullSchedule": "Бүрэн хуваарийг харах",
+        "unnamedClass": "Нэргүй хичээл"
+      },
+      "quickActions": {
+        "title": "Хурдан үйлдлүүд",
+        "description": "Түгээмэл даалгавар болон богино замууд",
+        "createClass": "Шинэ хичээл үүсгэх",
+        "scheduleSession": "Хичээлийн хуваарь тохируулах",
+        "viewBookings": "Захиалгуудыг харах"
+      }
+    },
+    "clients": {
+      "title": "Харилцагчид",
+      "subtitle": "Бүх захиалгуудыг удирдах",
+      "student": "Оюутан",
+      "class": "Хичээл:",
+      "dateNotAvailable": "Огноо байхгүй",
+      "noBookings": "Захиалга байхгүй",
+      "unknown": "Тодорхойгүй"
+    },
+    "classes": {
+      "title": "Хичээл",
+      "subtitle": "Студийн хичээлүүдээ удирдах",
+      "createClass": "Хичээл үүсгэх",
+      "table": {
+        "name": "Нэр",
+        "price": "Үнэ",
+        "duration": "Хугацаа",
+        "minutes": "минут"
+      },
+      "actions": {
+        "view": "Харах",
+        "edit": "Засах",
+        "delete": "Устгах",
+        "moreOptions": "Илүү сонголт"
+      },
+      "status": {
+        "active": "Идэвхтэй",
+        "inactive": "Идэвхгүй"
+      },
+      "empty": {
+        "noClasses": "Хичээл байхгүй",
+        "createFirst": "Анхны хичээл үүсгэх"
+      },
+      "sheet": {
+        "addClass": "Хичээл нэмэх",
+        "viewClass": "Хичээл харах",
+        "editClass": "Хичээл засах"
+      },
+      "form": {
+        "classType": "Хичээлийн төрөл",
+        "online": "Онлайн",
+        "onlineDescription": "Харилцагчид алсын зайнаас нэгдэж болох виртуал хичээл.",
+        "offline": "Офлайн",
+        "offlineDescription": "Таны студийн байршилд хувийн уулзалтын хичээл.",
+        "name": "Нэр",
+        "namePlaceholder": "жишээ нь: Бүлгийн пилатес",
+        "description": "Тайлбар",
+        "descriptionPlaceholder": "Харилцагчид энэ үйлчилгээнээс юу хүлээх вэ?",
+        "price": "Үнэ",
+        "currency": "Валют",
+        "currencyMNT": "MNT (Монгол төгрөг)",
+        "currencyUSD": "USD (Америк доллар)",
+        "location": "Байршил",
+        "locationPlaceholder": "Байршил оруулах",
+        "capacity": "Багтаамж",
+        "zoomLink": "Zoom холбоос",
+        "zoomLinkPlaceholder": "https://zoom.us/j/...",
+        "durationMinutes": "Хугацаа (минут)",
+        "durationPlaceholder": "60",
+        "isActive": "Идэвхтэй (хичээл захиалгад бэлэн)",
+        "creating": "Үүсгэж байна...",
+        "updating": "Шинэчлэж байна...",
+        "addClassButton": "Хичээл нэмэх",
+        "updateClassButton": "Хичээл шинэчлэх"
+      },
+      "view": {
+        "name": "Нэр",
+        "description": "Тайлбар",
+        "price": "Үнэ",
+        "capacity": "Багтаамж",
+        "person": "хүн",
+        "people": "хүн",
+        "minute": "минут",
+        "minutes": "минут",
+        "status": "Төлөв"
+      },
+      "dialog": {
+        "deleteTitle": "Хичээлийг устгах уу?",
+        "deleteDescription": "Та энэ хичээлийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.",
+        "deleting": "Устгаж байна..."
+      },
+      "toast": {
+        "deleted": "Хичээл амжилттай устгагдлаа",
+        "created": "Хичээл амжилттай үүсгэгдлээ",
+        "updated": "Хичээл амжилттай шинэчлэгдлээ"
+      }
+    },
+    "memberships": {
+      "plans": {
+        "title": "Гишүүнчлэлийн төлөвлөгөө",
+        "subtitle": "Жимын гишүүнчлэлийн төлөвлөгөө үүсгэх, удирдах",
+        "createPlan": "Төлөвлөгөө үүсгэх",
+        "empty": {
+          "noPlans": "Гишүүнчлэлийн төлөвлөгөө байхгүй",
+          "createFirst": "Анхны төлөвлөгөө үүсгэх"
+        },
+        "card": {
+          "month": "сар",
+          "months": "сар",
+          "active": "идэвхтэй",
+          "activeBadge": "Идэвхтэй",
+          "inactiveBadge": "Идэвхгүй"
+        },
+        "sheet": {
+          "createTitle": "Гишүүнчлэлийн төлөвлөгөө үүсгэх",
+          "editTitle": "Гишүүнчлэлийн төлөвлөгөө засах"
+        },
+        "form": {
+          "planName": "Төлөвлөгөөний нэр",
+          "planNamePlaceholder": "жишээ нь: Сар бүр, 3 сар",
+          "durationMonths": "Хугацаа (сар)",
+          "price": "Үнэ",
+          "currency": "Валют",
+          "description": "Тайлбар (сонголттой)",
+          "descriptionPlaceholder": "Энэ төлөвлөгөөнд юу багтсаныг тайлбарлана уу",
+          "isActive": "Идэвхтэй",
+          "saving": "Хадгалж байна...",
+          "createPlan": "Төлөвлөгөө үүсгэх",
+          "updatePlan": "Төлөвлөгөө шинэчлэх"
+        },
+        "dialog": {
+          "deleteTitle": "Гишүүнчлэлийн төлөвлөгөөг устгах уу?",
+          "deleteDescription": "Та \"{name}\" төлөвлөгөөг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.",
+          "warning": "Анхааруулга: Энэ төлөвлөгөөнд {count} идэвхтэй гишүүд байна.",
+          "deleting": "Устгаж байна..."
+        },
+        "toast": {
+          "deleted": "Гишүүнчлэлийн төлөвлөгөө амжилттай устгагдлаа"
+        }
+      },
+      "active": {
+        "title": "Идэвхтэй гишүүнчлэл",
+        "subtitle": "Жимын гишүүнчлэлийг харах, удирдах",
+        "checkIn": "Нэвтрэх",
+        "searchPlaceholder": "Нэр эсвэл төлөвлөгөөгөөр хайх...",
+        "filters": {
+          "all": "Бүгд",
+          "active": "Идэвхтэй",
+          "expired": "Дууссан"
+        },
+        "card": {
+          "unknownMember": "Тодорхойгүй гишүүн",
+          "expires": "Дуусах:",
+          "activeBadge": "Идэвхтэй",
+          "expiredBadge": "Дууссан",
+          "na": "Байхгүй"
+        },
+        "empty": {
+          "noMatches": "Шүүлтэнд тохирох гишүүнчлэл олдсонгүй",
+          "noMemberships": "Гишүүнчлэл байхгүй"
+        }
+      },
+      "checkin": {
+        "title": "Нэвтрэх",
+        "subtitle": "QR код сканнердах эсвэл гар аргаар гишүүдийг нэвтрүүлэх",
+        "tabs": {
+          "qrScanner": "QR код сканнер",
+          "manual": "Гар нэвтрэлт"
+        },
+        "qr": {
+          "title": "QR код сканнердах",
+          "placeholder": "QR код оруулах",
+          "button": "Нэвтрэх",
+          "comingSoon": "Гар нэвтрэлтийн функц удахгүй ирнэ",
+          "scanInstruction": "Гишүүний утсаас QR кодыг сканнердах эсвэл гар аргаар оруулах",
+          "gymQRTitle": "Жимын QR код",
+          "gymQRDescription": "Энэ QR кодыг жимийн оролтын хаалганы дэргэд байрлуул. Гишүүд үүнийг сканнердаж нэвтрэх боломжтой.",
+          "gymQRComingSoon": "QR код харуулах функц удахгүй ирнэ",
+          "member": "Гишүүн:",
+          "checkedInAt": "Нэвтэрсэн цаг:",
+          "searchMember": "Гишүүн хайх",
+          "searchPlaceholder": "Нэрээр хайх...",
+          "manualDescription": "Гар нэвтрэлтийн функц удахгүй ирнэ. Одоогоор QR код сканнердах ашиглана уу."
+        },
+        "toast": {
+          "qrRequired": "QR код оруулна уу",
+          "checkInSuccess": "{name}-д амжилттай нэвтэрлээ",
+          "checkInSuccessGeneric": "Амжилттай нэвтэрлээ"
+        }
+      }
+    },
+    "catalog": {
+      "orders": {
+        "title": "Захиалга",
+        "subtitle": "Бүх захиалгуудыг харах, удирдах",
+        "orderNumber": "Захиалга #{id}",
+        "viewDetails": "Дэлгэрэнгүй харах",
+        "noOrders": "Захиалга байхгүй"
+      },
+      "coupons": {
+        "title": "Купон",
+        "subtitle": "Хөнгөлөлтийн купонуудыг удирдах",
+        "createCoupon": "Купон үүсгэх",
+        "activeBadge": "Идэвхтэй",
+        "inactiveBadge": "Идэвхгүй",
+        "noCoupons": "Купон байхгүй",
+        "createFirst": "Анхны купон үүсгэх"
+      },
+      "plans": {
+        "title": "Төлөвлөгөө",
+        "subtitle": "Захиалгын төлөвлөгөөгөө удирдах",
+        "createPlan": "Төлөвлөгөө үүсгэх",
+        "noPlans": "Төлөвлөгөө байхгүй",
+        "createFirst": "Анхны төлөвлөгөө үүсгэх"
+      }
+    },
+    "settings": {
+      "studio": {
+        "title": "Студийн тохиргоо",
+        "subtitle": "Студийн профайл болон мэдээллийг удирдах",
+        "subtitleNew": "Захиалга хүлээн аж эхлэхийн тулд студийн профайлаа тохируулах"
+      },
+      "account": {
+        "title": "Дансны тохиргоо",
+        "subtitle": "Дансны мэдээллийг удирдах",
+        "profileInfo": "Профайлын мэдээлэл",
+        "updateDetails": "Хувийн мэдээллээ шинэчлэх",
+        "fullName": "Бүтэн нэр",
+        "email": "Имэйл",
+        "saveChanges": "Өөрчлөлт хадгалах"
+      },
+      "billing": {
+        "title": "Төлөвлөгөө & Төлбөр",
+        "subtitle": "Захиалгын төлөвлөгөө болон төлбөрийг удирдах",
+        "currentPlan": "Одоогийн төлөвлөгөө",
+        "activeSubscription": "Таны идэвхтэй захиалгын төлөвлөгөө",
+        "freeTrial": "Үнэгүй туршилт",
+        "planExpires": "Төлөвлөгөө {days} хоногийн дараа дуусна",
+        "upgradePlan": "Төлөвлөгөөг шинэчлэх",
+        "billingHistory": "Төлбөрийн түүх",
+        "viewInvoices": "Өмнөх нэхэмжлэх болон төлбөрүүдийг харах",
+        "noHistory": "Төлбөрийн түүх байхгүй"
+      },
+      "payments": {
+        "title": "Төлбөрийн тохиргоо",
+        "subtitle": "Төлбөрийн аргууд болон тохиргоогоо удирдах",
+        "paymentMethods": "Төлбөрийн аргууд",
+        "addRemove": "Төлбөрийн аргууд нэмэх эсвэл устгах",
+        "noMethods": "Төлбөрийн арга нэмэгдээгүй байна",
+        "addMethod": "Төлбөрийн арга нэмэх"
+      },
+      "policies": {
+        "title": "Бодлого",
+        "subtitle": "Студийн бодлого болон нөхцөлийг удирдах",
+        "cancellationPolicy": "Цуцлалтын бодлого",
+        "setPolicies": "Цуцлалт болон буцаан олголтын бодлогогоо тохируулах",
+        "enterPolicy": "Цуцлалтын бодлогоо оруулах...",
+        "savePolicy": "Бодлого хадгалах"
+      },
+      "team": {
+        "title": "Баг",
+        "subtitle": "Багийн гишүүдээ удирдах",
+        "inviteMember": "Гишүүн урих",
+        "noMembers": "Багийн гишүүд байхгүй",
+        "inviteFirst": "Анхны багийн гишүүн урих",
+        "manage": "Удирдах"
+      },
+      "availability": {
+        "title": "Чөлөөт цаг",
+        "subtitle": "Ажлын цаг болон чөлөөт цагаа тохируулах",
+        "workingHours": "Ажлын цаг",
+        "configureAvailability": "Студийн чөлөөт цагийг тохируулах",
+        "configureSchedule": "Долоо хоногийн хуваарь тохируулах",
+        "setAvailability": "Чөлөөт цаг тохируулах"
+      },
+      "integrations": {
+        "title": "Интеграци",
+        "subtitle": "Гуравдагч талын үйлчилгээтэй холбогдох",
+        "connected": "Холбогдсон",
+        "notConnected": "Холбогдоогүй",
+        "disconnect": "Салгах",
+        "connect": "Холбох"
+      },
+      "common": {
+        "title": "Тохиргоо",
+        "subtitle": "Данс болон тохиргоогоо удирдах"
+      }
+    },
+    "forms": {
+      "studioForm": {
+        "editTitle": "Студийн мэдээлэл засах",
+        "createTitle": "Студийн мэдээлэл",
+        "studioLogo": "Студийн лого",
+        "coverPhoto": "Хамар зураг",
+        "imageFormat": "JPEG, PNG, эсвэл WebP. Хамгийн ихдээ 5MB",
+        "coverFormat": "JPEG, PNG, эсвэл WebP. Хамгийн ихдээ 5MB. Зөвлөмж: 1200x400px",
+        "studioName": "Студийн нэр *",
+        "studioNamePlaceholder": "Миний фитнес студи",
+        "urlSlug": "URL slug *",
+        "urlSlugPlaceholder": "my-fitness-studio",
+        "urlSlugHelp": "Энэ нь таны студийн URL болно: /studio/your-slug",
+        "slugTaken": "Энэ slug аль хэдийн ашиглагдсан байна. Өөр сонгоно уу.",
+        "description": "Тайлбар",
+        "descriptionPlaceholder": "Оюутнуудад студийнхээ талаар хэлэх...",
+        "address": "Хаяг *",
+        "addressPlaceholder": "123 Main St, Ulaanbaatar, Mongolia",
+        "addressHelp": "Студийнхээ албан ёсны хаягийг оруулна уу. Энэ нь таны нийтийн студийн хуудсанд харагдана.",
+        "phone": "Утас",
+        "phonePlaceholder": "+976 1234 5678",
+        "email": "Имэйл",
+        "emailPlaceholder": "contact@studio.com",
+        "location": "Байршил",
+        "locationHelp": "Газрын зураг дээр дарж студийнхээ байршлыг тохируулна уу",
+        "loadingMap": "Газрын зураг ачааллаж байна...",
+        "toast": {
+          "updated": "Студи амжилттай шинэчлэгдлээ",
+          "created": "Студи амжилттай үүсгэгдлээ",
+          "failed": "Студи хадгалах боломжгүй"
+        }
+      },
+      "scheduleForm": {
+        "title": "Хуваарьд нэмэх",
+        "class": "Хичээл",
+        "selectClass": "Хичээл сонгох",
+        "noClasses": "Хуваарь үүсгэхийн өмнө хичээл үүсгэх хэрэгтэй.",
+        "startDate": "Эхлэх огноо",
+        "startTime": "Эхлэх цаг",
+        "hour": "Цаг",
+        "min": "Мин",
+        "repeat": "Давтах",
+        "doesNotRepeat": "Давтахгүй",
+        "weekly": "Долоо хоног бүр",
+        "repeatOn": "Давтах өдөр",
+        "repeatHelp": "Бид дараагийн 4 долоо хоногийн хуваарь үүсгэнэ.",
+        "saving": "Хадгалж байна...",
+        "addClass": "Хичээл нэмэх",
+        "inactive": "Идэвхгүй",
+        "errors": {
+          "chooseClass": "Хичээл сонгоно уу",
+          "selectDateTime": "Эхлэх огноо болон цаг сонгоно уу",
+          "selectDays": "Долоо хоног бүр давтахад дор хаяж нэг өдөр сонгоно уу",
+          "classNotAvailable": "Сонгосон хичээл байхгүй",
+          "inactiveClass": "Идэвхгүй хичээлийг хуваарьд оруулж болохгүй. Эхлээд хичээлийг идэвхжүүлнэ үү.",
+          "noSessions": "Ирэх хуваарь үүсгэгдсэнгүй"
+        },
+        "toast": {
+          "created": "Хуваарь амжилттай үүсгэгдлээ",
+          "failed": "Хуваарь үүсгэх боломжгүй"
+        }
+      }
+    },
+    "error": {
+      "title": "Ямар нэг зүйл буруу боллоо",
+      "description": "Самбар ачааллах үед алдаа гарлаа. Дахин оролдоно уу.",
+      "errorDetails": "Алдааны дэлгэрэнгүй:",
+      "tryAgain": "Дахин оролдох"
+    },
+    "common": {
+      "close": "Хаах",
+      "cancel": "Цуцлах",
+      "save": "Хадгалах",
+      "delete": "Устгах",
+      "edit": "Засах",
+      "view": "Харах",
+      "create": "Үүсгэх",
+      "update": "Шинэчлэх",
+      "loading": "Ачааллаж байна...",
+      "noData": "Мэдээлэл байхгүй",
+      "unknown": "Тодорхойгүй",
+      "na": "Байхгүй"
     }
   }
 }

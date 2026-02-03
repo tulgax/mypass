@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { ChevronRight, ChevronLeft, Calendar, Clock, MapPin, Phone, Mail, Users } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { BookingForm } from '@/components/studio/BookingForm'
+import { PublicStudioAuthBar } from '@/components/studio/PublicStudioAuthBar'
 import { formatTime, formatAmount, isToday } from '@/lib/utils'
 import type { PublicStudioWithInstances } from '@/lib/types/public'
 import type { Tables } from '@/lib/types/database'
@@ -32,6 +33,7 @@ interface StudioPageClientProps {
   studio: PublicStudioWithInstances
   classInstances: ClassInstance[]
   locale: string
+  showPublicAuthBar?: boolean
 }
 
 type ScheduleDay = {
@@ -52,7 +54,7 @@ type ScheduleDay = {
   }>
 }
 
-export function StudioPageClient({ studio, classInstances, locale }: StudioPageClientProps) {
+export function StudioPageClient({ studio, classInstances, locale, showPublicAuthBar }: StudioPageClientProps) {
   const t = useTranslations('landing.bookingPage')
   const defaultCoverUrl =
     'https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg'
@@ -224,6 +226,7 @@ export function StudioPageClient({ studio, classInstances, locale }: StudioPageC
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+            {showPublicAuthBar && <PublicStudioAuthBar />}
           </div>
 
           {/* Content */}

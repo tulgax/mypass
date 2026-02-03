@@ -149,7 +149,8 @@ export function BrandingShowcase() {
       <div className="md:col-span-2">
         <h1 className="text-2xl font-semibold">Branding</h1>
         <p className="text-sm text-muted-foreground">
-          Visual reference for UI components and variants.
+          Visual reference for UI components and variants using the Maia
+          (radix-maia) shadcn theme.
         </p>
       </div>
 
@@ -166,8 +167,9 @@ export function BrandingShowcase() {
               <Example title="What is this page?">
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    This page is a visual reference for MyPass UI: typography, color
-                    tokens, and the shadcn-style components used across the app.
+                    This page is a visual reference for MyPass UI with the Maia
+                    theme: typography, color tokens, and the shadcn-style components
+                    used across the app.
                   </p>
                   <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                     <li>Use it to check spacing, hover/focus states, and variants.</li>
@@ -183,11 +185,11 @@ export function BrandingShowcase() {
                     When you add a new UI primitive or variant, extend the “Components”
                     tab with a small demo and real-ish content.
                   </p>
-                  <div className="rounded-lg border bg-muted/40 p-3">
+                  <div className="rounded-lg border bg-muted p-3">
                     <div className="text-xs font-medium text-muted-foreground">
                       Tip
                     </div>
-                    <div className="mt-1 text-sm">
+                    <div className="mt-1 text-sm text-foreground">
                       Keep demos small and consistent so you can scan quickly.
                     </div>
                   </div>
@@ -233,7 +235,7 @@ export function BrandingShowcase() {
                         name: "destructive",
                         bgClass: "bg-destructive",
                         fgClass: "text-destructive-foreground",
-                        meta: "--destructive",
+                        meta: "--destructive / --destructive-foreground",
                       },
                       {
                         name: "success",

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/routing"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -109,7 +110,7 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/${locale}/auth/callback`,
         },
       })
 
@@ -247,6 +248,13 @@ export function SignInPageClient({ initialError }: SignInPageClientProps) {
           )}
         </Button>
       </form>
+
+      <div className="mt-4 text-center text-sm">
+        <span className="text-muted-foreground">{t('noAccount')} </span>
+        <Link href="/auth/signup" className="font-medium text-primary hover:underline">
+          {t('signUpLink')}
+        </Link>
+      </div>
     </>
   )
 }

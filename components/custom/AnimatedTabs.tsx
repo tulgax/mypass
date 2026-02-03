@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react"
 import { cn } from "@/lib/utils"
+import { useRef, useEffect } from "react"
 
 export type TabItem = {
   id: string
@@ -23,6 +24,18 @@ export function AnimatedTabs<T extends string>({
   className,
   layoutId = "activeTab",
 }: AnimatedTabsProps<T>) {
+  const prevActiveTab = useRef<T | null>(null)
+  const isInitialMount = useRef(true)
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+    }
+    prevActiveTab.current = activeTab
+  }, [activeTab])
+
+  const shouldAnimate = !isInitialMount.current && prevActiveTab.current !== activeTab
+
   return (
     <div
       className={cn(
@@ -46,9 +59,13 @@ export function AnimatedTabs<T extends string>({
             {tab.label}
             {isActive && (
               <motion.div
-                layoutId={layoutId}
+                layoutId={shouldAnimate ? layoutId : undefined}
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 500, 
+                  damping: 30 
+                }}
               />
             )}
           </button>

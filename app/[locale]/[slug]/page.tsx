@@ -15,7 +15,14 @@ async function StudioContent({ slug, locale }: { slug: string; locale: string })
     notFound()
   }
 
-  return <StudioPageClient studio={data} classInstances={data.classInstances} locale={locale} />
+  return (
+    <StudioPageClient
+      studio={data}
+      classInstances={data.classInstances}
+      locale={locale}
+      showPublicAuthBar
+    />
+  )
 }
 
 export default async function PublicStudioPage({

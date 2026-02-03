@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -27,6 +28,7 @@ import {
 import { ScheduleForm } from '@/components/dashboard/ScheduleForm'
 import { deleteClassInstance } from '@/lib/actions/class-instances'
 import { AnimatedTabs } from '@/components/custom/AnimatedTabs'
+import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import type { BookingWithRelations } from '@/lib/data/bookings'
 import { createClient } from '@/lib/supabase/client'
 import { X, Clock, MapPin, Users, Ban, Calendar } from 'lucide-react'
@@ -53,6 +55,8 @@ interface ScheduleClientProps {
 }
 
 export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
+  const t = useTranslations('studio.schedule')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -166,8 +170,8 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
       const bookingCount = selectedInstance.current_bookings || 0
       toast.success(
         bookingCount > 0
-          ? 'Schedule cancelled successfully'
-          : 'Schedule deleted successfully'
+          ? t('toast.scheduleCancelled')
+          : t('toast.scheduleDeleted')
       )
 
       // Set refreshing state to show skeleton
@@ -263,17 +267,17 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Schedule</h1>
-            <p className="text-sm text-muted-foreground">View your upcoming classes</p>
+            <h1 className="text-2xl font-semibold">{t('title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
-          <Button onClick={() => setOpen(true)}>Create Schedule</Button>
+          <Button onClick={() => setOpen(true)}>{t('createSchedule')}</Button>
         </div>
 
         {/* Tabs */}
         <AnimatedTabs
           tabs={[
-            { id: 'upcoming', label: 'Upcoming' },
-            { id: 'past', label: 'Past' },
+            { id: 'upcoming', label: t('tabs.upcoming') },
+            { id: 'past', label: t('tabs.past') },
           ]}
           activeTab={activeTab}
           onTabChange={(tab) => setActiveTab(tab as 'upcoming' | 'past')}
@@ -353,15 +357,17 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           </Card>
         ) : (
           <Card className="border-0 shadow-none">
-            <CardContent className="p-0 py-12 text-center">
-              <p className="text-muted-foreground mb-4">
-                {activeTab === 'upcoming'
-                  ? 'No upcoming classes scheduled'
-                  : 'No past classes'}
-              </p>
-              {activeTab === 'upcoming' && (
-                <Button onClick={() => setOpen(true)}>Create your first schedule</Button>
-              )}
+            <CardContent className="p-0">
+              <StudioEmptyState
+                variant="schedule"
+                title={activeTab === 'upcoming' ? t('empty.upcoming') : t('empty.past')}
+                action={
+                  activeTab === 'upcoming' ? (
+                    <Button onClick={() => setOpen(true)}>{t('empty.createFirst')}</Button>
+                  ) : undefined
+                }
+                embedded
+              />
             </CardContent>
           </Card>
         )}
@@ -372,11 +378,11 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           <div className="p-6 border-b">
             <SheetHeader>
               <div className="flex items-center justify-between">
-                <SheetTitle>Add to schedule</SheetTitle>
+                <SheetTitle>{t('sheet.addToSchedule')}</SheetTitle>
                 <SheetClose asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <X className="h-4 w-4" />
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{tCommon('close')}</span>
                   </Button>
                 </SheetClose>
               </div>
@@ -394,11 +400,11 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
             <div className="p-6 border-b">
               <SheetHeader>
                 <div className="flex items-center justify-between">
-                  <SheetTitle>Booking details</SheetTitle>
+                  <SheetTitle>{t('sheet.bookingDetails')}</SheetTitle>
                   <SheetClose asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <X className="h-4 w-4" />
-                      <span className="sr-only">Close</span>
+                      <span className="sr-only">{tCommon('close')}</span>
                     </Button>
                   </SheetClose>
                 </div>
@@ -441,23 +447,23 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {selectedInstance && selectedInstance.current_bookings > 0
-                ? 'Cancel Schedule?'
-                : 'Delete Schedule?'}
+                ? t('dialog.cancelSchedule')
+                : t('dialog.deleteSchedule')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {selectedInstance && selectedInstance.current_bookings > 0
-                ? `This instance has ${selectedInstance.current_bookings} booking(s). It will be cancelled but not deleted. This action cannot be undone.`
-                : 'Are you sure you want to delete this scheduled class? This action cannot be undone.'}
+                ? t('dialog.cancelScheduleDescription', { count: selectedInstance.current_bookings })
+                : t('dialog.deleteScheduleDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>{tCommon('cancel')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={isPending}
             >
-              {isPending ? 'Deleting...' : selectedInstance && selectedInstance.current_bookings > 0 ? 'Cancel Schedule' : 'Delete'}
+              {isPending ? t('dialog.deleting') : selectedInstance && selectedInstance.current_bookings > 0 ? t('dialog.cancelScheduleButton') : tCommon('delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -481,16 +487,46 @@ function ScheduleInstanceView({
   onCancel: () => void
   formatTime24: (date: Date | string) => string
 }) {
+  const t = useTranslations('studio.schedule')
+  const tCommon = useTranslations('studio.common')
   const [isPending, startTransition] = useTransition()
   const [clientTab, setClientTab] = useState<'attending' | 'cancelled'>('attending')
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [recurringSchedule, setRecurringSchedule] = useState<{ day_of_week: number; start_time: string } | null>(null)
+  const [loadingSchedule, setLoadingSchedule] = useState(false)
 
   const classData = instance.classes
 
   if (!classData) {
-    return <p className="text-sm text-muted-foreground">Class information not available</p>
+    return <p className="text-sm text-muted-foreground">{t('instanceView.classInfoNotAvailable')}</p>
   }
 
-  const handleCancelBooking = () => {
+  const handleOpenCancelDialog = async () => {
+    setCancelDialogOpen(true)
+    // Check if this class has a recurring schedule
+    setLoadingSchedule(true)
+    try {
+      const supabase = await createClient()
+      const { data: schedules } = await supabase
+        .from('class_schedules')
+        .select('day_of_week, start_time')
+        .eq('class_id', instance.class_id)
+        .eq('is_active', true)
+        .limit(1)
+        .single()
+
+      if (schedules) {
+        setRecurringSchedule(schedules)
+      }
+    } catch (error) {
+      // No recurring schedule found or error
+      setRecurringSchedule(null)
+    } finally {
+      setLoadingSchedule(false)
+    }
+  }
+
+  const handleCancelThisClass = () => {
     startTransition(async () => {
       const result = await deleteClassInstance({ id: instance.id })
 
@@ -499,7 +535,38 @@ function ScheduleInstanceView({
         return
       }
 
-      toast.success('Booking cancelled successfully')
+      toast.success(t('toast.classCancelled'))
+      setCancelDialogOpen(false)
+      onCancel()
+    })
+  }
+
+  const handleCancelAllFuture = () => {
+    startTransition(async () => {
+      // Cancel this instance and deactivate the recurring schedule
+      const supabase = await createClient()
+      
+      // First, cancel this instance
+      const result = await deleteClassInstance({ id: instance.id })
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      // Then deactivate the recurring schedule
+      const { error: scheduleError } = await supabase
+        .from('class_schedules')
+        .update({ is_active: false })
+        .eq('class_id', instance.class_id)
+        .eq('is_active', true)
+
+      if (scheduleError) {
+        console.error('Failed to deactivate schedule:', scheduleError)
+        // Continue anyway since the instance is cancelled
+      }
+
+      toast.success(t('toast.allFutureCancelled'))
+      setCancelDialogOpen(false)
       onCancel()
     })
   }
@@ -516,6 +583,15 @@ function ScheduleInstanceView({
   const timeDisplay = `${formatTime24(scheduledDate)} — ${formatTime24(endDate)}`
   const location = 'Ulaanbaatar Mongolia' // Default location
 
+  // Format recurring schedule text
+  const formatRecurringSchedule = () => {
+    if (!recurringSchedule) return ''
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const dayName = dayNames[recurringSchedule.day_of_week]
+    // start_time is already in "HH:MM" format
+    return t('instanceView.weeklyOn', { day: dayName, time: recurringSchedule.start_time })
+  }
+
   // Filter bookings by status
   const attendingBookings = bookings.filter(b => b.status === 'confirmed')
   const cancelledBookings = bookings.filter(b => b.status === 'cancelled')
@@ -523,16 +599,16 @@ function ScheduleInstanceView({
   const displayedBookings = clientTab === 'attending' ? attendingBookings : cancelledBookings
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Service Section (Read-only) */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Service</label>
+        <label className="text-sm font-medium text-muted-foreground mb-4">{t('instanceView.service')}</label>
         <div className="relative rounded-lg bg-blue-50 dark:bg-blue-950/20 border-l-4 border-l-blue-500 p-4">
           <div className="text-sm font-semibold mb-2">{classData.name}</div>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
-              <span>{classData.duration_minutes || 'N/A'} min</span>
+              <span>{classData.duration_minutes || tCommon('na')} {t('instanceView.min')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" />
@@ -544,7 +620,7 @@ function ScheduleInstanceView({
 
       {/* Date & Time Section (Read-only) */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Date & Time</label>
+        <label className="text-sm font-medium text-muted-foreground">{t('instanceView.dateTime')}</label>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-1.5 text-sm">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -559,12 +635,12 @@ function ScheduleInstanceView({
 
       {/* Clients Section */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-muted-foreground">Clients</label>
+        <label className="text-sm font-medium text-muted-foreground">{t('instanceView.clients')}</label>
 
         <AnimatedTabs
           tabs={[
-            { id: 'attending', label: `Attending ${attendingBookings.length}` },
-            { id: 'cancelled', label: `Cancelled ${cancelledBookings.length}` },
+            { id: 'attending', label: `${t('instanceView.attending')} ${attendingBookings.length}` },
+            { id: 'cancelled', label: `${t('instanceView.cancelled')} ${cancelledBookings.length}` },
           ]}
           activeTab={clientTab}
           onTabChange={(tab) => setClientTab(tab as 'attending' | 'cancelled')}
@@ -584,7 +660,7 @@ function ScheduleInstanceView({
                 className="flex items-center justify-between p-3 rounded-md border bg-muted/50"
               >
                 <div className="text-sm">
-                  {booking.user_profiles?.full_name || 'Unknown Client'}
+                  {booking.user_profiles?.full_name || t('instanceView.unknownClient')}
                 </div>
               </div>
             ))}
@@ -599,12 +675,12 @@ function ScheduleInstanceView({
             <div className="space-y-1">
               <p className="text-sm font-medium">
                 {clientTab === 'attending'
-                  ? 'No participants yet'
-                  : 'No cancelled bookings'}
+                  ? t('instanceView.noParticipants')
+                  : t('instanceView.noCancelledBookings')}
               </p>
               {clientTab === 'attending' && (
                 <p className="text-xs text-muted-foreground">
-                  Clients join by booking online on your public profile.
+                  {t('instanceView.clientsJoinInfo')}
                 </p>
               )}
             </div>
@@ -615,15 +691,71 @@ function ScheduleInstanceView({
       {/* Cancel Booking Button */}
       <div className="pt-4 border-t">
         <Button
-          variant="destructive"
+          variant="secondary"
           className="w-full"
-          onClick={handleCancelBooking}
+          onClick={handleOpenCancelDialog}
           disabled={isPending}
         >
           <Ban className="h-4 w-4 mr-2" />
-          Cancel booking
+          {t('instanceView.cancelBooking')}
         </Button>
       </div>
+
+      {/* Cancel Booking Confirmation Dialog */}
+      <AlertDialog
+        open={cancelDialogOpen}
+        onOpenChange={(open) => {
+          // Prevent closing while cancelling
+          if (!isPending && !loadingSchedule) {
+            setCancelDialogOpen(open)
+          }
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <button
+            onClick={() => !isPending && !loadingSchedule && setCancelDialogOpen(false)}
+            className="absolute right-4 top-4 rounded-full bg-muted p-1.5 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+            disabled={isPending || loadingSchedule}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-left">{t('dialog.cancelClassTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-left pt-2">
+              {t('dialog.cancelClassDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col gap-3 w-full">
+            <Button
+              variant="destructive"
+              className="w-full justify-center text-white"
+              onClick={handleCancelThisClass}
+              disabled={isPending || loadingSchedule}
+            >
+              {t('dialog.cancelThisClass')}
+            </Button>
+            {recurringSchedule && (
+              <Button
+                variant="secondary"
+                className="w-full justify-center"
+                onClick={handleCancelAllFuture}
+                disabled={isPending || loadingSchedule}
+              >
+                {t('dialog.cancelAllFuture')}
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              className="w-full justify-center"
+              onClick={() => setCancelDialogOpen(false)}
+              disabled={isPending || loadingSchedule}
+            >
+              {t('dialog.dismiss')}
+            </Button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,6 +18,8 @@ interface CheckInClientProps {
 }
 
 export function CheckInClient({ studioId }: CheckInClientProps) {
+  const t = useTranslations('studio.memberships.checkin')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [qrCode, setQrCode] = useState('')
@@ -29,7 +32,7 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
 
   const handleQRCheckIn = async () => {
     if (!qrCode.trim()) {
-      toast.error('Please enter a QR code')
+      toast.error(t('toast.qrRequired'))
       return
     }
 
@@ -64,10 +67,10 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
 
       setLastCheckIn({
         success: true,
-        message: 'Check-in successful',
+        message: t('toast.checkInSuccessGeneric'),
         studentName: membershipResult.data.student_name || undefined,
       })
-      toast.success(`Check-in successful for ${membershipResult.data.student_name || 'member'}`)
+      toast.success(t('toast.checkInSuccess', { name: membershipResult.data.student_name || 'member' }))
       setQrCode('')
       router.refresh()
     })
@@ -75,26 +78,26 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
 
   const handleManualCheckIn = async () => {
     // TODO: Implement manual check-in by searching for student
-    toast.info('Manual check-in feature coming soon')
+    toast.info(t('qr.comingSoon'))
   }
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Check In</h1>
-        <p className="text-sm text-muted-foreground">Scan QR codes or manually check in members</p>
+        <h1 className="text-2xl font-semibold">{t('title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <Tabs defaultValue="qr" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="qr">QR Code Scanner</TabsTrigger>
-          <TabsTrigger value="manual">Manual Check-In</TabsTrigger>
+          <TabsTrigger value="qr">{t('tabs.qrScanner')}</TabsTrigger>
+          <TabsTrigger value="manual">{t('tabs.manual')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="qr" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Scan QR Code</CardTitle>
+              <CardTitle>{t('qr.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -102,7 +105,7 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
                 <div className="flex gap-2">
                   <Input
                     id="qr-code"
-                    placeholder="Enter or scan QR code"
+                    placeholder={t('qr.placeholder')}
                     value={qrCode}
                     onChange={(e) => setQrCode(e.target.value)}
                     onKeyDown={(e) => {
@@ -114,11 +117,11 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
                   />
                   <Button onClick={handleQRCheckIn} disabled={isPending || !qrCode.trim()}>
                     <QrCode className="h-4 w-4 mr-2" />
-                    Check In
+                    {t('qr.button')}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Scan the QR code from the member's phone or enter it manually
+                  {t('qr.scanInstruction')}
                 </p>
               </div>
 
@@ -148,12 +151,12 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
                       </p>
                       {lastCheckIn.studentName && (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Member: {lastCheckIn.studentName}
+                          {t('qr.member')} {lastCheckIn.studentName}
                         </p>
                       )}
                       {lastCheckIn.success && (
                         <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                          Checked in at {formatDate(new Date())}
+                          {t('qr.checkedInAt')} {formatDate(new Date())}
                         </p>
                       )}
                     </div>
@@ -165,16 +168,16 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Gym QR Code</CardTitle>
+              <CardTitle>{t('qr.gymQRTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Display this QR code at your gym entrance. Members can scan it to check in.
+                {t('qr.gymQRDescription')}
               </p>
               <div className="p-4 bg-muted rounded-lg text-center">
                 <p className="text-sm font-mono">gym-checkin-{studioId}</p>
                 <p className="text-xs text-muted-foreground mt-2">
-                  QR code display coming soon
+                  {t('qr.gymQRComingSoon')}
                 </p>
               </div>
             </CardContent>
@@ -184,26 +187,26 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
         <TabsContent value="manual" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Manual Check-In</CardTitle>
+              <CardTitle>{t('tabs.manual')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="search">Search Member</Label>
+                <Label htmlFor="search">{t('qr.searchMember')}</Label>
                 <div className="flex gap-2">
                   <Input
                     id="search"
-                    placeholder="Search by name..."
+                    placeholder={t('qr.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <Button onClick={handleManualCheckIn} disabled={isPending || !searchQuery.trim()}>
                     <Search className="h-4 w-4 mr-2" />
-                    Search
+                    {tCommon('search')}
                   </Button>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                Manual check-in feature coming soon. For now, use QR code scanning.
+                {t('qr.manualDescription')}
               </p>
             </CardContent>
           </Card>

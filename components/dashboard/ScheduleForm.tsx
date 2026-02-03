@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { createScheduleWithRepeat } from '@/lib/actions/class-instances'
@@ -43,6 +44,8 @@ const daysOfWeek = [
 ]
 
 export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFormProps) {
+  const t = useTranslations('studio.forms.scheduleForm')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [selectedClassId, setSelectedClassId] = useState<string>('')
@@ -116,40 +119,40 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
 
     const classId = Number(selectedClassId)
     if (!classId) {
-      setError('Please choose a class')
-      toast.error('Please choose a class')
+      setError(t('errors.chooseClass'))
+      toast.error(t('errors.chooseClass'))
       return
     }
 
     if (!startDate || !startTime) {
-      setError('Please select a start date and time')
-      toast.error('Please select a start date and time')
+      setError(t('errors.selectDateTime'))
+      toast.error(t('errors.selectDateTime'))
       return
     }
 
     if (repeat === 'weekly' && selectedDays.length === 0) {
-      setError('Please select at least one day for weekly repeats')
-      toast.error('Please select at least one day for weekly repeats')
+      setError(t('errors.selectDays'))
+      toast.error(t('errors.selectDays'))
       return
     }
 
     const selectedClass = classes.find((cls) => cls.id === classId)
     if (!selectedClass) {
-      setError('Selected class is not available')
-      toast.error('Selected class is not available')
+      setError(t('errors.classNotAvailable'))
+      toast.error(t('errors.classNotAvailable'))
       return
     }
 
     if (!selectedClass.is_active) {
-      setError('Cannot schedule inactive classes. Please activate the class first.')
-      toast.error('Cannot schedule inactive classes. Please activate the class first.')
+      setError(t('errors.inactiveClass'))
+      toast.error(t('errors.inactiveClass'))
       return
     }
 
     const instances = buildInstances(selectedClass.duration_minutes)
     if (instances.length === 0) {
-      setError('No upcoming sessions generated')
-      toast.error('No upcoming sessions generated')
+      setError(t('errors.noSessions'))
+      toast.error(t('errors.noSessions'))
       return
     }
 
@@ -169,7 +172,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           return
         }
 
-        toast.success('Schedule created successfully')
+        toast.success(t('toast.created'))
         setStartDate('')
         setStartTime('')
         setSelectedDays([])
@@ -182,7 +185,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           setTimeout(() => onSuccess(), 100)
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to create schedule'
+        const errorMessage = err instanceof Error ? err.message : t('toast.failed')
         setError(errorMessage)
         toast.error(errorMessage)
       }
@@ -207,11 +210,11 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
 
     return (
       <div className="flex gap-2">
-        <Select value={hours} onValueChange={handleHourChange}>
+          <Select value={hours} onValueChange={handleHourChange}>
           <SelectTrigger>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              <SelectValue placeholder="Hour" />
+              <SelectValue placeholder={t('hour')} />
             </div>
           </SelectTrigger>
           <SelectContent className="max-h-[200px]">
@@ -224,7 +227,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
         </Select>
         <Select value={minutes} onValueChange={handleMinuteChange}>
           <SelectTrigger>
-            <SelectValue placeholder="Min" />
+            <SelectValue placeholder={t('min')} />
           </SelectTrigger>
           <SelectContent>
             {minuteOptions.map((minute) => (
@@ -241,10 +244,10 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
   const formContent = (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label>Class</Label>
+            <Label>{t('class')}</Label>
             <Select value={selectedClassId} onValueChange={setSelectedClassId}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a class" />
+                <SelectValue placeholder={t('selectClass')} />
               </SelectTrigger>
               <SelectContent>
                 {classes.map((cls) => (
@@ -253,20 +256,20 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
                     value={String(cls.id)}
                     disabled={!cls.is_active}
                   >
-                    {cls.name} • {cls.duration_minutes} min {!cls.is_active && '(Inactive)'}
+                    {cls.name} • {cls.duration_minutes} min {!cls.is_active && `(${t('inactive')})`}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {classes.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                You need to create a class before scheduling.
+                {t('noClasses')}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>Start Date</Label>
+            <Label>{t('startDate')}</Label>
             <Input
               type="date"
               value={startDate}
@@ -275,26 +278,26 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           </div>
 
           <div className="space-y-2">
-            <Label>Start Time</Label>
+            <Label>{t('startTime')}</Label>
             <TimePicker value={startTime} onChange={setStartTime} />
           </div>
 
           <div className="space-y-2">
-            <Label>Repeat</Label>
+            <Label>{t('repeat')}</Label>
             <Select value={repeat} onValueChange={(value) => setRepeat(value as RepeatOption)}>
               <SelectTrigger>
-                <SelectValue placeholder="Does not repeat" />
+                <SelectValue placeholder={t('doesNotRepeat')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Does not repeat</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="none">{t('doesNotRepeat')}</SelectItem>
+                <SelectItem value="weekly">{t('weekly')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {repeat === 'weekly' && (
             <div className="space-y-2">
-              <Label>Repeat on</Label>
+              <Label>{t('repeatOn')}</Label>
               <div className="flex flex-wrap gap-2">
                 {daysOfWeek.map((day) => (
                   <label
@@ -316,7 +319,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                We’ll create sessions for the next 4 weeks.
+                {t('repeatHelp')}
               </p>
             </div>
           )}
@@ -325,7 +328,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isPending || classes.length === 0}>
-              {isPending ? 'Saving...' : 'Add class'}
+              {isPending ? t('saving') : t('addClass')}
             </Button>
           </div>
         </form>
@@ -338,7 +341,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
   return (
     <Card className="max-w-2xl">
       <CardHeader>
-        <CardTitle>Add to schedule</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
       </CardHeader>
       <CardContent>
         {formContent}

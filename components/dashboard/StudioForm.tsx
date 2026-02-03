@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { updateStudio } from '@/lib/actions/studios'
 import { uploadStudioImage, validateImageFileForUpload } from '@/lib/utils/image-upload'
@@ -20,13 +21,16 @@ import type { Tables } from '@/lib/types/database'
 // Dynamically import MapPicker to avoid SSR issues
 const MapPicker = dynamic(() => import('@/components/ui/map-picker').then((mod) => ({ default: mod.MapPicker })), {
   ssr: false,
-  loading: () => (
-    <div className="w-full rounded-lg border overflow-hidden bg-muted" style={{ height: '300px' }}>
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">Loading map...</p>
+  loading: () => {
+    // Note: Translations not available in loading component, using English as fallback
+    return (
+      <div className="w-full rounded-lg border overflow-hidden bg-muted" style={{ height: '300px' }}>
+        <div className="flex h-full items-center justify-center">
+          <p className="text-sm text-muted-foreground">Loading map...</p>
+        </div>
       </div>
-    </div>
-  ),
+    )
+  },
 })
 
 type Studio = Tables<'studios'>
@@ -36,6 +40,8 @@ interface StudioFormProps {
 }
 
 export function StudioForm({ studio }: StudioFormProps) {
+  const t = useTranslations('studio.forms.studioForm')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -234,7 +240,7 @@ export function StudioForm({ studio }: StudioFormProps) {
             return
           }
 
-          toast.success('Studio updated successfully')
+          toast.success(t('toast.updated'))
           router.refresh()
         } else {
           // Create new studio
@@ -269,8 +275,8 @@ export function StudioForm({ studio }: StudioFormProps) {
 
           if (studioError) {
             if (studioError.code === '23505') {
-              setError('This slug is already taken. Please choose another.')
-              toast.error('This slug is already taken. Please choose another.')
+              setError(t('slugTaken'))
+              toast.error(t('slugTaken'))
             } else {
               setError(studioError.message)
               toast.error(studioError.message)
@@ -278,11 +284,11 @@ export function StudioForm({ studio }: StudioFormProps) {
             return
           }
 
-          toast.success('Studio created successfully')
+          toast.success(t('toast.created'))
           router.push('/studio')
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to save studio'
+        const errorMessage = err instanceof Error ? err.message : t('toast.failed')
         setError(errorMessage)
         toast.error(errorMessage)
       }
@@ -292,13 +298,13 @@ export function StudioForm({ studio }: StudioFormProps) {
   return (
     <Card className="max-w-2xl">
       <CardHeader>
-        <CardTitle>{isEditMode ? 'Edit Studio Information' : 'Studio Information'}</CardTitle>
+        <CardTitle>{isEditMode ? t('editTitle') : t('createTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Logo Upload */}
           <div className="space-y-2">
-            <Label>Studio Logo</Label>
+            <Label>{t('studioLogo')}</Label>
             <div className="flex items-center gap-4">
               {logoPreview ? (
                 <div className="relative h-20 w-20 rounded-lg border overflow-hidden">
@@ -330,7 +336,7 @@ export function StudioForm({ studio }: StudioFormProps) {
                   className="cursor-pointer"
                 />
                 <p className="text-muted-foreground text-xs mt-1">
-                  JPEG, PNG, or WebP. Max 5MB
+                  {t('imageFormat')}
                 </p>
               </div>
             </div>
@@ -338,7 +344,7 @@ export function StudioForm({ studio }: StudioFormProps) {
 
           {/* Cover Image Upload */}
           <div className="space-y-2">
-            <Label>Cover Photo</Label>
+            <Label>{t('coverPhoto')}</Label>
             <div className="space-y-2">
               {coverPreview ? (
                 <div className="relative h-48 w-full rounded-lg border overflow-hidden">
@@ -369,45 +375,45 @@ export function StudioForm({ studio }: StudioFormProps) {
                 className="cursor-pointer"
               />
               <p className="text-muted-foreground text-xs">
-                JPEG, PNG, or WebP. Max 5MB. Recommended: 1200x400px
+                {t('coverFormat')}
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Studio Name *</Label>
+            <Label htmlFor="name">{t('studioName')}</Label>
             <Input
               id="name"
               name="name"
               required
-              placeholder="My Fitness Studio"
+              placeholder={t('studioNamePlaceholder')}
               defaultValue={studio?.name}
             />
           </div>
 
           {!isEditMode && (
             <div className="space-y-2">
-              <Label htmlFor="slug">URL Slug *</Label>
+              <Label htmlFor="slug">{t('urlSlug')}</Label>
               <Input
                 id="slug"
                 name="slug"
                 required
-                placeholder="my-fitness-studio"
+                placeholder={t('urlSlugPlaceholder')}
                 pattern="[a-z0-9-]+"
                 title="Only lowercase letters, numbers, and hyphens allowed"
               />
               <p className="text-muted-foreground text-xs">
-                This will be your studio URL: /studio/your-slug
+                {t('urlSlugHelp')}
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('description')}</Label>
             <Textarea
               id="description"
               name="description"
-              placeholder="Tell students about your studio..."
+              placeholder={t('descriptionPlaceholder')}
               rows={4}
               defaultValue={studio?.description || ''}
             />
@@ -417,27 +423,27 @@ export function StudioForm({ studio }: StudioFormProps) {
             <Label htmlFor="address">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                Address *
+                {t('address')}
               </div>
             </Label>
             <Input
               id="address"
               name="address"
               required
-              placeholder="123 Main St, Ulaanbaatar, Mongolia"
+              placeholder={t('addressPlaceholder')}
               defaultValue={studio?.address || ''}
             />
             <p className="text-muted-foreground text-xs">
-              Enter the official address of your studio. This will be displayed on your public studio page.
+              {t('addressHelp')}
             </p>
           </div>
 
           {/* Interactive Map Picker - Optional visual location selector */}
           {isEditMode && (
             <div className="space-y-2">
-              <Label>Pin Location on Map (Optional)</Label>
+              <Label>{t('location')}</Label>
               <p className="text-muted-foreground text-xs">
-                Click on the map to visually set your studio location. This will help students find you more easily.
+                {t('locationHelp')}
               </p>
               <MapPicker
                 latitude={latitude}
@@ -447,11 +453,11 @@ export function StudioForm({ studio }: StudioFormProps) {
                 height="300px"
               />
               {isReverseGeocoding && (
-                <p className="text-xs text-muted-foreground">Getting address from location...</p>
+                <p className="text-xs text-muted-foreground">{t('loadingMap')}</p>
               )}
               {(latitude && longitude) && (
                 <p className="text-xs text-muted-foreground">
-                  Map location: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                  {t('location')}: {latitude.toFixed(6)}, {longitude.toFixed(6)}
                 </p>
               )}
             </div>
@@ -459,22 +465,22 @@ export function StudioForm({ studio }: StudioFormProps) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t('phone')}</Label>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="+976 12345678"
+                placeholder={t('phonePlaceholder')}
                 defaultValue={studio?.phone || ''}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="studio@example.com"
+                placeholder={t('emailPlaceholder')}
                 defaultValue={studio?.email || ''}
               />
             </div>
@@ -484,14 +490,14 @@ export function StudioForm({ studio }: StudioFormProps) {
 
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button type="submit" disabled={isPending || uploadingLogo || uploadingCover}>
               {isPending || uploadingLogo || uploadingCover
-                ? 'Saving...'
+                ? tCommon('loading')
                 : isEditMode
-                  ? 'Update Studio'
-                  : 'Create Studio'}
+                  ? tCommon('update')
+                  : tCommon('create')}
             </Button>
           </div>
         </form>

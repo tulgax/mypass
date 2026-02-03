@@ -390,6 +390,7 @@ export type Database = {
       studios: {
         Row: {
           address: string | null
+          country: string | null
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -406,6 +407,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          country?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -422,6 +424,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          country?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null

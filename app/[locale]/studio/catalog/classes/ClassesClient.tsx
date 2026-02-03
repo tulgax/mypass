@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -34,6 +35,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -63,6 +65,8 @@ interface ClassesClientProps {
 }
 
 export function ClassesClient({ classes }: ClassesClientProps) {
+  const t = useTranslations('studio.classes')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -125,7 +129,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       }
 
       // Show success toast
-      toast.success('Class deleted successfully')
+      toast.success(t('toast.deleted'))
       
       // Set refreshing state to show skeleton
       setIsRefreshing(true)
@@ -150,10 +154,10 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Classes</h1>
-            <p className="text-sm text-muted-foreground">Manage your studio classes</p>
+            <h1 className="text-2xl font-semibold">{t('title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
-          <Button onClick={() => setOpen(true)}>Create Class</Button>
+          <Button onClick={() => setOpen(true)}>{t('createClass')}</Button>
         </div>
 
         {(isPending || isRefreshing) ? (
@@ -222,14 +226,14 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 align-middle text-center text-sm">{formatAmount(cls.price, cls.currency)}</td>
-                      <td className="p-4 align-middle text-center text-sm">{cls.duration_minutes} minutes</td>
-                      <td className="p-4 align-middle text-center">
+                    <td className="p-4 align-middle text-center text-sm">{formatAmount(cls.price, cls.currency)}</td>
+                    <td className="p-4 align-middle text-center text-sm">{cls.duration_minutes} {t('table.minutes')}</td>
+                    <td className="p-4 align-middle text-center">
                         <Badge
                           variant={cls.is_active ? 'default' : 'secondary'}
                           className={cls.is_active ? 'bg-green-500 hover:bg-green-600' : ''}
                         >
-                          {cls.is_active ? 'Active' : 'Inactive'}
+                          {cls.is_active ? t('status.active') : t('status.inactive')}
                         </Badge>
                       </td>
                       <td className="p-4 align-middle text-right">
@@ -237,17 +241,17 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">More options</span>
+                              <span className="sr-only">{t('actions.moreOptions')}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-40">
                             <DropdownMenuItem onClick={() => handleView(cls.id)}>
                               <Eye className="h-4 w-4 mr-2" />
-                              View
+                              {t('actions.view')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleEdit(cls.id)}>
                               <Pencil className="h-4 w-4 mr-2" />
-                              Edit
+                              {t('actions.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -255,7 +259,7 @@ export function ClassesClient({ classes }: ClassesClientProps) {
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
+                              {t('actions.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -268,9 +272,13 @@ export function ClassesClient({ classes }: ClassesClientProps) {
           </Card>
         ) : (
           <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground mb-4">No classes yet</p>
-              <Button onClick={() => setOpen(true)}>Create your first class</Button>
+            <CardContent className="p-0">
+              <StudioEmptyState
+                variant="classes"
+                title={t('empty.noClasses')}
+                action={<Button onClick={() => setOpen(true)}>{t('empty.createFirst')}</Button>}
+                embedded
+              />
             </CardContent>
           </Card>
         )}
@@ -281,11 +289,11 @@ export function ClassesClient({ classes }: ClassesClientProps) {
           <div className="p-6 border-b">
             <SheetHeader>
               <div className="flex items-center justify-between">
-                <SheetTitle>Add class</SheetTitle>
+                <SheetTitle>{t('sheet.addClass')}</SheetTitle>
                 <SheetClose asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <X className="h-4 w-4" />
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{tCommon('close')}</span>
                   </Button>
                 </SheetClose>
               </div>
@@ -304,11 +312,11 @@ export function ClassesClient({ classes }: ClassesClientProps) {
               <div className="p-6 border-b">
                 <SheetHeader>
                   <div className="flex items-center justify-between">
-                    <SheetTitle>View Class</SheetTitle>
+                    <SheetTitle>{t('sheet.viewClass')}</SheetTitle>
                     <SheetClose asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">{tCommon('close')}</span>
                       </Button>
                     </SheetClose>
                   </div>
@@ -325,11 +333,11 @@ export function ClassesClient({ classes }: ClassesClientProps) {
               <div className="p-6 border-b">
                 <SheetHeader>
                   <div className="flex items-center justify-between">
-                    <SheetTitle>Edit class</SheetTitle>
+                    <SheetTitle>{t('sheet.editClass')}</SheetTitle>
                     <SheetClose asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">{tCommon('close')}</span>
                       </Button>
                     </SheetClose>
                   </div>
@@ -360,19 +368,19 @@ export function ClassesClient({ classes }: ClassesClientProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Class?</AlertDialogTitle>
+            <AlertDialogTitle>{t('dialog.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this class? This action cannot be undone.
+              {t('dialog.deleteDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>{tCommon('cancel')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={isPending}
             >
-              {isPending ? 'Deleting...' : 'Delete'}
+              {isPending ? t('dialog.deleting') : tCommon('delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -382,11 +390,12 @@ export function ClassesClient({ classes }: ClassesClientProps) {
 }
 
 function ClassViewSheetContent({ classData }: { classData: Class }) {
+  const t = useTranslations('studio.classes')
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-3 block text-muted-foreground">Class type</label>
+          <label className="text-sm font-medium mb-3 block text-muted-foreground">{t('form.classType')}</label>
           <div className="flex items-center gap-2 p-4 border-2 rounded-lg">
             <div className={`h-2 w-2 rounded-full ${classData.type === 'online' ? 'bg-green-500' : 'bg-blue-500'}`} />
             <span className="font-medium text-sm capitalize">{classData.type}</span>
@@ -395,13 +404,13 @@ function ClassViewSheetContent({ classData }: { classData: Class }) {
 
         <div className="space-y-4 border-t pt-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Name</label>
+            <label className="text-sm font-medium">{t('view.name')}</label>
             <div className="p-3 rounded-md border bg-muted/50 text-sm">{classData.name}</div>
           </div>
 
           {classData.description && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
+              <label className="text-sm font-medium">{t('view.description')}</label>
               <div className="p-3 rounded-md border bg-muted/50 text-sm whitespace-pre-wrap">
                 {classData.description}
               </div>
@@ -409,22 +418,22 @@ function ClassViewSheetContent({ classData }: { classData: Class }) {
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Price</label>
+            <label className="text-sm font-medium">{t('view.price')}</label>
             <div className="p-3 rounded-md border bg-muted/50 text-sm">
               {formatAmount(classData.price, classData.currency)}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Capacity</label>
+            <label className="text-sm font-medium">{t('view.capacity')}</label>
             <div className="p-3 rounded-md border bg-muted/50 text-sm">
-              {classData.capacity} {classData.capacity === 1 ? 'person' : 'people'}
+              {classData.capacity} {classData.capacity === 1 ? t('view.person') : t('view.people')}
             </div>
           </div>
 
           {classData.type === 'online' && classData.zoom_link && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Zoom Link</label>
+              <label className="text-sm font-medium">{t('form.zoomLink')}</label>
               <div className="p-3 rounded-md border bg-muted/50 text-sm break-all">
                 <a href={classData.zoom_link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                   {classData.zoom_link}
@@ -434,18 +443,18 @@ function ClassViewSheetContent({ classData }: { classData: Class }) {
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Duration</label>
+            <label className="text-sm font-medium">{t('form.durationMinutes')}</label>
             <div className="p-3 rounded-md border bg-muted/50 text-sm">
-              {classData.duration_minutes} {classData.duration_minutes === 1 ? 'minute' : 'minutes'}
+              {classData.duration_minutes} {classData.duration_minutes === 1 ? t('view.minute') : t('view.minutes')}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Status</label>
+            <label className="text-sm font-medium">{t('view.status')}</label>
             <div className="p-3 rounded-md border bg-muted/50 text-sm">
               <span className={`inline-flex items-center gap-2`}>
                 <span className={`h-2 w-2 rounded-full ${classData.is_active ? 'bg-green-500' : 'bg-gray-400'}`} />
-                {classData.is_active ? 'Active' : 'Inactive'}
+                {classData.is_active ? t('status.active') : t('status.inactive')}
               </span>
             </div>
           </div>
@@ -466,6 +475,8 @@ function ClassFormSheetContent({
   classData?: Class | null
   isEdit?: boolean
 }) {
+  const t = useTranslations('studio.classes')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -559,7 +570,7 @@ function ClassFormSheetContent({
           return
         }
 
-        toast.success(isEdit ? 'Class updated successfully' : 'Class created successfully')
+        toast.success(isEdit ? t('toast.updated') : t('toast.created'))
         onSuccess()
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to save class'
@@ -573,7 +584,7 @@ function ClassFormSheetContent({
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-3 block text-muted-foreground">Class type</label>
+          <label className="text-sm font-medium mb-3 block text-muted-foreground">{t('form.classType')}</label>
           <div className="grid grid-cols-2 gap-3">
             <label className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${classType === 'online'
               ? 'border-foreground bg-muted/50'
@@ -588,9 +599,9 @@ function ClassFormSheetContent({
                 className="mt-1 h-4 w-4 accent-black"
               />
               <div className="flex-1">
-                <div className="font-medium text-sm">Online</div>
+                <div className="font-medium text-sm">{t('form.online')}</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  A virtual class that clients can join remotely.
+                  {t('form.onlineDescription')}
                 </div>
               </div>
             </label>
@@ -607,9 +618,9 @@ function ClassFormSheetContent({
                 className="mt-1 h-4 w-4 accent-black"
               />
               <div className="flex-1">
-                <div className="font-medium text-sm">Offline</div>
+                <div className="font-medium text-sm">{t('form.offline')}</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  An in-person class at your studio location.
+                  {t('form.offlineDescription')}
                 </div>
               </div>
             </label>
@@ -618,12 +629,12 @@ function ClassFormSheetContent({
 
         <div className="space-y-4 border-t pt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t('form.name')}</Label>
             <Input
               id="name"
               name="name"
               defaultValue={classData?.name || ''}
-              placeholder="e.g. Pilates in group"
+              placeholder={t('form.namePlaceholder')}
               className={fieldErrors.name ? 'border-destructive' : ''}
             />
             {fieldErrors.name && (
@@ -632,12 +643,12 @@ function ClassFormSheetContent({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <textarea
               id="description"
               name="description"
               defaultValue={classData?.description || ''}
-              placeholder="What can clients expect from this service?"
+              placeholder={t('form.descriptionPlaceholder')}
               rows={4}
               className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${fieldErrors.description ? 'border-destructive' : 'border-input'
                 }`}
@@ -649,7 +660,7 @@ function ClassFormSheetContent({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
+              <Label htmlFor="price">{t('form.price')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10">₮</span>
                 <Input
@@ -669,14 +680,14 @@ function ClassFormSheetContent({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
+              <Label htmlFor="currency">{t('form.currency')}</Label>
               <Select value={currency} onValueChange={setCurrency}>
                 <SelectTrigger id="currency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="MNT">MNT (Mongolian Tugrik)</SelectItem>
-                  <SelectItem value="USD" disabled>USD (US Dollar)</SelectItem>
+                  <SelectItem value="MNT">{t('form.currencyMNT')}</SelectItem>
+                  <SelectItem value="USD" disabled>{t('form.currencyUSD')}</SelectItem>
                 </SelectContent>
               </Select>
               <input type="hidden" name="currency" value={currency} />
@@ -684,20 +695,20 @@ function ClassFormSheetContent({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">{t('form.location')}</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input
                 id="location"
                 name="location"
-                placeholder="Enter location"
+                placeholder={t('form.locationPlaceholder')}
                 className="pl-10"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="capacity">Capacity</Label>
+            <Label htmlFor="capacity">{t('form.capacity')}</Label>
             <div className="relative">
               <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input
@@ -716,13 +727,13 @@ function ClassFormSheetContent({
 
           {classType === 'online' && (
             <div className="space-y-2">
-              <Label htmlFor="zoom_link">Zoom Link</Label>
+              <Label htmlFor="zoom_link">{t('form.zoomLink')}</Label>
               <Input
                 id="zoom_link"
                 name="zoom_link"
                 type="url"
                 defaultValue={classData?.zoom_link || ''}
-                placeholder="https://zoom.us/j/..."
+                placeholder={t('form.zoomLinkPlaceholder')}
                 className={fieldErrors.zoom_link ? 'border-destructive' : ''}
               />
               {fieldErrors.zoom_link && (
@@ -732,14 +743,14 @@ function ClassFormSheetContent({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="duration_minutes">Duration (minutes)</Label>
+            <Label htmlFor="duration_minutes">{t('form.durationMinutes')}</Label>
             <Input
               id="duration_minutes"
               name="duration_minutes"
               type="number"
               min="1"
               defaultValue={classData?.duration_minutes || ''}
-              placeholder="60"
+              placeholder={t('form.durationPlaceholder')}
               className={fieldErrors.duration_minutes ? 'border-destructive' : ''}
             />
             {fieldErrors.duration_minutes && (
@@ -756,7 +767,7 @@ function ClassFormSheetContent({
               className="h-4 w-4 rounded border-gray-300"
             />
             <Label htmlFor="is_active" className="cursor-pointer font-normal">
-              Active (class is available for booking)
+              {t('form.isActive')}
             </Label>
           </div>
         </div>
@@ -766,10 +777,10 @@ function ClassFormSheetContent({
 
       <div className="flex gap-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isPending}>
-          Cancel
+          {tCommon('cancel')}
         </Button>
         <Button type="submit" disabled={isPending} className="flex-1">
-          {isPending ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update class' : 'Add class')}
+          {isPending ? (isEdit ? t('form.updating') : t('form.creating')) : (isEdit ? t('form.updateClassButton') : t('form.addClassButton'))}
         </Button>
       </div>
     </form>

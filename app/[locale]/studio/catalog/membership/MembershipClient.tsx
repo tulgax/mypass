@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -40,6 +41,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -61,6 +63,8 @@ interface MembershipClientProps {
 }
 
 export function MembershipClient({ plans }: MembershipClientProps) {
+  const t = useTranslations('studio.memberships.plans')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -104,7 +108,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
         return
       }
 
-      toast.success('Membership plan deleted successfully')
+      toast.success(t('toast.deleted'))
       setIsRefreshing(true)
       router.refresh()
       await new Promise((resolve) => setTimeout(resolve, 300))
@@ -119,12 +123,12 @@ export function MembershipClient({ plans }: MembershipClientProps) {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Membership Plans</h1>
+            <h1 className="text-2xl font-semibold">{t('title')}</h1>
             <p className="text-sm text-muted-foreground">
-              Create and manage membership plans for your gym
+              {t('subtitle')}
             </p>
           </div>
-          <Button onClick={() => setOpen(true)}>Create Plan</Button>
+          <Button onClick={() => setOpen(true)}>{t('createPlan')}</Button>
         </div>
 
         {(isPending || isRefreshing) ? (
@@ -149,7 +153,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
                     <div>
                       <h3 className="font-semibold text-lg">{plan.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {plan.duration_months} {plan.duration_months === 1 ? 'month' : 'months'}
+                        {plan.duration_months} {plan.duration_months === 1 ? t('card.month') : t('card.months')}
                       </p>
                     </div>
                     <DropdownMenu>
@@ -161,7 +165,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(plan.id)}>
                           <Pencil className="h-4 w-4 mr-2" />
-                          Edit
+                          {tCommon('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -169,7 +173,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
+                          {tCommon('delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -184,12 +188,12 @@ export function MembershipClient({ plans }: MembershipClientProps) {
                     <div className="flex items-center gap-4 pt-2 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1.5">
                         <Users className="h-3.5 w-3.5" />
-                        <span>{plan.active_members_count || 0} active</span>
+                        <span>{plan.active_members_count || 0} {t('card.active')}</span>
                       </div>
                       {plan.is_active ? (
-                        <Badge variant="default">Active</Badge>
+                        <Badge variant="default">{t('card.activeBadge')}</Badge>
                       ) : (
-                        <Badge variant="secondary">Inactive</Badge>
+                        <Badge variant="secondary">{t('card.inactiveBadge')}</Badge>
                       )}
                     </div>
                   </div>
@@ -199,9 +203,13 @@ export function MembershipClient({ plans }: MembershipClientProps) {
           </div>
         ) : (
           <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground mb-4">No membership plans yet</p>
-              <Button onClick={() => setOpen(true)}>Create your first plan</Button>
+            <CardContent className="p-0">
+              <StudioEmptyState
+                variant="memberships"
+                title={t('empty.noPlans')}
+                action={<Button onClick={() => setOpen(true)}>{t('empty.createFirst')}</Button>}
+                embedded
+              />
             </CardContent>
           </Card>
         )}
@@ -212,7 +220,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
         <SheetContent side="right" className="w-full sm:max-w-lg">
           <SheetHeader>
             <div className="flex items-center justify-between">
-              <SheetTitle>Create Membership Plan</SheetTitle>
+              <SheetTitle>{t('sheet.createTitle')}</SheetTitle>
               <SheetClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <X className="h-4 w-4" />
@@ -232,7 +240,7 @@ export function MembershipClient({ plans }: MembershipClientProps) {
         <SheetContent side="right" className="w-full sm:max-w-lg">
           <SheetHeader>
             <div className="flex items-center justify-between">
-              <SheetTitle>Edit Membership Plan</SheetTitle>
+              <SheetTitle>{t('sheet.editTitle')}</SheetTitle>
               <SheetClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <X className="h-4 w-4" />
@@ -254,24 +262,24 @@ export function MembershipClient({ plans }: MembershipClientProps) {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Membership Plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t('dialog.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{selectedPlan?.name}"? This action cannot be undone.
+              {t('dialog.deleteDescription', { name: selectedPlan?.name || '' })}
               {selectedPlan && selectedPlan.active_members_count && selectedPlan.active_members_count > 0 && (
                 <span className="block mt-2 text-destructive">
-                  Warning: This plan has {selectedPlan.active_members_count} active members.
+                  {t('dialog.warning', { count: selectedPlan.active_members_count })}
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>{tCommon('cancel')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={isPending}
             >
-              {isPending ? 'Deleting...' : 'Delete'}
+              {isPending ? t('dialog.deleting') : tCommon('delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -289,6 +297,8 @@ function MembershipPlanForm({
   onSuccess: () => void
   onCancel: () => void
 }) {
+  const t = useTranslations('studio.memberships.plans')
+  const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -350,18 +360,18 @@ function MembershipPlanForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       <div className="space-y-2">
-        <Label htmlFor="name">Plan Name</Label>
+        <Label htmlFor="name">{t('form.planName')}</Label>
         <Input
           id="name"
           name="name"
           defaultValue={plan?.name || ''}
-          placeholder="e.g., Monthly, 3 Months"
+          placeholder={t('form.planNamePlaceholder')}
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="duration_months">Duration (months)</Label>
+        <Label htmlFor="duration_months">{t('form.durationMonths')}</Label>
         <Input
           id="duration_months"
           name="duration_months"
@@ -375,7 +385,7 @@ function MembershipPlanForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="price">Price</Label>
+          <Label htmlFor="price">{t('form.price')}</Label>
           <Input
             id="price"
             name="price"
@@ -387,7 +397,7 @@ function MembershipPlanForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="currency">Currency</Label>
+          <Label htmlFor="currency">{t('form.currency')}</Label>
           <Input
             id="currency"
             name="currency"
@@ -399,12 +409,12 @@ function MembershipPlanForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description (optional)</Label>
+        <Label htmlFor="description">{t('form.description')}</Label>
         <Textarea
           id="description"
           name="description"
           defaultValue={plan?.description || ''}
-          placeholder="Describe what's included in this plan"
+          placeholder={t('form.descriptionPlaceholder')}
           rows={3}
         />
       </div>
@@ -417,17 +427,17 @@ function MembershipPlanForm({
           defaultChecked={plan?.is_active !== false}
           className="h-4 w-4 rounded border-gray-300"
         />
-        <Label htmlFor="is_active">Active</Label>
+        <Label htmlFor="is_active">{t('form.isActive')}</Label>
       </div>
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
       <div className="flex gap-2">
         <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isPending}>
-          Cancel
+          {tCommon('cancel')}
         </Button>
         <Button type="submit" className="flex-1" disabled={isPending}>
-          {isPending ? 'Saving...' : isEditMode ? 'Update Plan' : 'Create Plan'}
+          {isPending ? t('form.saving') : isEditMode ? t('form.updatePlan') : t('form.createPlan')}
         </Button>
       </div>
     </form>

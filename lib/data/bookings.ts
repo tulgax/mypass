@@ -66,7 +66,8 @@ export async function getBookingsForStudio(instanceIds: number[]): Promise<Booki
 
   const supabase = await getSupabaseClient()
   
-  const { data, error } = await supabase
+  // Fetch bookings with class_instances relation
+  const { data: bookingsData, error: bookingsError } = await supabase
     .from('bookings')
     .select(`
       id,
@@ -84,19 +85,42 @@ export async function getBookingsForStudio(instanceIds: number[]): Promise<Booki
         classes (
           name
         )
-      ),
-      user_profiles (
-        full_name
       )
     `)
     .in('class_instance_id', instanceIds)
     .order('created_at', { ascending: false })
 
-  if (error) {
-    throw new Error(`Failed to fetch bookings: ${error.message}`)
+  if (bookingsError) {
+    throw new Error(`Failed to fetch bookings: ${bookingsError.message}`)
   }
 
-  return (data || []) as BookingWithRelations[]
+  if (!bookingsData || bookingsData.length === 0) {
+    return []
+  }
+
+  // Fetch user profiles separately since the relationship isn't recognized by Supabase
+  const studentIds = [...new Set(bookingsData.map((b: { student_id: string }) => b.student_id))]
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('user_profiles')
+    .select('id, full_name')
+    .in('id', studentIds)
+
+  if (profilesError) {
+    // Log error but continue without profiles rather than failing completely
+    console.error('Failed to fetch user profiles:', profilesError)
+  }
+
+  // Merge bookings with user profiles
+  const profilesMap = new Map(
+    (profilesData || []).map((p: { id: string; full_name: string | null }) => [p.id, p])
+  )
+
+  const bookingsWithProfiles = bookingsData.map((booking: { student_id: string; [key: string]: unknown }) => ({
+    ...booking,
+    user_profiles: profilesMap.get(booking.student_id) || null,
+  })) as BookingWithRelations[]
+
+  return bookingsWithProfiles
 }
 
 /**
@@ -146,7 +170,8 @@ export async function getPaymentsByBookingIds(bookingIds: number[]): Promise<Pay
 export async function getBookingsByInstanceId(instanceId: number): Promise<BookingWithRelations[]> {
   const supabase = await getSupabaseClient()
   
-  const { data, error } = await supabase
+  // Fetch bookings first
+  const { data: bookingsData, error: bookingsError } = await supabase
     .from('bookings')
     .select(`
       id,
@@ -158,18 +183,40 @@ export async function getBookingsByInstanceId(instanceId: number): Promise<Booki
       qr_code,
       checked_in_at,
       created_at,
-      updated_at,
-      user_profiles (
-        id,
-        full_name
-      )
+      updated_at
     `)
     .eq('class_instance_id', instanceId)
     .order('created_at', { ascending: false })
 
-  if (error) {
-    throw new Error(`Failed to fetch bookings: ${error.message}`)
+  if (bookingsError) {
+    throw new Error(`Failed to fetch bookings: ${bookingsError.message}`)
   }
 
-  return (data || []) as BookingWithRelations[]
+  if (!bookingsData || bookingsData.length === 0) {
+    return []
+  }
+
+  // Fetch user profiles separately since the relationship isn't recognized by Supabase
+  const studentIds = [...new Set(bookingsData.map((b: { student_id: string }) => b.student_id))]
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('user_profiles')
+    .select('id, full_name')
+    .in('id', studentIds)
+
+  if (profilesError) {
+    // Log error but continue without profiles rather than failing completely
+    console.error('Failed to fetch user profiles:', profilesError)
+  }
+
+  // Merge bookings with user profiles
+  const profilesMap = new Map(
+    (profilesData || []).map((p: { id: string; full_name: string | null }) => [p.id, p])
+  )
+
+  const bookingsWithProfiles = bookingsData.map((booking: { student_id: string; [key: string]: unknown }) => ({
+    ...booking,
+    user_profiles: profilesMap.get(booking.student_id) || null,
+  })) as BookingWithRelations[]
+
+  return bookingsWithProfiles
 }
