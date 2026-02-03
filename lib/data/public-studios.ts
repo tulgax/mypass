@@ -40,9 +40,17 @@ export async function getPublicStudioWithUpcomingInstances(
   
   // If no active classes, return studio with empty instances
   if (classIds.length === 0) {
+    const { data: membershipPlans } = await supabase
+      .from('membership_plans')
+      .select('*')
+      .eq('studio_id', studio.id)
+      .eq('is_active', true)
+      .order('duration_months', { ascending: true })
+
     return {
       ...studio,
       classInstances: [],
+      membershipPlans: membershipPlans || [],
     }
   }
 
@@ -62,8 +70,17 @@ export async function getPublicStudioWithUpcomingInstances(
       classes: inst.classes as Class, // Type assertion safe because we filtered nulls
     }))
 
+  // Fetch active membership plans for public display
+  const { data: membershipPlans } = await supabase
+    .from('membership_plans')
+    .select('*')
+    .eq('studio_id', studio.id)
+    .eq('is_active', true)
+    .order('duration_months', { ascending: true })
+
   return {
     ...studio,
     classInstances: validInstances,
+    membershipPlans: membershipPlans || [],
   }
 }

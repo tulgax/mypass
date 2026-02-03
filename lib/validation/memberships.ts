@@ -36,6 +36,13 @@ export const checkInMembershipSchema = z.object({
 // Get Membership by QR Schema
 export const getMembershipByQRSchema = z.object({
   qr_code: z.string().min(1, 'QR code is required'),
+  studio_id: z.number().int().positive(),
+})
+
+// Get Membership by ID for Check-in Schema
+export const getMembershipByIdForCheckInSchema = z.object({
+  membership_id: z.number().int().positive('Membership ID is required'),
+  studio_id: z.number().int().positive(),
 })
 
 // Expire Membership Schema
@@ -48,4 +55,5 @@ export type UpdateMembershipPlanInput = z.infer<typeof updateMembershipPlanSchem
 export type PurchaseMembershipInput = z.infer<typeof purchaseMembershipSchema>
 export type CheckInMembershipInput = z.infer<typeof checkInMembershipSchema>
 export type GetMembershipByQRInput = z.infer<typeof getMembershipByQRSchema>
+export type GetMembershipByIdForCheckInInput = z.infer<typeof getMembershipByIdForCheckInSchema>
 export type ExpireMembershipInput = z.infer<typeof expireMembershipSchema>

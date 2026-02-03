@@ -8,15 +8,20 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { formatAmount, formatDate } from '@/lib/utils'
-import { Search, Users, Calendar, Clock } from 'lucide-react'
+import { Search, Users, Calendar, Clock, LogIn, Hash } from 'lucide-react'
 import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
+import { Link } from '@/i18n/routing'
 import type { MembershipWithRelations } from '@/lib/data/memberships'
 
 interface MembershipsClientProps {
   memberships: MembershipWithRelations[]
+  lastCheckIns: Record<number, string>
 }
 
-export function MembershipsClient({ memberships: initialMemberships }: MembershipsClientProps) {
+export function MembershipsClient({
+  memberships: initialMemberships,
+  lastCheckIns,
+}: MembershipsClientProps) {
   const t = useTranslations('studio.memberships.active')
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
@@ -96,20 +101,26 @@ export function MembershipsClient({ memberships: initialMemberships }: Membershi
                 const isExpired = new Date(membership.expires_at) < new Date()
                 const isActive = membership.status === 'active' && !isExpired
 
+                const lastCheckIn = lastCheckIns[membership.id]
+
                 return (
                   <div
                     key={membership.id}
                     className="p-6 hover:bg-muted/50 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
                           <h3 className="font-semibold">
                             {membership.user_profiles?.full_name || t('card.unknownMember')}
                           </h3>
                           <Badge variant={isActive ? 'default' : 'secondary'}>
                             {isActive ? t('card.activeBadge') : t('card.expiredBadge')}
                           </Badge>
+                          <span className="flex items-center gap-1.5 text-sm text-muted-foreground font-mono">
+                            <Hash className="h-3.5 w-3.5" />
+                            {t('card.id')} {membership.id}
+                          </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1.5">
@@ -129,8 +140,23 @@ export function MembershipsClient({ memberships: initialMemberships }: Membershi
                               )}
                             </span>
                           </div>
+                          <div className="flex items-center gap-1.5">
+                            <LogIn className="h-3.5 w-3.5" />
+                            <span>
+                              {lastCheckIn
+                                ? t('card.lastCheckIn', { date: formatDate(new Date(lastCheckIn)) })
+                                : t('card.neverCheckedIn')}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      {isActive && (
+                        <Button variant="outline" size="sm" className="shrink-0" asChild>
+                          <Link href={`/studio/memberships/checkin?id=${membership.id}`}>
+                            {t('card.checkIn')}
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )

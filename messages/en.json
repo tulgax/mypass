@@ -231,7 +231,8 @@
       "studioTagline": "Strength meets flow.",
       "tabs": {
         "schedule": "Schedule",
-        "pricing": "Pricing",
+        "membership": "Membership",
+        "plans": "Plans",
         "contact": "Contact"
       },
       "dateRange": "June 29 - July 5",
@@ -271,6 +272,19 @@
         "phone": "Phone",
         "email": "Email",
         "hours": "Hours"
+      },
+      "membership": {
+        "perMonth": "month",
+        "perYear": "year",
+        "months": "months",
+        "noPlans": "No membership plans available.",
+        "purchase": "Pay",
+        "signInToPurchase": "Sign in to purchase",
+        "purchaseSuccess": "Membership purchased successfully",
+        "purchaseError": "Could not purchase membership"
+      },
+      "plans": {
+        "noPlans": "No plans available."
       }
     },
     "logos": {
@@ -384,6 +398,8 @@
       "catalog": "Catalog",
       "classes": "Classes",
       "clients": "Clients",
+      "memberships": "Memberships",
+      "checkIn": "Check In",
       "settings": "Settings",
       "studioSettings": "Studio Settings",
       "account": "Account",
@@ -469,6 +485,32 @@
       "exploreStudios": "Explore Studios",
       "myBookings": "My Bookings"
     },
+    "memberships": {
+      "title": "My Memberships",
+      "subtitle": "View your active gym memberships",
+      "purchaseMembership": "Purchase Membership",
+      "active": "Active",
+      "expired": "Expired",
+      "noActive": "No active memberships",
+      "browseGyms": "Browse Gyms",
+      "checkInQRCode": "Check-In QR Code",
+      "checkInId": "Your Membership ID",
+      "showCheckInId": "Show Check-In ID",
+      "checkInIdInstruction": "Tell staff your membership ID for check-in",
+      "showQRCode": "Show QR Code",
+      "selected": "Selected",
+      "noExpired": "No expired memberships",
+      "continueSubscription": "Continue subscription",
+      "renewDialogTitle": "Renew your membership",
+      "renewDialogDescription": "Renew your membership to continue access. Payment will be processed.",
+      "pay": "Pay",
+      "cancel": "Cancel",
+      "perMonth": "month",
+      "perYear": "year",
+      "months": "months",
+      "renewSuccess": "Membership renewed successfully",
+      "renewError": "Could not renew membership"
+    },
     "shell": {
       "title": "MyPass",
       "subtitle": "Student Dashboard",
@@ -486,6 +528,9 @@
     }
   },
   "studio": {
+    "common": {
+      "search": "Search"
+    },
     "schedule": {
       "title": "Schedule",
       "subtitle": "View your upcoming classes",
@@ -711,7 +756,11 @@
           "expires": "Expires:",
           "activeBadge": "Active",
           "expiredBadge": "Expired",
-          "na": "N/A"
+          "na": "N/A",
+          "id": "ID",
+          "lastCheckIn": "Last check-in: {date}",
+          "neverCheckedIn": "Never checked in",
+          "checkIn": "Check in"
         },
         "empty": {
           "noMatches": "No memberships match your filters",
@@ -720,10 +769,20 @@
       },
       "checkin": {
         "title": "Check In",
-        "subtitle": "Scan QR codes or manually check in members",
+        "subtitle": "Enter membership ID to check in members",
         "tabs": {
           "qrScanner": "QR Code Scanner",
+          "membershipId": "Membership ID",
           "manual": "Manual Check-In"
+        },
+        "membershipId": {
+          "title": "Check In by Membership ID",
+          "label": "Membership ID",
+          "placeholder": "Enter membership ID (e.g. 123)",
+          "button": "Check In",
+          "instruction": "Ask the member for their membership ID",
+          "member": "Member:",
+          "checkedInAt": "Checked in at"
         },
         "qr": {
           "title": "Scan QR Code",
@@ -738,10 +797,12 @@
           "checkedInAt": "Checked in at",
           "searchMember": "Search Member",
           "searchPlaceholder": "Search by name...",
-          "manualDescription": "Manual check-in feature coming soon. For now, use QR code scanning."
+          "manualDescription": "Manual check-in feature coming soon. For now, use membership ID."
         },
         "toast": {
           "qrRequired": "Please enter a QR code",
+          "idRequired": "Please enter a membership ID",
+          "idInvalid": "Please enter a valid membership ID (number)",
           "checkInSuccess": "Check-in successful for {name}",
           "checkInSuccessGeneric": "Check-in successful"
         }

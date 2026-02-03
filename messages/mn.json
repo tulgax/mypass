@@ -231,7 +231,8 @@
       "studioTagline": "Хүч чадал урсгалтай уулздаг.",
       "tabs": {
         "schedule": "Хуваарь",
-        "pricing": "Үнэ",
+        "membership": "Гишүүнчлэл",
+        "plans": "Төлөвлөгөө",
         "contact": "Холбогдох"
       },
       "dateRange": "6-р сарын 29 - 7-р сарын 5",
@@ -271,6 +272,19 @@
         "phone": "Утас",
         "email": "Имэйл",
         "hours": "Цагийн хуваарь"
+      },
+      "membership": {
+        "perMonth": "сар",
+        "perYear": "жил",
+        "months": "сар",
+        "noPlans": "Гишүүнчлэлийн төлөвлөгөө байхгүй байна.",
+        "purchase": "Төлөх",
+        "signInToPurchase": "Худалдан авахын тулд нэвтрэнэ үү",
+        "purchaseSuccess": "Гишүүнчлэл амжилттай худалдаж авлаа",
+        "purchaseError": "Гишүүнчлэл худалдаж авах боломжгүй"
+      },
+      "plans": {
+        "noPlans": "Төлөвлөгөө байхгүй байна."
       }
     },
     "logos": {
@@ -384,6 +398,8 @@
       "catalog": "Каталог",
       "classes": "Хичээл",
       "clients": "Харилцагчид",
+      "memberships": "Гишүүнчлэл",
+      "checkIn": "Ирц бүртгэх",
       "settings": "Тохиргоо",
       "studioSettings": "Студийн тохиргоо",
       "account": "Данс",
@@ -469,6 +485,32 @@
       "exploreStudios": "Студи судлах",
       "myBookings": "Миний захиалгууд"
     },
+    "memberships": {
+      "title": "Миний гишүүнчлэлүүд",
+      "subtitle": "Идэвхтэй гишүүнчлэлээ харах",
+      "purchaseMembership": "Гишүүнчлэл худалдаж авах",
+      "active": "Идэвхтэй",
+      "expired": "Хугацаа дууссан",
+      "noActive": "Идэвхтэй гишүүнчлэл байхгүй",
+      "browseGyms": "Студи судлах",
+      "checkInQRCode": "Ирцийн QR код",
+      "checkInId": "Таны гишүүнчлэлийн ID",
+      "showCheckInId": "Ирцийн ID харуулах",
+      "checkInIdInstruction": "Ирц бүртгүүлэхийн тулд ажилтнуудад гишүүнчлэлийн ID-гаа хэлнэ үү",
+      "showQRCode": "QR код харуулах",
+      "selected": "Сонгогдсон",
+      "noExpired": "Хугацаа дууссан гишүүнчлэл байхгүй",
+      "continueSubscription": "Захиалгаа үргэлжлүүлэх",
+      "renewDialogTitle": "Гишүүнчлэлээ сэргээх",
+      "renewDialogDescription": "Хандах эрхээ үргэлжлүүлэхийн тулд гишүүнчлэлээ сэргээнэ үү. Төлбөр авна.",
+      "pay": "Төлөх",
+      "cancel": "Цуцлах",
+      "perMonth": "сар",
+      "perYear": "жил",
+      "months": "сар",
+      "renewSuccess": "Гишүүнчлэл амжилттай сэргээгдлээ",
+      "renewError": "Гишүүнчлэл сэргээх боломжгүй"
+    },
     "shell": {
       "title": "MyPass",
       "subtitle": "Оюутны самбар",
@@ -486,6 +528,9 @@
     }
   },
   "studio": {
+    "common": {
+      "search": "Хайх"
+    },
     "schedule": {
       "title": "Хуваарь",
       "subtitle": "Ирэх хичээлүүдээ харах",
@@ -711,7 +756,11 @@
           "expires": "Дуусах:",
           "activeBadge": "Идэвхтэй",
           "expiredBadge": "Дууссан",
-          "na": "Байхгүй"
+          "na": "Байхгүй",
+          "id": "ID",
+          "lastCheckIn": "Сүүлийн ирц: {date}",
+          "neverCheckedIn": "Ирц бүртгүүлж байгаагүй",
+          "checkIn": "Ирц бүртгүүлэх"
         },
         "empty": {
           "noMatches": "Шүүлтэнд тохирох гишүүнчлэл олдсонгүй",
@@ -720,10 +769,20 @@
       },
       "checkin": {
         "title": "Нэвтрэх",
-        "subtitle": "QR код сканнердах эсвэл гар аргаар гишүүдийг нэвтрүүлэх",
+        "subtitle": "Гишүүдийг нэвтрүүлэхийн тулд гишүүнчлэлийн ID оруулна уу",
         "tabs": {
           "qrScanner": "QR код сканнер",
+          "membershipId": "Гишүүнчлэлийн ID",
           "manual": "Гар нэвтрэлт"
+        },
+        "membershipId": {
+          "title": "Гишүүнчлэлийн ID-аар нэвтрэх",
+          "label": "Гишүүнчлэлийн ID",
+          "placeholder": "Гишүүнчлэлийн ID оруулна уу (жишээ нь 123)",
+          "button": "Нэвтрэх",
+          "instruction": "Гишүүнээс гишүүнчлэлийн ID-гаа асууна уу",
+          "member": "Гишүүн:",
+          "checkedInAt": "Нэвтэрсэн цаг:"
         },
         "qr": {
           "title": "QR код сканнердах",
@@ -738,10 +797,12 @@
           "checkedInAt": "Нэвтэрсэн цаг:",
           "searchMember": "Гишүүн хайх",
           "searchPlaceholder": "Нэрээр хайх...",
-          "manualDescription": "Гар нэвтрэлтийн функц удахгүй ирнэ. Одоогоор QR код сканнердах ашиглана уу."
+          "manualDescription": "Гар нэвтрэлтийн функц удахгүй ирнэ. Одоогоор гишүүнчлэлийн ID ашиглана уу."
         },
         "toast": {
           "qrRequired": "QR код оруулна уу",
+          "idRequired": "Гишүүнчлэлийн ID оруулна уу",
+          "idInvalid": "Зөв гишүүнчлэлийн ID оруулна уу (тоо)",
           "checkInSuccess": "{name}-д амжилттай нэвтэрлээ",
           "checkInSuccessGeneric": "Амжилттай нэвтэрлээ"
         }

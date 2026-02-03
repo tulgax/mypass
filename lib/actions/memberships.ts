@@ -9,6 +9,7 @@ import {
   purchaseMembershipSchema,
   checkInMembershipSchema,
   getMembershipByQRSchema,
+  getMembershipByIdForCheckInSchema,
   expireMembershipSchema,
 } from '@/lib/validation/memberships'
 import { getStudioBasicInfo } from '@/lib/data/studios'
@@ -323,15 +324,19 @@ export async function checkInMembership(input: unknown): Promise<ActionResult> {
 }
 
 /**
- * Get membership by QR code
+ * Get membership by QR code (validates membership belongs to the studio)
  */
 export async function getMembershipByQRCode(input: unknown): Promise<ActionResult<{ id: number; student_name: string | null }>> {
   try {
-    const { qr_code } = getMembershipByQRSchema.parse(input)
+    const { qr_code, studio_id } = getMembershipByQRSchema.parse(input)
 
     const membership = await getMembershipByQR(qr_code)
     if (!membership) {
       return { success: false, error: 'Membership not found' }
+    }
+
+    if (membership.studio_id !== studio_id) {
+      return { success: false, error: 'Membership is not for this studio' }
     }
 
     return {
@@ -346,6 +351,37 @@ export async function getMembershipByQRCode(input: unknown): Promise<ActionResul
       return { success: false, error: error.message }
     }
     return { success: false, error: 'Failed to get membership by QR code' }
+  }
+}
+
+/**
+ * Get membership by ID for check-in (validates membership belongs to the studio)
+ */
+export async function getMembershipByIdForCheckIn(input: unknown): Promise<ActionResult<{ id: number; student_name: string | null }>> {
+  try {
+    const { membership_id, studio_id } = getMembershipByIdForCheckInSchema.parse(input)
+
+    const membership = await getMembershipById(membership_id)
+    if (!membership) {
+      return { success: false, error: 'Membership not found' }
+    }
+
+    if (membership.studio_id !== studio_id) {
+      return { success: false, error: 'Membership is not for this studio' }
+    }
+
+    return {
+      success: true,
+      data: {
+        id: membership.id,
+        student_name: membership.user_profiles?.full_name || null,
+      },
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    }
+    return { success: false, error: 'Failed to get membership' }
   }
 }
 

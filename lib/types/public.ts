@@ -4,6 +4,7 @@ import type { ClassInstanceWithClass as BaseClassInstanceWithClass } from '@/lib
 type Studio = Tables<'studios'>
 type Class = Tables<'classes'>
 type ClassInstance = Tables<'class_instances'>
+type MembershipPlan = Tables<'membership_plans'>
 
 /**
  * Class instance with full class details for public pages
@@ -14,10 +15,11 @@ export type ClassInstanceWithClass = ClassInstance & {
 }
 
 /**
- * Studio with upcoming class instances for public booking pages
+ * Studio with upcoming class instances and membership plans for public booking pages
  */
 export type PublicStudioWithInstances = Studio & {
   classInstances: ClassInstanceWithClass[]
+  membershipPlans?: MembershipPlan[]
   latitude?: number | null
   longitude?: number | null
 }

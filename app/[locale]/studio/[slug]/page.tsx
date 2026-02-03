@@ -61,5 +61,15 @@ export default async function StudioPage({
     (inst: { classes: Tables<'classes'> | null }) => inst.classes && inst.classes.is_active
   ) as ClassInstance[]
 
-  return <StudioPageClient studio={studio} classInstances={validInstances} locale={locale} />
+  // Fetch active membership plans for display
+  const { data: membershipPlans } = await supabase
+    .from('membership_plans')
+    .select('*')
+    .eq('studio_id', studio.id)
+    .eq('is_active', true)
+    .order('duration_months', { ascending: true })
+
+  const studioWithPlans = { ...studio, membershipPlans: membershipPlans || [] }
+
+  return <StudioPageClient studio={studioWithPlans} classInstances={validInstances} locale={locale} />
 }

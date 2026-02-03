@@ -3,7 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import { CheckInClient } from './CheckInClient'
 import { getStudioBasicInfo } from '@/lib/data/studios'
 
-export default async function CheckInPage() {
+export default async function CheckInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>
+}) {
   const supabase = await createClient()
   const {
     data: { user },
@@ -19,5 +23,13 @@ export default async function CheckInPage() {
     notFound()
   }
 
-  return <CheckInClient studioId={studio.id} />
+  const params = await searchParams
+  const initialMembershipId = params.id ?? undefined
+
+  return (
+    <CheckInClient
+      studioId={studio.id}
+      initialMembershipId={initialMembershipId}
+    />
+  )
 }

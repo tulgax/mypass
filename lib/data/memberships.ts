@@ -236,6 +236,36 @@ export async function getMembershipByQR(qrCode: string): Promise<MembershipWithR
 }
 
 /**
+ * Get last check-in timestamp per membership (for multiple memberships)
+ */
+export async function getLastCheckInsForMemberships(
+  membershipIds: number[]
+): Promise<Record<number, string>> {
+  if (membershipIds.length === 0) return {}
+
+  const supabase = await getSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('membership_check_ins')
+    .select('membership_id, checked_in_at')
+    .in('membership_id', membershipIds)
+    .order('checked_in_at', { ascending: false })
+
+  if (error) {
+    throw new Error(`Failed to fetch last check-ins: ${error.message}`)
+  }
+
+  const result: Record<number, string> = {}
+  for (const row of data || []) {
+    const mid = row.membership_id as number
+    if (!(mid in result)) {
+      result[mid] = row.checked_in_at as string
+    }
+  }
+  return result
+}
+
+/**
  * Get membership plan by ID
  */
 export async function getMembershipPlanById(id: number): Promise<MembershipPlan | null> {

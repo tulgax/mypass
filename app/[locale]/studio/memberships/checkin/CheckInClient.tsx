@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -9,36 +9,51 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { checkInMembership, getMembershipByQRCode } from '@/lib/actions/memberships'
-import { QrCode, Search, CheckCircle2, XCircle } from 'lucide-react'
+import { checkInMembership, getMembershipByIdForCheckIn } from '@/lib/actions/memberships'
+import { Hash, Search, CheckCircle2, XCircle } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface CheckInClientProps {
   studioId: number
+  initialMembershipId?: string
 }
 
-export function CheckInClient({ studioId }: CheckInClientProps) {
+export function CheckInClient({ studioId, initialMembershipId }: CheckInClientProps) {
   const t = useTranslations('studio.memberships.checkin')
   const tCommon = useTranslations('studio.common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [qrCode, setQrCode] = useState('')
+  const [membershipIdInput, setMembershipIdInput] = useState(initialMembershipId ?? '')
   const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    if (initialMembershipId) {
+      setMembershipIdInput(initialMembershipId)
+    }
+  }, [initialMembershipId])
   const [lastCheckIn, setLastCheckIn] = useState<{
     success: boolean
     message: string
     studentName?: string
   } | null>(null)
 
-  const handleQRCheckIn = async () => {
-    if (!qrCode.trim()) {
-      toast.error(t('toast.qrRequired'))
+  const handleMembershipIdCheckIn = async () => {
+    const trimmed = membershipIdInput.trim()
+    if (!trimmed) {
+      toast.error(t('toast.idRequired'))
+      return
+    }
+    const membershipId = parseInt(trimmed, 10)
+    if (isNaN(membershipId) || membershipId <= 0) {
+      toast.error(t('toast.idInvalid'))
       return
     }
 
     startTransition(async () => {
-      // First, get membership by QR code
-      const membershipResult = await getMembershipByQRCode({ qr_code: qrCode.trim() })
+      const membershipResult = await getMembershipByIdForCheckIn({
+        membership_id: membershipId,
+        studio_id: studioId,
+      })
 
       if (!membershipResult.success) {
         setLastCheckIn({
@@ -49,11 +64,10 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
         return
       }
 
-      // Then check in
       const checkInResult = await checkInMembership({
         membership_id: membershipResult.data.id,
         check_in_method: 'student_qr',
-        checked_by: null, // Will be set by the action
+        checked_by: null,
       })
 
       if (!checkInResult.success) {
@@ -71,7 +85,7 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
         studentName: membershipResult.data.student_name || undefined,
       })
       toast.success(t('toast.checkInSuccess', { name: membershipResult.data.student_name || 'member' }))
-      setQrCode('')
+      setMembershipIdInput('')
       router.refresh()
     })
   }
@@ -88,40 +102,42 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      <Tabs defaultValue="qr" className="space-y-6">
+      <Tabs defaultValue="id" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="qr">{t('tabs.qrScanner')}</TabsTrigger>
+          <TabsTrigger value="id">{t('tabs.membershipId')}</TabsTrigger>
           <TabsTrigger value="manual">{t('tabs.manual')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="qr" className="space-y-6">
+        <TabsContent value="id" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('qr.title')}</CardTitle>
+              <CardTitle>{t('membershipId.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="qr-code">QR Code</Label>
+                <Label htmlFor="membership-id">{t('membershipId.label')}</Label>
                 <div className="flex gap-2">
                   <Input
-                    id="qr-code"
-                    placeholder={t('qr.placeholder')}
-                    value={qrCode}
-                    onChange={(e) => setQrCode(e.target.value)}
+                    id="membership-id"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={t('membershipId.placeholder')}
+                    value={membershipIdInput}
+                    onChange={(e) => setMembershipIdInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        handleQRCheckIn()
+                        handleMembershipIdCheckIn()
                       }
                     }}
                     disabled={isPending}
                   />
-                  <Button onClick={handleQRCheckIn} disabled={isPending || !qrCode.trim()}>
-                    <QrCode className="h-4 w-4 mr-2" />
-                    {t('qr.button')}
+                  <Button onClick={handleMembershipIdCheckIn} disabled={isPending || !membershipIdInput.trim()}>
+                    <Hash className="h-4 w-4 mr-2" />
+                    {t('membershipId.button')}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {t('qr.scanInstruction')}
+                  {t('membershipId.instruction')}
                 </p>
               </div>
 
@@ -151,35 +167,18 @@ export function CheckInClient({ studioId }: CheckInClientProps) {
                       </p>
                       {lastCheckIn.studentName && (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          {t('qr.member')} {lastCheckIn.studentName}
+                          {t('membershipId.member')} {lastCheckIn.studentName}
                         </p>
                       )}
                       {lastCheckIn.success && (
                         <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                          {t('qr.checkedInAt')} {formatDate(new Date())}
+                          {t('membershipId.checkedInAt')} {formatDate(new Date())}
                         </p>
                       )}
                     </div>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('qr.gymQRTitle')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t('qr.gymQRDescription')}
-              </p>
-              <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-sm font-mono">gym-checkin-{studioId}</p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {t('qr.gymQRComingSoon')}
-                </p>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

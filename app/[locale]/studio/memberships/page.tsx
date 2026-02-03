@@ -2,7 +2,10 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { MembershipsClient } from './MembershipsClient'
 import { getStudioBasicInfo } from '@/lib/data/studios'
-import { getActiveMemberships } from '@/lib/data/memberships'
+import {
+  getActiveMemberships,
+  getLastCheckInsForMemberships,
+} from '@/lib/data/memberships'
 
 export default async function MembershipsPage() {
   const supabase = await createClient()
@@ -21,6 +24,13 @@ export default async function MembershipsPage() {
   }
 
   const memberships = await getActiveMemberships(studio.id)
+  const membershipIds = memberships.map((m) => m.id)
+  const lastCheckIns = await getLastCheckInsForMemberships(membershipIds)
 
-  return <MembershipsClient memberships={memberships} />
+  return (
+    <MembershipsClient
+      memberships={memberships}
+      lastCheckIns={lastCheckIns}
+    />
+  )
 }

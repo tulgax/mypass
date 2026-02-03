@@ -2,14 +2,25 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { formatAmount, formatDate } from '@/lib/utils'
-import { Calendar, Clock, MapPin, QrCode } from 'lucide-react'
+import { Calendar, Clock, Hash, Loader2, MapPin } from 'lucide-react'
 import type { MembershipWithRelations } from '@/lib/data/memberships'
 import { MembershipQRDisplay } from '@/components/student/MembershipQRDisplay'
+import { purchaseMembership } from '@/lib/actions/memberships'
+import { toast } from 'sonner'
 
 interface StudentMembershipsClientProps {
   memberships: MembershipWithRelations[]
@@ -17,9 +28,12 @@ interface StudentMembershipsClientProps {
 
 export function StudentMembershipsClient({ memberships }: StudentMembershipsClientProps) {
   const router = useRouter()
+  const t = useTranslations('student.memberships')
   const [selectedMembership, setSelectedMembership] = useState<MembershipWithRelations | null>(
     memberships.find((m) => m.status === 'active' && new Date(m.expires_at) > new Date()) || null
   )
+  const [renewMembership, setRenewMembership] = useState<MembershipWithRelations | null>(null)
+  const [isRenewing, setIsRenewing] = useState(false)
 
   const activeMemberships = memberships.filter(
     (m) => m.status === 'active' && new Date(m.expires_at) > new Date()
@@ -28,25 +42,47 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
     (m) => m.status === 'expired' || new Date(m.expires_at) <= new Date()
   )
 
+  const handleContinueSubscription = async () => {
+    if (!renewMembership?.membership_plan_id || !renewMembership?.studio_id) return
+    setIsRenewing(true)
+    try {
+      const result = await purchaseMembership({
+        membership_plan_id: renewMembership.membership_plan_id,
+        studio_id: renewMembership.studio_id,
+      })
+      if (result.success) {
+        toast.success(t('renewSuccess'))
+        setRenewMembership(null)
+        router.refresh()
+      } else {
+        toast.error(result.error || t('renewError'))
+      }
+    } catch {
+      toast.error(t('renewError'))
+    } finally {
+      setIsRenewing(false)
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">My Memberships</h1>
-          <p className="text-sm text-muted-foreground">View your active gym memberships</p>
+          <h1 className="text-2xl font-semibold">{t('title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button onClick={() => router.push('/student/explore')}>
-          Purchase Membership
+          {t('purchaseMembership')}
         </Button>
       </div>
 
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList>
           <TabsTrigger value="active">
-            Active ({activeMemberships.length})
+            {t('active')} ({activeMemberships.length})
           </TabsTrigger>
           <TabsTrigger value="expired">
-            Expired ({expiredMemberships.length})
+            {t('expired')} ({expiredMemberships.length})
           </TabsTrigger>
         </TabsList>
 
@@ -65,7 +101,7 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle>{membership.membership_plans?.name || 'Membership'}</CardTitle>
-                        <Badge variant="default">Active</Badge>
+                        <Badge variant="default">{t('active')}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -98,8 +134,8 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
                         className="w-full"
                         onClick={() => setSelectedMembership(membership)}
                       >
-                        <QrCode className="h-4 w-4 mr-2" />
-                        {isSelected ? 'Selected' : 'Show QR Code'}
+                        <Hash className="h-4 w-4 mr-2" />
+                        {isSelected ? t('selected') : t('showCheckInId')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -109,24 +145,21 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground mb-4">No active memberships</p>
+                <p className="text-muted-foreground mb-4">{t('noActive')}</p>
                 <Button onClick={() => router.push('/student/explore')}>
-                  Browse Gyms
+                  {t('browseGyms')}
                 </Button>
               </CardContent>
             </Card>
           )}
 
-          {selectedMembership && selectedMembership.qr_code && (
+          {selectedMembership && (
             <Card>
               <CardHeader>
-                <CardTitle>Check-In QR Code</CardTitle>
+                <CardTitle>{t('checkInId')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MembershipQRDisplay
-                  qrCode={selectedMembership.qr_code}
-                  membershipId={selectedMembership.id}
-                />
+                <MembershipQRDisplay membershipId={selectedMembership.id} />
               </CardContent>
             </Card>
           )}
@@ -143,7 +176,7 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle>{membership.membership_plans?.name || 'Membership'}</CardTitle>
-                        <Badge variant="secondary">Expired</Badge>
+                        <Badge variant="secondary">{t('expired')}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -166,9 +199,9 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => router.push('/student/explore')}
+                        onClick={() => setRenewMembership(membership)}
                       >
-                        Renew Membership
+                        {t('continueSubscription')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -178,12 +211,58 @@ export function StudentMembershipsClient({ memberships }: StudentMembershipsClie
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No expired memberships</p>
+                <p className="text-muted-foreground">{t('noExpired')}</p>
               </CardContent>
             </Card>
           )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!renewMembership} onOpenChange={(open) => !open && setRenewMembership(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('renewDialogTitle')}</DialogTitle>
+            <DialogDescription>{t('renewDialogDescription')}</DialogDescription>
+          </DialogHeader>
+          {renewMembership && (
+            <div className="space-y-4 py-4">
+              <div>
+                <p className="font-medium">{renewMembership.membership_plans?.name || 'Membership'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {renewMembership.studios?.name}
+                </p>
+                <p className="mt-2 text-lg font-semibold">
+                  {formatAmount(
+                    renewMembership.membership_plans?.price || 0,
+                    renewMembership.membership_plans?.currency || 'MNT'
+                  )}
+                  {renewMembership.membership_plans?.duration_months === 1
+                    ? ` / ${t('perMonth')}`
+                    : renewMembership.membership_plans?.duration_months === 12
+                      ? ` / ${t('perYear')}`
+                      : ` / ${renewMembership.membership_plans?.duration_months} ${t('months')}`}
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenewMembership(null)}
+              disabled={isRenewing}
+            >
+              {t('cancel')}
+            </Button>
+            <Button onClick={handleContinueSubscription} disabled={isRenewing}>
+              {isRenewing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('pay')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

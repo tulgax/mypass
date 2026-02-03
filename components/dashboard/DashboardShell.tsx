@@ -6,6 +6,7 @@ import { usePathname } from "@/i18n/routing"
 import { Link } from "@/i18n/routing"
 import {
   CalendarDays,
+  CreditCard,
   LayoutGrid,
   Users,
   Settings,
@@ -56,6 +57,8 @@ const pathToNavKey: Record<string, string> = {
   "/studio/catalog/classes/new": "createClass",
   "/studio/catalog/membership": "membership",
   "/studio/clients": "clients",
+  "/studio/memberships": "memberships",
+  "/studio/memberships/checkin": "checkIn",
   "/studio/settings": "settings",
   "/studio/settings/studio": "studioSettings",
   "/studio/settings/account": "account",
@@ -194,6 +197,12 @@ export function DashboardShell({
       url: "/studio/clients",
       icon: Users,
       isActive: pathname === "/studio/clients",
+    },
+    {
+      title: t('memberships'),
+      url: "/studio/memberships",
+      icon: CreditCard,
+      isActive: pathname.startsWith("/studio/memberships"),
     },
     {
       title: t('settings'),

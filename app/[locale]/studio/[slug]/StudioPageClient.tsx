@@ -8,6 +8,7 @@ import { ChevronRight, ChevronLeft, Calendar, Clock, MapPin, Phone, Mail, Users 
 import dynamic from 'next/dynamic'
 import { BookingForm } from '@/components/studio/BookingForm'
 import { PublicStudioAuthBar } from '@/components/studio/PublicStudioAuthBar'
+import { MembershipPlanPurchaseButton } from '@/components/studio/MembershipPlanPurchaseButton'
 import { formatTime, formatAmount, isToday } from '@/lib/utils'
 import type { PublicStudioWithInstances } from '@/lib/types/public'
 import type { Tables } from '@/lib/types/database'
@@ -58,7 +59,7 @@ export function StudioPageClient({ studio, classInstances, locale, showPublicAut
   const t = useTranslations('landing.bookingPage')
   const defaultCoverUrl =
     'https://gbrvxbmbemvhajerdixh.supabase.co/storage/v1/object/public/Branding/Images/jared-rice-8w7b4SdhOgw-unsplash.jpg'
-  const [activeTab, setActiveTab] = useState<'schedule' | 'pricing' | 'contact'>('schedule')
+  const [activeTab, setActiveTab] = useState<'schedule' | 'membership' | 'plans' | 'contact'>('schedule')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedInstance, setSelectedInstance] = useState<number | null>(null)
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
@@ -260,7 +261,7 @@ export function StudioPageClient({ studio, classInstances, locale, showPublicAut
 
             {/* Navigation Tabs */}
             <div className="flex gap-6 border-b border-border relative">
-              {(['schedule', 'pricing', 'contact'] as const).map((tab) => (
+              {(['schedule', 'membership', 'plans', 'contact'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -448,17 +449,66 @@ export function StudioPageClient({ studio, classInstances, locale, showPublicAut
                             </motion.div>
                           )}
 
-                          {/* Pricing Content */}
-                          {activeTab === 'pricing' && (
+                          {/* Membership Content */}
+                          {activeTab === 'membership' && (
                             <motion.div
-                              key="pricing"
+                              key="membership"
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -10 }}
                               transition={{ duration: 0.2 }}
                               className="space-y-3 md:space-y-4"
                             >
-                              {/* Get unique classes for pricing display */}
+                              {(studio.membershipPlans?.length ?? 0) > 0 ? (
+                                studio.membershipPlans!.map((plan) => (
+                                  <motion.div
+                                    key={plan.id}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4 rounded-xl p-4 md:p-6 border border-border hover:bg-muted/30 transition-colors"
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-base md:text-lg font-semibold">{plan.name}</h4>
+                                      <p className="mt-1 text-sm md:text-base font-medium">
+                                        {formatAmount(plan.price, plan.currency)}
+                                        {plan.duration_months === 1
+                                          ? ` / ${t('membership.perMonth')}`
+                                          : plan.duration_months === 12
+                                            ? ` / ${t('membership.perYear')}`
+                                            : ` / ${plan.duration_months} ${t('membership.months')}`}
+                                      </p>
+                                      {plan.description && (
+                                        <p className="mt-2 text-xs md:text-sm text-muted-foreground">
+                                          {plan.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                    {showPublicAuthBar && (
+                                      <MembershipPlanPurchaseButton
+                                        plan={plan}
+                                        studioId={studio.id}
+                                        locale={locale}
+                                      />
+                                    )}
+                                  </motion.div>
+                                ))
+                              ) : (
+                                <div className="flex h-32 md:h-40 flex-col items-center justify-center rounded-lg border border-dashed border-border p-4 md:p-8 text-center text-muted-foreground">
+                                  <p className="text-xs md:text-sm">{t('membership.noPlans')}</p>
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+
+                          {/* Plans Content (class pricing) */}
+                          {activeTab === 'plans' && (
+                            <motion.div
+                              key="plans"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              transition={{ duration: 0.2 }}
+                              className="space-y-3 md:space-y-4"
+                            >
                               {Array.from(
                                 new Map(classInstances.map((inst) => [inst.classes.id, inst.classes])).values()
                               ).map((cls) => (
@@ -496,7 +546,7 @@ export function StudioPageClient({ studio, classInstances, locale, showPublicAut
                               ))}
                               {classInstances.length === 0 && (
                                 <div className="flex h-32 md:h-40 flex-col items-center justify-center rounded-lg border border-dashed border-border p-4 md:p-8 text-center text-muted-foreground">
-                                  <p className="text-xs md:text-sm">No pricing available</p>
+                                  <p className="text-xs md:text-sm">{t('plans.noPlans')}</p>
                                 </div>
                               )}
                             </motion.div>
