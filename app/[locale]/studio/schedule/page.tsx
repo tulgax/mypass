@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ScheduleClient } from './ScheduleClient'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
+import { getStudioInstructorOptions } from '@/lib/data/studio-team'
 import { getActiveClassesByStudioId, getClassIdsByStudioId } from '@/lib/data/classes'
 import { getUpcomingClassInstances } from '@/lib/data/class-instances'
 
@@ -15,19 +16,27 @@ export default async function SchedulePage() {
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
-
+  const { studio, role } = await getStudioAndRoleForUser(user.id)
   if (!studio) {
     notFound()
   }
 
-  // Parallel fetch classes and instances
-  const [classes, classIds] = await Promise.all([
+  const canEditSchedule = role === 'owner' || role === 'manager'
+
+  const [classes, classIds, instructors] = await Promise.all([
     getActiveClassesByStudioId(studio.id),
     getClassIdsByStudioId(studio.id),
+    getStudioInstructorOptions(studio.id),
   ])
 
   const instances = await getUpcomingClassInstances(classIds)
 
-  return <ScheduleClient instances={instances} classes={classes} />
+  return (
+    <ScheduleClient
+      instances={instances}
+      classes={classes}
+      instructors={instructors}
+      canEditSchedule={canEditSchedule}
+    />
+  )
 }

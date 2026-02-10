@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CheckInClient } from './CheckInClient'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 
 export default async function CheckInPage({
   searchParams,
@@ -17,7 +17,7 @@ export default async function CheckInPage({
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
 
   if (!studio) {
     notFound()

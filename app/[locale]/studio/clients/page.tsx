@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import { formatDateTime } from '@/lib/utils'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import { getClassIdsByStudioId } from '@/lib/data/classes'
 import { getClassInstanceIdsByClassIds } from '@/lib/data/class-instances'
 import { getBookingsForStudio } from '@/lib/data/bookings'
@@ -22,7 +22,7 @@ export default async function ClientsPage() {
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
 
   if (!studio) {
     notFound()

@@ -54,8 +54,8 @@ const items = [
     icon: LayoutDashboardIcon,
   },
   {
-    title: "Explore Studios",
-    href: "/student/explore",
+    title: "Explore",
+    href: "/explore",
     icon: CompassIcon,
   },
   {

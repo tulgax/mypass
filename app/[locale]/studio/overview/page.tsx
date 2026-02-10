@@ -9,7 +9,7 @@ import { formatAmount } from '@/lib/utils'
 import { Users, Calendar, DollarSign, BookOpen, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import { getClassIdsByStudioId } from '@/lib/data/classes'
 import { getClassInstanceIdsByClassIds } from '@/lib/data/class-instances'
 import { getBookingsByInstanceIds, getPaymentsByBookingIds } from '@/lib/data/bookings'
@@ -27,7 +27,7 @@ async function OverviewStats() {
     return null
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
   if (!studio) {
     return null
   }
@@ -223,7 +223,7 @@ export default async function OverviewPage() {
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
 
   if (!studio) {
     notFound()

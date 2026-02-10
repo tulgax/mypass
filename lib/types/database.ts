@@ -104,6 +104,13 @@ export type Database = {
             referencedRelation: "classes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "class_instances_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       class_schedules: {
@@ -387,6 +394,106 @@ export type Database = {
           },
         ]
       }
+      plans: {
+        Row: {
+          id: number
+          studio_id: number
+          name: string
+          description: string | null
+          image_url: string | null
+          payment_type: string
+          price: number
+          currency: string
+          billing_period_months: number | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: never
+          studio_id: number
+          name: string
+          description?: string | null
+          image_url?: string | null
+          payment_type: string
+          price: number
+          currency?: string
+          billing_period_months?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: never
+          studio_id?: number
+          name?: string
+          description?: string | null
+          image_url?: string | null
+          payment_type?: string
+          price?: number
+          currency?: string
+          billing_period_months?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plans_studio_id_fkey"
+            columns: ["studio_id"]
+            isOneToOne: false
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_items: {
+        Row: {
+          id: number
+          plan_id: number
+          class_id: number
+          quantity: number
+        }
+        Insert: {
+          id?: never
+          plan_id: number
+          class_id: number
+          quantity: number
+        }
+        Update: {
+          id?: never
+          plan_id?: number
+          class_id?: number
+          quantity?: number
+        }
+        Relationships: [
+          { foreignKeyName: "plan_items_plan_id_fkey", columns: ["plan_id"], isOneToOne: false, referencedRelation: "plans", referencedColumns: ["id"] },
+          { foreignKeyName: "plan_items_class_id_fkey", columns: ["class_id"], isOneToOne: false, referencedRelation: "classes", referencedColumns: ["id"] },
+        ]
+      }
+      plan_benefits: {
+        Row: {
+          id: number
+          plan_id: number
+          benefit_text: string
+          sort_order: number
+        }
+        Insert: {
+          id?: never
+          plan_id: number
+          benefit_text: string
+          sort_order?: number
+        }
+        Update: {
+          id?: never
+          plan_id?: number
+          benefit_text?: string
+          sort_order?: number
+        }
+        Relationships: [
+          { foreignKeyName: "plan_benefits_plan_id_fkey", columns: ["plan_id"], isOneToOne: false, referencedRelation: "plans", referencedColumns: ["id"] },
+        ]
+      }
       studios: {
         Row: {
           address: string | null
@@ -440,6 +547,230 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      studio_team_members: {
+        Row: {
+          id: number
+          studio_id: number
+          user_id: string
+          role: string
+          invited_at: string
+          invited_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: never
+          studio_id: number
+          user_id: string
+          role: string
+          invited_at?: string
+          invited_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: never
+          studio_id?: number
+          user_id?: string
+          role?: string
+          invited_at?: string
+          invited_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studio_team_members_studio_id_fkey"
+            columns: ["studio_id"]
+            isOneToOne: false
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "studio_team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "studio_team_members_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_classes: {
+        Row: {
+          access_duration_days: number
+          category: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          difficulty_level: string | null
+          duration_seconds: number | null
+          id: number
+          instructor_id: string | null
+          is_active: boolean
+          is_featured: boolean
+          mux_asset_id: string | null
+          mux_playback_id: string | null
+          mux_status: string
+          mux_upload_id: string | null
+          preview_mux_asset_id: string | null
+          preview_mux_playback_id: string | null
+          preview_mux_upload_id: string | null
+          price: number
+          sort_order: number
+          studio_id: number
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          access_duration_days?: number
+          category?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          difficulty_level?: string | null
+          duration_seconds?: number | null
+          id?: never
+          instructor_id?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          mux_asset_id?: string | null
+          mux_playback_id?: string | null
+          mux_status?: string
+          mux_upload_id?: string | null
+          preview_mux_asset_id?: string | null
+          preview_mux_playback_id?: string | null
+          preview_mux_upload_id?: string | null
+          price: number
+          sort_order?: number
+          studio_id: number
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          access_duration_days?: number
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          difficulty_level?: string | null
+          duration_seconds?: number | null
+          id?: never
+          instructor_id?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          mux_asset_id?: string | null
+          mux_playback_id?: string | null
+          mux_status?: string
+          mux_upload_id?: string | null
+          preview_mux_asset_id?: string | null
+          preview_mux_playback_id?: string | null
+          preview_mux_upload_id?: string | null
+          price?: number
+          sort_order?: number
+          studio_id?: number
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_classes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_classes_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_classes_studio_id_fkey"
+            columns: ["studio_id"]
+            isOneToOne: false
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_purchases: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string | null
+          expires_at: string | null
+          gateway: string | null
+          gateway_transaction_id: string | null
+          id: number
+          purchased_at: string | null
+          status: string
+          student_id: string
+          updated_at: string
+          video_class_id: number
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          gateway?: string | null
+          gateway_transaction_id?: string | null
+          id?: never
+          purchased_at?: string | null
+          status?: string
+          student_id: string
+          updated_at?: string
+          video_class_id: number
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          expires_at?: string | null
+          gateway?: string | null
+          gateway_transaction_id?: string | null
+          id?: never
+          purchased_at?: string | null
+          status?: string
+          student_id?: string
+          updated_at?: string
+          video_class_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_purchases_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_purchases_video_class_id_fkey"
+            columns: ["video_class_id"]
+            isOneToOne: false
+            referencedRelation: "video_classes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -496,6 +827,14 @@ export type Database = {
       update_user_role: {
         Args: { new_role: string; user_id_param: string }
         Returns: undefined
+      }
+      get_user_id_by_email: {
+        Args: { user_email: string }
+        Returns: string
+      }
+      user_can_manage_studio: {
+        Args: { p_studio_id: number }
+        Returns: boolean
       }
     }
     Enums: {

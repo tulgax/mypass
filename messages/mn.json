@@ -37,6 +37,7 @@
       "pricing": "Үнэ",
       "help": "Тусламж",
       "referEarn": "Холбоо барих",
+      "explore": "Судлах",
       "signIn": "Нэвтрэх",
       "signUp": "Бүртгүүлэх",
       "productLinks": {
@@ -231,6 +232,7 @@
       "studioTagline": "Хүч чадал урсгалтай уулздаг.",
       "tabs": {
         "schedule": "Хуваарь",
+        "pricing": "Үнэ",
         "membership": "Гишүүнчлэл",
         "plans": "Төлөвлөгөө",
         "contact": "Холбогдох"
@@ -399,6 +401,8 @@
       "classes": "Хичээл",
       "clients": "Харилцагчид",
       "memberships": "Гишүүнчлэл",
+      "instructors": "Зөвлөхүүд",
+      "videoClasses": "Видео хичээлүүд",
       "checkIn": "Ирц бүртгэх",
       "settings": "Тохиргоо",
       "studioSettings": "Студийн тохиргоо",
@@ -421,6 +425,14 @@
       "toggleSidebar": "Хажуу цэсийг нээх/хаах"
     },
     "header": {
+      "schedule": "Хуваарь",
+      "classes": "Хичээл",
+      "clients": "Харилцагчид",
+      "createClass": "Хичээл үүсгэх",
+      "studioSettings": "Студийн тохиргоо",
+      "manageSchedule": "Хичээлийн хуваарийг удирдах",
+      "manageClasses": "Хичээлүүдээ удирдах",
+      "viewBookings": "Бүх захиалгуудыг харах",
       "notifications": "Мэдэгдэл"
     },
     "overview": {
@@ -466,17 +478,6 @@
         "title": "Эхлэхийн тулд студи үүсгэх",
         "button": "Студи үүсгэх"
       }
-    },
-    "header": {
-      "schedule": "Хуваарь",
-      "classes": "Хичээл",
-      "clients": "Харилцагчид",
-      "createClass": "Хичээл үүсгэх",
-      "studioSettings": "Студийн тохиргоо",
-      "manageSchedule": "Хичээлийн хуваарийг удирдах",
-      "manageClasses": "Хичээлүүдээ удирдах",
-      "viewBookings": "Бүх захиалгуудыг харах",
-      "notifications": "Мэдэгдэл"
     }
   },
   "student": {
@@ -529,7 +530,18 @@
   },
   "studio": {
     "common": {
-      "search": "Хайх"
+      "close": "Хаах",
+      "cancel": "Цуцлах",
+      "save": "Хадгалах",
+      "delete": "Устгах",
+      "edit": "Засах",
+      "view": "Харах",
+      "create": "Үүсгэх",
+      "update": "Шинэчлэх",
+      "loading": "Ачааллаж байна...",
+      "noData": "Мэдээлэл байхгүй",
+      "unknown": "Тодорхойгүй",
+      "na": "Байхгүй"
     },
     "schedule": {
       "title": "Хуваарь",
@@ -566,7 +578,8 @@
         "scheduleCancelled": "Хуваарь амжилттай цуцлагдлаа",
         "scheduleDeleted": "Хуваарь амжилттай устгагдлаа",
         "classCancelled": "Хичээл амжилттай цуцлагдлаа",
-        "allFutureCancelled": "Ирээдүйн бүх хичээл амжилттай цуцлагдлаа"
+        "allFutureCancelled": "Ирээдүйн бүх хичээл амжилттай цуцлагдлаа",
+        "instructorUpdated": "Зөвлөх шинэчлэгдлээ"
       },
       "instanceView": {
         "service": "Үйлчилгээ",
@@ -581,8 +594,18 @@
         "classInfoNotAvailable": "Хичээлийн мэдээлэл байхгүй",
         "unknownClient": "Тодорхойгүй харилцагч",
         "min": "мин",
-        "weeklyOn": "Долоо хоног бүр {day} {time} цагт"
+        "weeklyOn": "Долоо хоног бүр {day} {time} цагт",
+        "instructor": "Зөвлөх",
+        "unassigned": "Томилогдоогүй"
       }
+    },
+    "instructors": {
+      "title": "Зөвлөхүүд",
+      "subtitle": "Цалин тооцоход зөвлөхүүдийн хичээл, цагийн статистик",
+      "instructor": "Зөвлөх",
+      "classesTaught": "Заасан хичээл",
+      "hoursTaught": "Заасан цаг",
+      "empty": "Зөвлөх байхгүй. Тохиргоо > Баг хэсгээс Зөвлөх үүрэгтэй гишүүн нэмнэ үү."
     },
     "overview": {
       "stats": {
@@ -827,10 +850,63 @@
       },
       "plans": {
         "title": "Төлөвлөгөө",
-        "subtitle": "Захиалгын төлөвлөгөөгөө удирдах",
+        "subtitle": "Үнэ бүхий хичээлийн багц үүсгэх",
         "createPlan": "Төлөвлөгөө үүсгэх",
         "noPlans": "Төлөвлөгөө байхгүй",
-        "createFirst": "Анхны төлөвлөгөө үүсгэх"
+        "createFirst": "Анхны төлөвлөгөө үүсгэх",
+        "card": {
+          "membership": "Гишүүнчлэл",
+          "singlePayment": "Нэг удаагийн төлбөр",
+          "monthly": "Сар бүр",
+          "quarterly": "Улирал бүр",
+          "yearly": "Жил бүр",
+          "activeBadge": "Идэвхтэй",
+          "inactiveBadge": "Идэвхгүй"
+        },
+        "sheet": {
+          "createTitle": "Төлөвлөгөө нэмэх",
+          "editTitle": "Төлөвлөгөө засах"
+        },
+        "form": {
+          "name": "Нэр",
+          "namePlaceholder": "жишээ нь, Эхлэгч багц",
+          "description": "Тайлбар",
+          "descriptionPlaceholder": "Энэ төлөвлөгөөнд юу багтсаныг тайлбарлана уу",
+          "pricing": "Үнэ",
+          "membership": "Гишүүнчлэл",
+          "singlePayment": "Нэг удаагийн төлбөр",
+          "price": "Үнэ",
+          "currency": "Валют",
+          "currencyMNT": "MNT (Монгол төгрөг)",
+          "currencyUSD": "USD (Америк доллар)",
+          "billingPeriod": "Төлбөрийн хугацаа",
+          "selectBilling": "Төлбөрийн хугацаа сонгох",
+          "monthly": "Сар бүр",
+          "quarterly": "Улирал бүр",
+          "yearly": "Жил бүр",
+          "classes": "Хичээлүүд",
+          "addClass": "Хичээл нэмэх",
+          "classPlaceholder": "Хичээл сонгох",
+          "quantity": "Тоо хэмжээ",
+          "benefits": "Давуу тал",
+          "addBenefit": "Давуу тал нэмэх",
+          "benefitPlaceholder": "жишээ нь, Сард 4 хичээл",
+          "isActive": "Идэвхтэй",
+          "saving": "Хадгалж байна...",
+          "createPlan": "Төлөвлөгөө үүсгэх",
+          "updatePlan": "Өөрчлөлт хадгалах",
+          "itemsRequired": "Наад зах нь нэг хичээл, тоо хэмжээ нэмнэ үү"
+        },
+        "dialog": {
+          "deleteTitle": "Төлөвлөгөө устгах уу?",
+          "deleteDescription": "Та \"{name}\" төлөвлөгөөг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.",
+          "deleting": "Устгаж байна..."
+        },
+        "toast": {
+          "created": "Төлөвлөгөө амжилттай үүслээ",
+          "updated": "Төлөвлөгөө амжилттай шинэчлэгдлээ",
+          "deleted": "Төлөвлөгөө амжилттай устгагдлаа"
+        }
       }
     },
     "settings": {
@@ -880,9 +956,35 @@
         "title": "Баг",
         "subtitle": "Багийн гишүүдээ удирдах",
         "inviteMember": "Гишүүн урих",
-        "noMembers": "Багийн гишүүд байхгүй",
+        "noMembers": "Багийн гишүүд байхгүй. Эхний багийн гишүүнээ урьж эхэлнэ үү.",
         "inviteFirst": "Анхны багийн гишүүн урих",
-        "manage": "Удирдах"
+        "manage": "Удирдах",
+        "colMember": "Гишүүн",
+        "colEmail": "И-мэйл",
+        "colPhone": "Утас",
+        "colRole": "Үүрэг",
+        "colJoined": "Нэгдсэн",
+        "colActions": "Үйлдэл",
+        "roleOwner": "Эзэмшигч",
+        "roleManager": "Менежер",
+        "roleInstructor": "Зөвлөх",
+        "you": "Та",
+        "inviteDialogTitle": "Багийн гишүүн урих",
+        "inviteDialogDescription": "Тэд аль хэдийн MyPass данстай байх ёстой. И-мэйл болон үүргийг сонгоно уу.",
+        "emailLabel": "И-мэйл",
+        "emailPlaceholder": "colleague@example.com",
+        "roleLabel": "Үүрэг",
+        "inviteButton": "Урих",
+        "removeMember": "Багаас хасах",
+        "removeConfirmTitle": "Багийн гишүүнийг хасах уу?",
+        "removeConfirmDescription": "Тэр энэ студид нэвтрэх эрхээ алдах болно. Үүнийг буцаах боломжгүй.",
+        "changeRole": "Үүрэг солих",
+        "removing": "Хасаж байна…",
+        "inviteSuccess": "Багийн гишүүн нэмэгдлээ",
+        "inviteErrorNoAccount": "Энэ и-мэйлтэй данс олдсонгүй. Эхлээд бүртгүүлнэ үү.",
+        "updateSuccess": "Үүрэг шинэчлэгдлээ",
+        "removeSuccess": "Багийн гишүүн хасагдлаа",
+        "totalMembers": "{count} гишүүн"
       },
       "availability": {
         "title": "Чөлөөт цаг",
@@ -974,19 +1076,244 @@
       "errorDetails": "Алдааны дэлгэрэнгүй:",
       "tryAgain": "Дахин оролдох"
     },
-    "common": {
-      "close": "Хаах",
-      "cancel": "Цуцлах",
-      "save": "Хадгалах",
-      "delete": "Устгах",
+    "videoClasses": {
+      "title": "Видео хичээлүүд",
+      "subtitle": "Онлайн видео оруулж борлуулах",
+      "createVideo": "Видео үүсгэх",
+      "createSheetTitle": "Видео хичээл үүсгэх",
+      "editSheetTitle": "Видео хичээл засах",
+      "purchasesSheetTitle": "Худалдан авалт",
+      "empty": "Видео хичээл байхгүй",
+      "emptyAction": "Анхны видеогоо үүсгэх",
+      "status": {
+        "ready": "Бэлэн",
+        "uploading": "Оруулж байна",
+        "processing": "Боловсруулж байна",
+        "errored": "Алдаа",
+        "draft": "Ноорог"
+      },
+      "uploadVideo": "Видео оруулах",
+      "reset": "Дахин эхлүүлэх",
+      "refreshStatus": "Төлөв шалгах",
+      "playbackReady": "Playback бэлэн",
+      "active": "Идэвхтэй",
+      "inactive": "Идэвхгүй",
       "edit": "Засах",
-      "view": "Харах",
-      "create": "Үүсгэх",
-      "update": "Шинэчлэх",
-      "loading": "Ачааллаж байна...",
-      "noData": "Мэдээлэл байхгүй",
-      "unknown": "Тодорхойгүй",
-      "na": "Байхгүй"
+      "delete": "Устгах",
+      "purchases": "Худалдан авалт",
+      "preview": "Үзэх",
+      "deleteDialogTitle": "Видео хичээлийг устгах уу?",
+      "deleteDialogDescription": "Үүнийг буцаах боломжгүй.",
+      "deleting": "Устгаж байна…",
+      "form": {
+        "titleLabel": "Гарчиг",
+        "titlePlaceholder": "ж.нь. Өглөөний йога",
+        "descriptionLabel": "Тайлбар",
+        "descriptionPlaceholder": "Сурагчдад юу заах вэ гэдгийг тайлбарлана уу...",
+        "priceLabel": "Үнэ",
+        "currencyLabel": "Валют",
+        "accessDaysLabel": "Хандах хугацаа (өдөр)",
+        "activeLabel": "Идэвхтэй",
+        "activeDescription": "Сурагчдад харагдана",
+        "instructorLabel": "Багш",
+        "instructorPlaceholder": "Багш сонгох",
+        "categoryLabel": "Ангилал",
+        "categoryPlaceholder": "Ангилал сонгох буюу бичих",
+        "difficultyLabel": "Түвшин",
+        "tagsLabel": "Тэмдэглэл",
+        "tagsPlaceholder": "Бичээд Enter дарна уу",
+        "thumbnailLabel": "Зураг URL",
+        "thumbnailPlaceholder": "https://example.com/thumbnail.jpg",
+        "thumbnailHelp": "Хоосон үлдээвэл видеоноос автоматаар үүсгэнэ.",
+        "featuredLabel": "Онцлох",
+        "featuredDescription": "Нүүр хуудасанд тодорхойлох",
+        "sortOrderLabel": "Эрэмбэ",
+        "sortOrderHelp": "Бага тоо эхлээд гарна (үндсэн: 0)",
+        "save": "Хадгалах",
+        "saving": "Хадгалж байна…"
+      },
+      "toast": {
+        "created": "Амжилттай үүслээ",
+        "updated": "Амжилттай шинэчлэгдлээ",
+        "deleted": "Амжилттай устгагдлаа",
+        "uploadComplete": "Оруулалт дууслаа",
+        "uploadFailed": "Оруулалт амжилтгүй",
+        "activated": "Идэвхжлээ",
+        "previewUploadComplete": "Танилцуулга оруулагдлаа",
+        "previewUploadFailed": "Танилцуулга оруулалт амжилтгүй",
+        "published": "Амжилттай нийтлэгдлээ",
+        "draftSaved": "Ноорог хадгалагдлаа"
+      },
+      "purchasesEmpty": "Худалдан авалт алга.",
+      "activate": "Идэвхжүүлэх",
+      "activateHint": "Төлбөрийн интеграци хүртэлх түр (dev/admin) үйлдэл.",
+      "noInstructor": "Багш сонгогдоогүй",
+      "noDuration": "—",
+      "wizard": {
+        "title": "Шинэ видео хичээл",
+        "editTitle": "Видео хичээл засах",
+        "step1": "Оруулах",
+        "step2": "Дэлгэрэнгүй",
+        "step3": "Үнэ",
+        "step4": "Хянах",
+        "next": "Дараах",
+        "back": "Буцах",
+        "uploadTitle": "Видеогоо оруулна уу",
+        "uploadDescription": "Видео файлаа чирч тавих буюу сонгоно уу. Видео боловсруулагдаж байх зуур дэлгэрэнгүй мэдээллийг бөглөнө үү.",
+        "uploadPreviewTitle": "Танилцуулга оруулах (сонгомол)",
+        "uploadPreviewDescription": "Худалдан авагчдад үнэгүй үзүүлэх богино танилцуулга.",
+        "previewUploaded": "Танилцуулга оруулагдсан",
+        "detailsTitle": "Видеоны дэлгэрэнгүй",
+        "detailsDescription": "Видео хичээлийн мэдээллийг нэмнэ үү.",
+        "pricingTitle": "Үнэ ба тохиргоо",
+        "pricingDescription": "Үнэ тогтоож тохиргоог тохируулна уу.",
+        "reviewTitle": "Хянаж нийтлэх",
+        "reviewDescription": "Нийтлэхийн өмнө хянана уу.",
+        "saveAsDraft": "Ноорог хадгалах",
+        "publish": "Нийтлэх",
+        "publishing": "Нийтлэж байна…",
+        "savingDraft": "Хадгалж байна…",
+        "videoProcessing": "Видео боловсруулагдаж байна. Бэлэн болмогц нийтлэх боломжтой.",
+        "noVideoUploaded": "Видео оруулаагүй байна. Буцаж видео оруулна уу.",
+        "publishReady": "Видео бэлэн. Одоо нийтлэх боломжтой."
+      },
+      "difficulty": {
+        "beginner": "Анхан шат",
+        "intermediate": "Дунд",
+        "advanced": "Дэвшүүлсэн"
+      },
+      "categories": {
+        "yoga": "Йога",
+        "pilates": "Пилатес",
+        "hiit": "HIIT",
+        "strength": "Хүч",
+        "dance": "Бүжиг",
+        "meditation": "Бяслал",
+        "stretching": "Сунгалт",
+        "cardio": "Кардио",
+        "other": "Бусад"
+      }
+    }
+  },
+  "explore": {
+    "hub": {
+      "title": "Судлах",
+      "subtitle": "Студи, хичээл, видео, гишүүнчлэлийг олоорой",
+      "searchPlaceholder": "Студи, хичээл, видео хайх...",
+      "featuredStudios": "Онцлох студиуд",
+      "viewAll": "Бүгдийг харах",
+      "stats": {
+        "studios": "Студи",
+        "upcomingClasses": "Удахгүй болох хичээл",
+        "videoClasses": "Видео хичээл"
+      },
+      "categories": {
+        "title": "Ангиллаар хайх",
+        "yoga": "Йога",
+        "pilates": "Пилатес",
+        "hiit": "HIIT",
+        "strength": "Хүч",
+        "dance": "Бүжиг",
+        "boxing": "Бокс",
+        "crossfit": "CrossFit",
+        "meditation": "Бясалгал"
+      }
+    },
+    "nav": {
+      "studios": "Студиуд",
+      "classes": "Хичээлүүд",
+      "videos": "Видео",
+      "memberships": "Гишүүнчлэл"
+    },
+    "studios": {
+      "title": "Студиуд",
+      "subtitle": "Ойролцоох студийг олоорой",
+      "mapView": "Газрын зураг",
+      "gridView": "Жагсаалт",
+      "classesCount": "{count} хичээл",
+      "upcomingCount": "{count} удахгүй",
+      "viewStudio": "Студи харах",
+      "noResults": "Студи олдсонгүй",
+      "noResultsDescription": "Хайлтаа өөрчлөөд дахин оролдоно уу."
+    },
+    "classes": {
+      "title": "Хичээлүүд",
+      "subtitle": "Бүх студийн удахгүй болох хичээлүүд",
+      "filterType": "Хичээлийн төрөл",
+      "filterStudio": "Студи",
+      "allTypes": "Бүх төрөл",
+      "allStudios": "Бүх студи",
+      "typeOnline": "Онлайн",
+      "typeOffline": "Биечлэн",
+      "spotsLeft": "{count} зай үлдсэн",
+      "full": "Дүүрсэн",
+      "bookNow": "Захиалах",
+      "noResults": "Хичээл олдсонгүй",
+      "noResultsDescription": "Шүүлтүүрээ өөрчлөөд дахин оролдоно уу."
+    },
+    "videos": {
+      "title": "Видео хичээл",
+      "subtitle": "Өөрийн хурдаар суралцаарай",
+      "filterCategory": "Ангилал",
+      "filterDifficulty": "Түвшин",
+      "filterStudio": "Студи",
+      "allCategories": "Бүх ангилал",
+      "allDifficulties": "Бүх түвшин",
+      "allStudios": "Бүх студи",
+      "beginner": "Эхлэгч",
+      "intermediate": "Дунд",
+      "advanced": "Ахисан",
+      "featured": "Онцлох",
+      "watch": "Үзэх",
+      "free": "Үнэгүй",
+      "noResults": "Видео хичээл олдсонгүй",
+      "noResultsDescription": "Шүүлтүүрээ өөрчлөөд дахин оролдоно уу."
+    },
+    "memberships": {
+      "title": "Гишүүнчлэл",
+      "subtitle": "Тохирох гишүүнчлэлээ олоорой",
+      "filterStudio": "Студи",
+      "allStudios": "Бүх студи",
+      "perMonth": "/сар",
+      "months": "{count} сар",
+      "viewPlan": "Төлөвлөгөө харах",
+      "noResults": "Гишүүнчлэлийн төлөвлөгөө олдсонгүй",
+      "noResultsDescription": "Шүүлтүүрээ өөрчлөөд дахин оролдоно уу."
+    },
+    "common": {
+      "search": "Хайх",
+      "filter": "Шүүх",
+      "clearFilters": "Шүүлтүүр цэвэрлэх",
+      "showing": "{count} үр дүн",
+      "signInToBook": "Захиалахын тулд нэвтрэх",
+      "explore": "Судлах"
+    }
+  },
+  "studioPublic": {
+    "videos": {
+      "title": "Видео хичээлүүд",
+      "subtitle": "Энэ студийн онлайн видео хичээлүүд",
+      "empty": "Одоогоор видео хичээл байхгүй байна.",
+      "allCategories": "Бүх ангилал",
+      "allLevels": "Бүх түвшин",
+      "duration": "{minutes} мин",
+      "days": "{count} өдөр"
+    },
+    "videoWatch": {
+      "notReady": "Энэ видео боловсруулагдаж байна. Дараа дахин оролдоно уу.",
+      "signInToWatch": "Энэ видеог үзэхийн тулд нэвтэрч худалдан авна уу.",
+      "signIn": "Нэвтрэх",
+      "noAccess": "Та энэ видеог үзэх эрхгүй байна.",
+      "pending": "Төлбөр хүлээгдэж байна.",
+      "backToVideos": "Видеонууд руу буцах",
+      "paymentComingSoon": "Төлбөрийн интеграци удахгүй. Одоогоор тестийн зориулалтаар худалдан авалтыг гараар идэвхжүүлнэ.",
+      "securityNote": "Гарын үсэгтэй (signed) playback ашиглан хамгаалсан. Гэхдээ дэлгэц бичлэгийг 100% хаах боломжгүй.",
+      "instructor": "Багш",
+      "category": "Ангилал",
+      "difficulty": "Түвшин",
+      "duration": "Үргэлжлэх хугацаа",
+      "freePreview": "Үнэгүй танилцуулга",
+      "tags": "Тэмдэглэл"
     }
   }
 }

@@ -7,6 +7,8 @@ import { Link } from "@/i18n/routing"
 import {
   CalendarDays,
   CreditCard,
+  Video,
+  GraduationCap,
   LayoutGrid,
   Users,
   Settings,
@@ -31,10 +33,14 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 import type { Locale } from "@/i18n/routing"
 
+export type StudioRole = 'owner' | 'manager' | 'instructor'
+
 interface DashboardShellProps {
   children: React.ReactNode
   locale: Locale
   studioName?: string | null
+  studioId?: number
+  studioRole?: StudioRole
   onSignOut: () => void
   user: {
     name: string
@@ -68,6 +74,8 @@ const pathToNavKey: Record<string, string> = {
   "/studio/settings/billing": "planBilling",
   "/studio/settings/team": "team",
   "/studio/settings/integrations": "integrations",
+  "/studio/instructors": "instructors",
+  "/studio/video-classes": "videoClasses",
 }
 
 /**
@@ -132,127 +140,104 @@ export function DashboardShell({
   children,
   locale,
   studioName,
+  studioId,
+  studioRole = 'owner',
   onSignOut,
   user,
 }: DashboardShellProps) {
   const t = useTranslations('dashboard.navigation')
   const tHeader = useTranslations('dashboard.header')
   const tSidebar = useTranslations('dashboard.sidebar')
-  // Get pathname without locale prefix (next-intl provides this)
   const pathname = usePathname()
-
-  // Generate breadcrumbs from pathname (translated)
   const breadcrumbs = generateBreadcrumbs(pathname, (key) => t(key))
 
-  // Navigation items for MyPass studio
-  // URLs are relative (without locale) - next-intl Link handles locale
-  const navItems = [
-    {
-      title: t('overview'),
-      url: "/studio/overview",
-      icon: LayoutGrid,
-      isActive: pathname === "/studio/overview",
-    },
-    {
-      title: t('schedule'),
-      url: "/studio/schedule",
-      icon: CalendarDays,
-      isActive: pathname === "/studio/schedule",
-    },
-    {
-      title: t('catalog'),
-      url: "/studio/catalog/classes",
-      icon: FolderOpen,
-      isActive: pathname.startsWith("/studio/catalog"),
-      items: [
-        {
-          title: t('classes'),
-          url: "/studio/catalog/classes",
-          isActive: pathname === "/studio/catalog/classes" || pathname.startsWith("/studio/catalog/classes/"),
-        },
-        {
-          title: t('plans'),
-          url: "/studio/catalog/plans",
-          isActive: pathname === "/studio/catalog/plans",
-        },
-        {
-          title: t('membership'),
-          url: "/studio/catalog/membership",
-          isActive: pathname === "/studio/catalog/membership" || pathname.startsWith("/studio/catalog/membership/"),
-        },
-        {
-          title: t('coupons'),
-          url: "/studio/catalog/coupons",
-          isActive: pathname === "/studio/catalog/coupons",
-        },
-        {
-          title: t('orders'),
-          url: "/studio/catalog/orders",
-          isActive: pathname === "/studio/catalog/orders" || pathname.startsWith("/studio/catalog/orders/"),
-        },
-      ],
-    },
-    {
-      title: t('clients'),
-      url: "/studio/clients",
-      icon: Users,
-      isActive: pathname === "/studio/clients",
-    },
-    {
-      title: t('memberships'),
-      url: "/studio/memberships",
-      icon: CreditCard,
-      isActive: pathname.startsWith("/studio/memberships"),
-    },
-    {
-      title: t('settings'),
-      url: "#",
-      icon: Settings,
-      isActive: pathname.startsWith("/studio/settings"),
-      items: [
-        {
-          title: t('account'),
-          url: "/studio/settings/account",
-          isActive: pathname === "/studio/settings/account",
-        },
-        {
-          title: t('payments'),
-          url: "/studio/settings/payments",
-          isActive: pathname === "/studio/settings/payments",
-        },
-        {
-          title: t('policies'),
-          url: "/studio/settings/policies",
-          isActive: pathname === "/studio/settings/policies",
-        },
-        {
-          title: t('availability'),
-          url: "/studio/settings/availability",
-          isActive: pathname === "/studio/settings/availability",
-        },
-        {
-          title: t('planBilling'),
-          url: "/studio/settings/billing",
-          isActive: pathname === "/studio/settings/billing",
-        },
-        {
-          title: t('team'),
-          url: "/studio/settings/team",
-          isActive: pathname === "/studio/settings/team",
-        },
-        {
-          title: t('integrations'),
-          url: "/studio/settings/integrations",
-          isActive: pathname === "/studio/settings/integrations",
-        },
-        {
-          title: t('studioSettings'),
-          url: "/studio/settings/studio",
-          isActive: pathname === "/studio/settings/studio",
-        },
-      ],
-    },
-  ]
+  const canEditCatalog = studioRole === 'owner' || studioRole === 'manager'
+  const canSeeSettings = studioRole === 'owner'
+  const canSeeInstructors = studioRole === 'owner' || studioRole === 'manager'
+  const canSeeVideoClasses = studioRole === 'owner' || studioRole === 'manager'
+
+  const navItems = React.useMemo(() => {
+    const items: Array<{
+      title: string
+      url: string
+      icon: typeof LayoutGrid
+      isActive?: boolean
+      items?: Array< { title: string; url: string; isActive: boolean }>
+    }> = [
+      {
+        title: t('overview'),
+        url: "/studio/overview",
+        icon: LayoutGrid,
+        isActive: pathname === "/studio/overview",
+      },
+      {
+        title: t('schedule'),
+        url: "/studio/schedule",
+        icon: CalendarDays,
+        isActive: pathname === "/studio/schedule",
+      },
+    ]
+
+    if (canEditCatalog) {
+      items.push({
+        title: t('catalog'),
+        url: "/studio/catalog/classes",
+        icon: FolderOpen,
+        isActive: pathname.startsWith("/studio/catalog"),
+        items: [
+          { title: t('classes'), url: "/studio/catalog/classes", isActive: pathname === "/studio/catalog/classes" || pathname.startsWith("/studio/catalog/classes/") },
+          { title: t('plans'), url: "/studio/catalog/plans", isActive: pathname === "/studio/catalog/plans" },
+          { title: t('membership'), url: "/studio/catalog/membership", isActive: pathname === "/studio/catalog/membership" || pathname.startsWith("/studio/catalog/membership/") },
+          { title: t('coupons'), url: "/studio/catalog/coupons", isActive: pathname === "/studio/catalog/coupons" },
+          { title: t('orders'), url: "/studio/catalog/orders", isActive: pathname === "/studio/catalog/orders" || pathname.startsWith("/studio/catalog/orders/") },
+        ],
+      })
+    }
+
+    items.push(
+      { title: t('clients'), url: "/studio/clients", icon: Users, isActive: pathname === "/studio/clients" },
+      { title: t('memberships'), url: "/studio/memberships", icon: CreditCard, isActive: pathname.startsWith("/studio/memberships") },
+    )
+
+    if (canSeeVideoClasses) {
+      items.push({
+        title: t('videoClasses'),
+        url: "/studio/video-classes",
+        icon: Video,
+        isActive: pathname === "/studio/video-classes",
+      })
+    }
+
+    if (canSeeInstructors) {
+      items.push({
+        title: t('instructors'),
+        url: "/studio/instructors",
+        icon: GraduationCap,
+        isActive: pathname === "/studio/instructors",
+      })
+    }
+
+    if (canSeeSettings) {
+      items.push({
+        title: t('settings'),
+        url: "#",
+        icon: Settings,
+        isActive: pathname.startsWith("/studio/settings"),
+        items: [
+          { title: t('account'), url: "/studio/settings/account", isActive: pathname === "/studio/settings/account" },
+          { title: t('payments'), url: "/studio/settings/payments", isActive: pathname === "/studio/settings/payments" },
+          { title: t('policies'), url: "/studio/settings/policies", isActive: pathname === "/studio/settings/policies" },
+          { title: t('availability'), url: "/studio/settings/availability", isActive: pathname === "/studio/settings/availability" },
+          { title: t('planBilling'), url: "/studio/settings/billing", isActive: pathname === "/studio/settings/billing" },
+          { title: t('team'), url: "/studio/settings/team", isActive: pathname === "/studio/settings/team" },
+          { title: t('integrations'), url: "/studio/settings/integrations", isActive: pathname === "/studio/settings/integrations" },
+          { title: t('studioSettings'), url: "/studio/settings/studio", isActive: pathname === "/studio/settings/studio" },
+        ],
+      })
+    }
+
+    return items
+  }, [pathname, studioRole, canEditCatalog, canSeeSettings, canSeeInstructors, t])
 
   return (
     <SidebarProvider>

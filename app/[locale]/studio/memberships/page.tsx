@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { MembershipsClient } from './MembershipsClient'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import {
   getActiveMemberships,
   getLastCheckInsForMemberships,
@@ -17,7 +17,7 @@ export default async function MembershipsPage() {
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
 
   if (!studio) {
     notFound()

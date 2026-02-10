@@ -25,6 +25,7 @@ export const createScheduleWithRepeatSchema = z.object({
   start_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)'),
   repeat: z.enum(['none', 'weekly']).default('none'),
   selected_days: z.array(z.number().int().min(0).max(6)).optional(),
+  instructor_id: z.string().uuid().nullable().optional(),
 })
 
 export const updateClassInstanceSchema = z.object({

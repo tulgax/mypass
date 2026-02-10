@@ -1,8 +1,8 @@
 import { redirect as nextRedirect } from 'next/navigation'
 import { headers } from 'next/headers'
-import { Link } from '@/i18n/routing'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import type { Locale } from '@/i18n/routing'
 import { routing } from '@/i18n/routing'
 
@@ -75,18 +75,12 @@ export default async function DashboardLayout({
     nextRedirect(`/${locale}/auth/signup`)
   }
 
-  // Redirect if profile exists but role is not studio_owner
-  if (profile && profile.role !== 'studio_owner') {
-    console.log('[Dashboard Layout] Redirecting to student - Role:', profile.role)
+  // Resolve studio access: owner (studios.owner_id) or team member (studio_team_members)
+  const { studio, role } = await getStudioAndRoleForUser(user.id)
+  if (!studio) {
+    // User is not owner nor team member of any studio -> redirect to student
     nextRedirect(`/${locale}/student`)
   }
-
-  // Fetch studio data
-  const { data: studio } = await supabase
-    .from('studios')
-    .select('id, slug, name')
-    .eq('owner_id', user.id)
-    .single()
 
   // Server action for sign out
   async function signOut() {
@@ -112,9 +106,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <DashboardShell 
+    <DashboardShell
       locale={locale}
-      studioName={studio?.name}
+      studioName={studio.name}
+      studioId={studio.id}
+      studioRole={role ?? 'owner'}
       onSignOut={signOut}
       user={userData}
     >

@@ -25,8 +25,11 @@ interface ClassOption {
   is_active: boolean
 }
 
+export type InstructorOption = { id: string; full_name: string | null }
+
 interface ScheduleFormProps {
   classes: ClassOption[]
+  instructors?: InstructorOption[]
   onSuccess?: () => void
   inSheet?: boolean
 }
@@ -43,7 +46,7 @@ const daysOfWeek = [
   { label: 'Sun', value: 0 },
 ]
 
-export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFormProps) {
+export function ScheduleForm({ classes, instructors = [], onSuccess, inSheet = false }: ScheduleFormProps) {
   const t = useTranslations('studio.forms.scheduleForm')
   const tCommon = useTranslations('studio.common')
   const router = useRouter()
@@ -53,6 +56,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
   const [startTime, setStartTime] = useState('')
   const [repeat, setRepeat] = useState<RepeatOption>('none')
   const [selectedDays, setSelectedDays] = useState<number[]>([])
+  const [instructorId, setInstructorId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const activeClasses = useMemo(
@@ -164,6 +168,7 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
           start_time: startTime,
           repeat,
           selected_days: repeat === 'weekly' ? selectedDays : undefined,
+          instructor_id: instructorId ?? undefined,
         })
 
         if (!result.success) {
@@ -178,7 +183,8 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
         setSelectedDays([])
         setRepeat('none')
         setSelectedClassId('')
-        
+        setInstructorId(null)
+
         // Refresh and call onSuccess if provided
         router.refresh()
         if (onSuccess) {
@@ -281,6 +287,28 @@ export function ScheduleForm({ classes, onSuccess, inSheet = false }: ScheduleFo
             <Label>{t('startTime')}</Label>
             <TimePicker value={startTime} onChange={setStartTime} />
           </div>
+
+          {instructors.length > 0 && (
+            <div className="space-y-2">
+              <Label>{t('instructor', { defaultValue: 'Instructor' })}</Label>
+              <Select
+                value={instructorId ?? 'unassigned'}
+                onValueChange={(v) => setInstructorId(v === 'unassigned' ? null : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('instructorOptional', { defaultValue: 'Optional' })} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">{t('unassigned', { defaultValue: 'Unassigned' })}</SelectItem>
+                  {instructors.map((inst) => (
+                    <SelectItem key={inst.id} value={inst.id}>
+                      {inst.full_name ?? inst.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>{t('repeat')}</Label>

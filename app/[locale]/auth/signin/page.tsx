@@ -12,9 +12,10 @@ export default async function SignInPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: { message?: string }
+  searchParams: Promise<{ message?: string }>
 }) {
   const { locale } = await params
+  const resolvedSearchParams = await searchParams
   const t = await getTranslations({ locale, namespace: 'auth.signIn' })
   const supabase = await createClient()
   const {
@@ -57,7 +58,7 @@ export default async function SignInPage({
           <h1 className="text-lg font-medium">{t('title')}</h1>
         </div>
 
-        <SignInPageClient initialError={searchParams?.message} />
+        <SignInPageClient initialError={resolvedSearchParams?.message} />
 
         {/* Legal Text */}
         <p className="text-center text-xs text-muted-foreground">

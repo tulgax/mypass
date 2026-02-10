@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createClassSchema, updateClassSchema, classIdSchema } from '@/lib/validation/classes'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 
 export type ActionResult<T = void> =
   | (T extends void ? { success: true } : { success: true; data: T })
@@ -23,9 +23,9 @@ export async function createClass(input: unknown): Promise<ActionResult<{ id: nu
 
     const validated = createClassSchema.parse(input)
 
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found. Please create a studio first.' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot create classes.' }
     }
 
     const { data, error } = await supabase
@@ -76,10 +76,9 @@ export async function updateClass(input: unknown): Promise<ActionResult> {
     const validated = updateClassSchema.parse(input)
     const { id, ...updateData } = validated
 
-    // Verify the class belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot edit classes' }
     }
 
     const { error: verifyError } = await supabase
@@ -129,10 +128,9 @@ export async function deleteClass(input: unknown): Promise<ActionResult> {
 
     const { id } = classIdSchema.parse(input)
 
-    // Verify the class belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot delete classes' }
     }
 
     const { error: verifyError } = await supabase

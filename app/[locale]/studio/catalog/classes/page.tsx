@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ClassesClient } from './ClassesClient'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import { getClassesByStudioId } from '@/lib/data/classes'
 
 export default async function ClassesPage() {
@@ -14,7 +14,7 @@ export default async function ClassesPage() {
     notFound()
   }
 
-  const studio = await getStudioBasicInfo(user.id)
+  const { studio } = await getStudioAndRoleForUser(user.id)
 
   if (!studio) {
     notFound()

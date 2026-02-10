@@ -12,7 +12,7 @@ import {
   getMembershipByIdForCheckInSchema,
   expireMembershipSchema,
 } from '@/lib/validation/memberships'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import {
   getMembershipPlanById,
   getMembershipById,
@@ -37,9 +37,9 @@ export async function createMembershipPlan(input: unknown): Promise<ActionResult
 
     const validated = createMembershipPlanSchema.parse(input)
 
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found. Please create a studio first.' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot create membership plans.' }
     }
 
     const { data, error } = await supabase
@@ -87,10 +87,9 @@ export async function updateMembershipPlan(input: unknown): Promise<ActionResult
     const validated = updateMembershipPlanSchema.parse(input)
     const { id, ...updateData } = validated
 
-    // Verify the plan belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot edit membership plans' }
     }
 
     const { error: verifyError } = await supabase
@@ -139,10 +138,9 @@ export async function deleteMembershipPlan(input: unknown): Promise<ActionResult
 
     const { id } = membershipPlanIdSchema.parse(input)
 
-    // Verify the plan belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot delete membership plans' }
     }
 
     const { error: verifyError } = await supabase
@@ -399,10 +397,9 @@ export async function expireMembership(input: unknown): Promise<ActionResult> {
 
     const { id } = expireMembershipSchema.parse(input)
 
-    // Verify the membership belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot expire memberships' }
     }
 
     const { error: verifyError } = await supabase

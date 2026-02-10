@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createScheduleWithRepeatSchema, updateClassInstanceSchema, deleteClassInstanceSchema, updateClassInstanceInstructorSchema, createManualBookingSchema } from '@/lib/validation/class-instances'
-import { getStudioBasicInfo } from '@/lib/data/studios'
+import { getStudioAndRoleForUser } from '@/lib/data/studios'
 import { getActiveClassesByStudioId } from '@/lib/data/classes'
 import { getClassInstanceById } from '@/lib/data/class-instances'
 
@@ -16,7 +16,8 @@ export type ActionResult<T = void> =
  */
 export async function createClassInstances(
   classId: number,
-  instances: Array<{ scheduled_at: string; ends_at: string }>
+  instances: Array<{ scheduled_at: string; ends_at: string }>,
+  instructorId?: string | null
 ): Promise<ActionResult<{ count: number }>> {
   try {
     const supabase = await createClient()
@@ -26,10 +27,9 @@ export async function createClassInstances(
       return { success: false, error: 'Unauthorized' }
     }
 
-    // Verify the class belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot create schedule' }
     }
 
     const { data: classData, error: verifyError } = await supabase
@@ -58,6 +58,7 @@ export async function createClassInstances(
           class_id: classId,
           scheduled_at: instance.scheduled_at,
           ends_at: instance.ends_at,
+          ...(instructorId != null ? { instructor_id: instructorId } : {}),
         }))
       )
 
@@ -90,12 +91,11 @@ export async function createScheduleWithRepeat(input: unknown): Promise<ActionRe
     }
 
     const validated = createScheduleWithRepeatSchema.parse(input)
-    const { class_id, start_date, start_time, repeat, selected_days } = validated
+    const { class_id, start_date, start_time, repeat, selected_days, instructor_id } = validated
 
-    // Verify the class belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot create schedule' }
     }
 
     const activeClasses = await getActiveClassesByStudioId(studio.id)
@@ -164,7 +164,7 @@ export async function createScheduleWithRepeat(input: unknown): Promise<ActionRe
     }
 
     // Create instances
-    const result = await createClassInstances(class_id, instances)
+    const result = await createClassInstances(class_id, instances, instructor_id ?? undefined)
     if (!result.success) {
       return result
     }
@@ -193,13 +193,11 @@ export async function updateClassInstance(input: unknown): Promise<ActionResult>
     const validated = updateClassInstanceSchema.parse(input)
     const { id, scheduled_at, ends_at } = validated
 
-    // Verify the instance belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot edit schedule' }
     }
 
-    // Get instance and verify ownership
     const instance = await getClassInstanceById(id)
     if (!instance) {
       return { success: false, error: 'Class instance not found' }
@@ -257,13 +255,11 @@ export async function deleteClassInstance(input: unknown): Promise<ActionResult>
 
     const { id } = deleteClassInstanceSchema.parse(input)
 
-    // Verify the instance belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot delete schedule' }
     }
 
-    // Get instance and verify ownership
     const instance = await getClassInstanceById(id)
     if (!instance) {
       return { success: false, error: 'Class instance not found' }
@@ -323,13 +319,11 @@ export async function updateClassInstanceInstructor(input: unknown): Promise<Act
     const validated = updateClassInstanceInstructorSchema.parse(input)
     const { id, instructor_id } = validated
 
-    // Verify the instance belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot update instructor' }
     }
 
-    // Get instance and verify ownership
     const instance = await getClassInstanceById(id)
     if (!instance) {
       return { success: false, error: 'Class instance not found' }
@@ -376,13 +370,11 @@ export async function createManualBooking(input: unknown): Promise<ActionResult>
     const validated = createManualBookingSchema.parse(input)
     const { class_instance_id, student_id, status } = validated
 
-    // Verify the instance belongs to the user's studio
-    const studio = await getStudioBasicInfo(user.id)
-    if (!studio) {
-      return { success: false, error: 'Studio not found' }
+    const { studio, role } = await getStudioAndRoleForUser(user.id)
+    if (!studio || (role !== 'owner' && role !== 'manager')) {
+      return { success: false, error: 'Studio not found or you cannot add bookings' }
     }
 
-    // Get instance and verify ownership
     const instance = await getClassInstanceById(class_instance_id)
     if (!instance) {
       return { success: false, error: 'Class instance not found' }

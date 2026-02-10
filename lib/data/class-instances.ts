@@ -11,6 +11,7 @@ type ClassInstance = Tables<'class_instances'>
 
 export type ClassInstanceWithClass = ClassInstance & {
   classes: Pick<Tables<'classes'>, 'name' | 'capacity' | 'type' | 'duration_minutes' | 'studio_id'> | null
+  instructor?: { id: string; full_name: string | null } | null
 }
 
 /**
@@ -62,6 +63,10 @@ export async function getUpcomingClassInstances(classIds: number[], limit?: numb
         type,
         duration_minutes,
         studio_id
+      ),
+      instructor:user_profiles!class_instances_instructor_id_fkey (
+        id,
+        full_name
       )
     `)
     .in('class_id', classIds)
@@ -126,6 +131,10 @@ export async function getClassInstanceById(instanceId: number): Promise<ClassIns
         type,
         duration_minutes,
         studio_id
+      ),
+      instructor:user_profiles!class_instances_instructor_id_fkey (
+        id,
+        full_name
       )
     `)
     .eq('id', instanceId)

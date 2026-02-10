@@ -26,12 +26,19 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { ScheduleForm } from '@/components/dashboard/ScheduleForm'
-import { deleteClassInstance } from '@/lib/actions/class-instances'
+import { deleteClassInstance, updateClassInstanceInstructor } from '@/lib/actions/class-instances'
 import { AnimatedTabs } from '@/components/custom/AnimatedTabs'
 import { StudioEmptyState } from '@/components/dashboard/StudioEmptyState'
 import type { BookingWithRelations } from '@/lib/data/bookings'
 import { createClient } from '@/lib/supabase/client'
-import { X, Clock, MapPin, Users, Ban, Calendar } from 'lucide-react'
+import { X, Clock, MapPin, Users, Ban, Calendar, User } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type ClassInstanceWithClass = Tables<'class_instances'> & {
   classes: {
@@ -40,6 +47,7 @@ type ClassInstanceWithClass = Tables<'class_instances'> & {
     type: string
     duration_minutes?: number
   } | null
+  instructor?: { id: string; full_name: string | null } | null
 }
 
 interface ClassOption {
@@ -49,12 +57,21 @@ interface ClassOption {
   is_active: boolean
 }
 
+export type InstructorOption = { id: string; full_name: string | null }
+
 interface ScheduleClientProps {
   instances: ClassInstanceWithClass[]
   classes: ClassOption[]
+  instructors?: InstructorOption[]
+  canEditSchedule?: boolean
 }
 
-export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
+export function ScheduleClient({
+  instances,
+  classes,
+  instructors = [],
+  canEditSchedule = true,
+}: ScheduleClientProps) {
   const t = useTranslations('studio.schedule')
   const tCommon = useTranslations('studio.common')
   const router = useRouter()
@@ -270,7 +287,9 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
             <h1 className="text-2xl font-semibold">{t('title')}</h1>
             <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
-          <Button onClick={() => setOpen(true)}>{t('createSchedule')}</Button>
+          {canEditSchedule && (
+            <Button onClick={() => setOpen(true)}>{t('createSchedule')}</Button>
+          )}
         </div>
 
         {/* Tabs */}
@@ -343,6 +362,12 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
                                     <Users className="h-3.5 w-3.5" />
                                     <span>{participants}</span>
                                   </div>
+                                  {instance.instructor && (
+                                    <div className="flex items-center gap-1.5">
+                                      <User className="h-3.5 w-3.5" />
+                                      <span>{instance.instructor.full_name ?? '—'}</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -362,7 +387,7 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
                 variant="schedule"
                 title={activeTab === 'upcoming' ? t('empty.upcoming') : t('empty.past')}
                 action={
-                  activeTab === 'upcoming' ? (
+                  activeTab === 'upcoming' && canEditSchedule ? (
                     <Button onClick={() => setOpen(true)}>{t('empty.createFirst')}</Button>
                   ) : undefined
                 }
@@ -389,7 +414,12 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
             </SheetHeader>
           </div>
           <div className="flex-1 overflow-y-auto p-6">
-            <ScheduleForm classes={classes} onSuccess={handleSuccess} inSheet />
+            <ScheduleForm
+              classes={classes}
+              instructors={instructors}
+              onSuccess={handleSuccess}
+              inSheet
+            />
           </div>
         </SheetContent>
       </Sheet>
@@ -415,6 +445,8 @@ export function ScheduleClient({ instances, classes }: ScheduleClientProps) {
                 instance={selectedInstance}
                 bookings={bookings}
                 loadingBookings={loadingBookings}
+                instructors={instructors}
+                canEditSchedule={canEditSchedule}
                 onRefresh={() => {
                   router.refresh()
                   if (selectedInstance) {
@@ -476,13 +508,17 @@ function ScheduleInstanceView({
   instance,
   bookings,
   loadingBookings,
+  instructors,
+  canEditSchedule,
   onRefresh,
   onCancel,
-  formatTime24
+  formatTime24,
 }: {
   instance: ClassInstanceWithClass
   bookings: BookingWithRelations[]
   loadingBookings: boolean
+  instructors: InstructorOption[]
+  canEditSchedule: boolean
   onRefresh: () => void
   onCancel: () => void
   formatTime24: (date: Date | string) => string
@@ -490,6 +526,7 @@ function ScheduleInstanceView({
   const t = useTranslations('studio.schedule')
   const tCommon = useTranslations('studio.common')
   const [isPending, startTransition] = useTransition()
+  const [instructorPending, setInstructorPending] = useState(false)
   const [clientTab, setClientTab] = useState<'attending' | 'cancelled'>('attending')
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [recurringSchedule, setRecurringSchedule] = useState<{ day_of_week: number; start_time: string } | null>(null)
@@ -583,6 +620,23 @@ function ScheduleInstanceView({
   const timeDisplay = `${formatTime24(scheduledDate)} — ${formatTime24(endDate)}`
   const location = 'Ulaanbaatar Mongolia' // Default location
 
+  const handleInstructorChange = (instructorId: string | null) => {
+    setInstructorPending(true)
+    startTransition(async () => {
+      const result = await updateClassInstanceInstructor({
+        id: instance.id,
+        instructor_id: instructorId || null,
+      })
+      if (result.success) {
+        toast.success(t('toast.instructorUpdated', { defaultValue: 'Instructor updated' }))
+        onRefresh()
+      } else {
+        toast.error(result.error)
+      }
+      setInstructorPending(false)
+    })
+  }
+
   // Format recurring schedule text
   const formatRecurringSchedule = () => {
     if (!recurringSchedule) return ''
@@ -631,6 +685,35 @@ function ScheduleInstanceView({
             <span>{timeDisplay}</span>
           </div>
         </div>
+      </div>
+
+      {/* Instructor Section */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-muted-foreground">{t('instanceView.instructor', { defaultValue: 'Instructor' })}</label>
+        {canEditSchedule && instructors.length > 0 ? (
+          <Select
+            value={instance.instructor_id ?? 'unassigned'}
+            onValueChange={(v) => handleInstructorChange(v === 'unassigned' ? null : v)}
+            disabled={instructorPending}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t('instanceView.unassigned', { defaultValue: 'Unassigned' })} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="unassigned">{t('instanceView.unassigned', { defaultValue: 'Unassigned' })}</SelectItem>
+              {instructors.map((inst) => (
+                <SelectItem key={inst.id} value={inst.id}>
+                  {inst.full_name ?? inst.id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <div className="flex items-center gap-1.5 text-sm">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span>{instance.instructor?.full_name ?? '—'}</span>
+          </div>
+        )}
       </div>
 
       {/* Clients Section */}
@@ -688,18 +771,20 @@ function ScheduleInstanceView({
         )}
       </div>
 
-      {/* Cancel Booking Button */}
-      <div className="pt-4 border-t">
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={handleOpenCancelDialog}
-          disabled={isPending}
-        >
-          <Ban className="h-4 w-4 mr-2" />
-          {t('instanceView.cancelBooking')}
-        </Button>
-      </div>
+      {/* Cancel Booking Button - only for owner/manager */}
+      {canEditSchedule && (
+        <div className="pt-4 border-t">
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={handleOpenCancelDialog}
+            disabled={isPending}
+          >
+            <Ban className="h-4 w-4 mr-2" />
+            {t('instanceView.cancelBooking')}
+          </Button>
+        </div>
+      )}
 
       {/* Cancel Booking Confirmation Dialog */}
       <AlertDialog

@@ -37,6 +37,7 @@
       "pricing": "Pricing",
       "help": "Help",
       "referEarn": "Refer & Earn",
+      "explore": "Explore",
       "signIn": "Sign in",
       "signUp": "Sign up",
       "productLinks": {
@@ -231,6 +232,7 @@
       "studioTagline": "Strength meets flow.",
       "tabs": {
         "schedule": "Schedule",
+        "pricing": "Pricing",
         "membership": "Membership",
         "plans": "Plans",
         "contact": "Contact"
@@ -399,6 +401,8 @@
       "classes": "Classes",
       "clients": "Clients",
       "memberships": "Memberships",
+      "instructors": "Instructors",
+      "videoClasses": "Video Classes",
       "checkIn": "Check In",
       "settings": "Settings",
       "studioSettings": "Studio Settings",
@@ -421,6 +425,14 @@
       "toggleSidebar": "Toggle Sidebar"
     },
     "header": {
+      "schedule": "Schedule",
+      "classes": "Classes",
+      "clients": "Clients",
+      "createClass": "Create Class",
+      "studioSettings": "Studio Settings",
+      "manageSchedule": "Manage your class schedule",
+      "manageClasses": "Manage your classes",
+      "viewBookings": "View all bookings",
       "notifications": "Notifications"
     },
     "overview": {
@@ -466,17 +478,6 @@
         "title": "Create your studio to get started",
         "button": "Create Studio"
       }
-    },
-    "header": {
-      "schedule": "Schedule",
-      "classes": "Classes",
-      "clients": "Clients",
-      "createClass": "Create Class",
-      "studioSettings": "Studio Settings",
-      "manageSchedule": "Manage your class schedule",
-      "manageClasses": "Manage your classes",
-      "viewBookings": "View all bookings",
-      "notifications": "Notifications"
     }
   },
   "student": {
@@ -529,7 +530,18 @@
   },
   "studio": {
     "common": {
-      "search": "Search"
+      "close": "Close",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "create": "Create",
+      "update": "Update",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "unknown": "Unknown",
+      "na": "N/A"
     },
     "schedule": {
       "title": "Schedule",
@@ -566,7 +578,8 @@
         "scheduleCancelled": "Schedule cancelled successfully",
         "scheduleDeleted": "Schedule deleted successfully",
         "classCancelled": "Class cancelled successfully",
-        "allFutureCancelled": "All future classes cancelled successfully"
+        "allFutureCancelled": "All future classes cancelled successfully",
+        "instructorUpdated": "Instructor updated"
       },
       "instanceView": {
         "service": "Service",
@@ -581,8 +594,18 @@
         "classInfoNotAvailable": "Class information not available",
         "unknownClient": "Unknown Client",
         "min": "min",
-        "weeklyOn": "Weekly on {day} at {time}"
+        "weeklyOn": "Weekly on {day} at {time}",
+        "instructor": "Instructor",
+        "unassigned": "Unassigned"
       }
+    },
+    "instructors": {
+      "title": "Instructors",
+      "subtitle": "Teaching stats and hours for payroll",
+      "instructor": "Instructor",
+      "classesTaught": "Classes taught",
+      "hoursTaught": "Hours taught",
+      "empty": "No instructors yet. Add team members with the Instructor role in Settings > Team."
     },
     "overview": {
       "stats": {
@@ -827,10 +850,63 @@
       },
       "plans": {
         "title": "Plans",
-        "subtitle": "Manage your subscription plans",
+        "subtitle": "Create class bundles with pricing",
         "createPlan": "Create Plan",
         "noPlans": "No plans yet",
-        "createFirst": "Create your first plan"
+        "createFirst": "Create your first plan",
+        "card": {
+          "membership": "Membership",
+          "singlePayment": "Single payment",
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "yearly": "Yearly",
+          "activeBadge": "Active",
+          "inactiveBadge": "Inactive"
+        },
+        "sheet": {
+          "createTitle": "Add plan",
+          "editTitle": "Edit plan"
+        },
+        "form": {
+          "name": "Name",
+          "namePlaceholder": "e.g., Starter Flow",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe what this plan includes",
+          "pricing": "Pricing",
+          "membership": "Membership",
+          "singlePayment": "Single payment",
+          "price": "Price",
+          "currency": "Currency",
+          "currencyMNT": "MNT (Mongolian Tugrik)",
+          "currencyUSD": "USD (US Dollar)",
+          "billingPeriod": "Billing period",
+          "selectBilling": "Select billing period",
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "yearly": "Yearly",
+          "classes": "Classes",
+          "addClass": "Add class",
+          "classPlaceholder": "Select class",
+          "quantity": "Quantity",
+          "benefits": "Benefits",
+          "addBenefit": "Add benefit",
+          "benefitPlaceholder": "e.g., 4 classes per month",
+          "isActive": "Active",
+          "saving": "Saving...",
+          "createPlan": "Create Plan",
+          "updatePlan": "Save changes",
+          "itemsRequired": "Add at least one class with quantity"
+        },
+        "dialog": {
+          "deleteTitle": "Delete plan?",
+          "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+          "deleting": "Deleting..."
+        },
+        "toast": {
+          "created": "Plan created successfully",
+          "updated": "Plan updated successfully",
+          "deleted": "Plan deleted successfully"
+        }
       }
     },
     "settings": {
@@ -880,9 +956,35 @@
         "title": "Team",
         "subtitle": "Manage your team members",
         "inviteMember": "Invite Member",
-        "noMembers": "No team members yet",
+        "noMembers": "No team members yet. Invite your first team member to get started.",
         "inviteFirst": "Invite your first team member",
-        "manage": "Manage"
+        "manage": "Manage",
+        "colMember": "Member",
+        "colEmail": "Email",
+        "colPhone": "Phone",
+        "colRole": "Role",
+        "colJoined": "Joined",
+        "colActions": "Actions",
+        "roleOwner": "Owner",
+        "roleManager": "Manager",
+        "roleInstructor": "Instructor",
+        "you": "You",
+        "inviteDialogTitle": "Invite team member",
+        "inviteDialogDescription": "They must already have a MyPass account. Enter their email and choose a role.",
+        "emailLabel": "Email",
+        "emailPlaceholder": "colleague@example.com",
+        "roleLabel": "Role",
+        "inviteButton": "Send invite",
+        "removeMember": "Remove from team",
+        "removeConfirmTitle": "Remove team member?",
+        "removeConfirmDescription": "They will lose access to this studio. This action cannot be undone.",
+        "changeRole": "Change role",
+        "removing": "Removing…",
+        "inviteSuccess": "Team member added",
+        "inviteErrorNoAccount": "No account found with this email. They must sign up first.",
+        "updateSuccess": "Role updated",
+        "removeSuccess": "Team member removed",
+        "totalMembers": "{count} members"
       },
       "availability": {
         "title": "Availability",
@@ -974,19 +1076,246 @@
       "errorDetails": "Error details:",
       "tryAgain": "Try again"
     },
-    "common": {
-      "close": "Close",
-      "cancel": "Cancel",
-      "save": "Save",
-      "delete": "Delete",
+    "videoClasses": {
+      "title": "Video Classes",
+      "subtitle": "Upload and sell on-demand videos",
+      "createVideo": "New Video",
+      "createSheetTitle": "Create video class",
+      "editSheetTitle": "Edit video class",
+      "purchasesSheetTitle": "Purchases",
+      "empty": "No video classes yet",
+      "emptyAction": "Create your first video",
+      "status": {
+        "ready": "Ready",
+        "uploading": "Uploading",
+        "processing": "Processing",
+        "errored": "Errored",
+        "draft": "Draft"
+      },
+      "uploadVideo": "Upload video",
+      "uploadPreview": "Upload preview",
+      "reset": "Reset",
+      "refreshStatus": "Refresh status",
+      "playbackReady": "Playback ready",
+      "active": "Active",
+      "inactive": "Inactive",
+      "featured": "Featured",
       "edit": "Edit",
-      "view": "View",
-      "create": "Create",
-      "update": "Update",
-      "loading": "Loading...",
-      "noData": "No data available",
-      "unknown": "Unknown",
-      "na": "N/A"
+      "delete": "Delete",
+      "purchases": "Purchases",
+      "preview": "Preview",
+      "deleteDialogTitle": "Delete video class?",
+      "deleteDialogDescription": "This action can’t be undone.",
+      "deleting": "Deleting…",
+      "form": {
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g. Morning Yoga Flow",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Describe what students will learn in this video...",
+        "priceLabel": "Price",
+        "currencyLabel": "Currency",
+        "accessDaysLabel": "Access duration (days)",
+        "activeLabel": "Active",
+        "activeDescription": "Visible to students",
+        "instructorLabel": "Instructor",
+        "instructorPlaceholder": "Select instructor",
+        "categoryLabel": "Category",
+        "categoryPlaceholder": "Select or type a category",
+        "difficultyLabel": "Difficulty Level",
+        "tagsLabel": "Tags",
+        "tagsPlaceholder": "Type and press Enter to add tags",
+        "thumbnailLabel": "Custom Thumbnail URL",
+        "thumbnailPlaceholder": "https://example.com/thumbnail.jpg",
+        "thumbnailHelp": "Leave empty to use the auto-generated thumbnail from the video.",
+        "featuredLabel": "Featured",
+        "featuredDescription": "Highlight this video on the public page",
+        "sortOrderLabel": "Sort Order",
+        "sortOrderHelp": "Lower numbers appear first (default: 0)",
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "toast": {
+        "created": "Created successfully",
+        "updated": "Updated successfully",
+        "deleted": "Deleted successfully",
+        "uploadComplete": "Upload complete",
+        "uploadFailed": "Upload failed",
+        "activated": "Activated",
+        "previewUploadComplete": "Preview upload complete",
+        "previewUploadFailed": "Preview upload failed",
+        "published": "Published successfully",
+        "draftSaved": "Saved as draft"
+      },
+      "purchasesEmpty": "No purchases yet.",
+      "activate": "Activate",
+      "activateHint": "Activate is a temporary dev/admin action until the payment gateway is integrated.",
+      "noInstructor": "No instructor",
+      "noDuration": "—",
+      "wizard": {
+        "title": "New Video Class",
+        "editTitle": "Edit Video Class",
+        "step1": "Upload",
+        "step2": "Details",
+        "step3": "Pricing",
+        "step4": "Review",
+        "next": "Next",
+        "back": "Back",
+        "uploadTitle": "Upload your video",
+        "uploadDescription": "Drag and drop your video file or click to browse. The video will start processing while you fill in the details.",
+        "uploadPreviewTitle": "Upload preview clip (optional)",
+        "uploadPreviewDescription": "A short trailer that potential buyers can watch for free.",
+        "previewUploaded": "Preview clip uploaded",
+        "detailsTitle": "Video details",
+        "detailsDescription": "Add information about your video class.",
+        "pricingTitle": "Pricing & settings",
+        "pricingDescription": "Set the price and configure display options.",
+        "reviewTitle": "Review & publish",
+        "reviewDescription": "Review your video class before publishing.",
+        "saveAsDraft": "Save as Draft",
+        "publish": "Publish",
+        "publishing": "Publishing…",
+        "savingDraft": "Saving…",
+        "videoProcessing": "Video is still processing. You can publish once it is ready.",
+        "noVideoUploaded": "No video uploaded yet. Go back to upload a video.",
+        "publishReady": "Video is ready. You can publish now."
+      },
+      "difficulty": {
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "categories": {
+        "yoga": "Yoga",
+        "pilates": "Pilates",
+        "hiit": "HIIT",
+        "strength": "Strength",
+        "dance": "Dance",
+        "meditation": "Meditation",
+        "stretching": "Stretching",
+        "cardio": "Cardio",
+        "other": "Other"
+      }
+    }
+  },
+  "explore": {
+    "hub": {
+      "title": "Explore",
+      "subtitle": "Discover studios, classes, videos, and memberships",
+      "searchPlaceholder": "Search studios, classes, videos...",
+      "featuredStudios": "Featured Studios",
+      "viewAll": "View all",
+      "stats": {
+        "studios": "Studios",
+        "upcomingClasses": "Upcoming Classes",
+        "videoClasses": "Video Classes"
+      },
+      "categories": {
+        "title": "Browse by Category",
+        "yoga": "Yoga",
+        "pilates": "Pilates",
+        "hiit": "HIIT",
+        "strength": "Strength",
+        "dance": "Dance",
+        "boxing": "Boxing",
+        "crossfit": "CrossFit",
+        "meditation": "Meditation"
+      }
+    },
+    "nav": {
+      "studios": "Studios",
+      "classes": "Classes",
+      "videos": "Videos",
+      "memberships": "Memberships"
+    },
+    "studios": {
+      "title": "Studios",
+      "subtitle": "Find the perfect studio near you",
+      "mapView": "Map",
+      "gridView": "Grid",
+      "classesCount": "{count} classes",
+      "upcomingCount": "{count} upcoming",
+      "viewStudio": "View Studio",
+      "noResults": "No studios found",
+      "noResultsDescription": "Try adjusting your search or filters."
+    },
+    "classes": {
+      "title": "Classes",
+      "subtitle": "Browse upcoming classes across all studios",
+      "filterType": "Class Type",
+      "filterStudio": "Studio",
+      "allTypes": "All types",
+      "allStudios": "All studios",
+      "typeOnline": "Online",
+      "typeOffline": "In-person",
+      "spotsLeft": "{count} spots left",
+      "full": "Full",
+      "bookNow": "Book Now",
+      "noResults": "No upcoming classes found",
+      "noResultsDescription": "Try adjusting your filters or check back later."
+    },
+    "videos": {
+      "title": "Video Classes",
+      "subtitle": "Learn at your own pace with on-demand videos",
+      "filterCategory": "Category",
+      "filterDifficulty": "Difficulty",
+      "filterStudio": "Studio",
+      "allCategories": "All categories",
+      "allDifficulties": "All levels",
+      "allStudios": "All studios",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "featured": "Featured",
+      "watch": "Watch",
+      "free": "Free",
+      "noResults": "No video classes found",
+      "noResultsDescription": "Try adjusting your filters."
+    },
+    "memberships": {
+      "title": "Memberships",
+      "subtitle": "Find the right membership plan for you",
+      "filterStudio": "Studio",
+      "allStudios": "All studios",
+      "perMonth": "/month",
+      "months": "{count} months",
+      "viewPlan": "View Plan",
+      "noResults": "No membership plans found",
+      "noResultsDescription": "Try adjusting your filters."
+    },
+    "common": {
+      "search": "Search",
+      "filter": "Filter",
+      "clearFilters": "Clear filters",
+      "showing": "Showing {count} results",
+      "signInToBook": "Sign in to book",
+      "explore": "Explore"
+    }
+  },
+  "studioPublic": {
+    "videos": {
+      "title": "Video classes",
+      "subtitle": "On-demand videos from this studio",
+      "empty": "No video classes available yet.",
+      "allCategories": "All categories",
+      "allLevels": "All levels",
+      "duration": "{minutes} min",
+      "days": "{count} days access"
+    },
+    "videoWatch": {
+      "notReady": "This video is still processing. Please try again soon.",
+      "signInToWatch": "Sign in to purchase and watch this video.",
+      "signIn": "Sign in",
+      "noAccess": "You don't have access to this video yet.",
+      "pending": "Payment pending.",
+      "backToVideos": "Back to videos",
+      "paymentComingSoon": "Payment integration is coming soon. For now, purchases are activated manually for testing.",
+      "securityNote": "Streaming is protected with signed playback. However, no web app can fully prevent screen recording.",
+      "instructor": "Instructor",
+      "category": "Category",
+      "difficulty": "Difficulty",
+      "duration": "Duration",
+      "freePreview": "Free Preview",
+      "tags": "Tags"
     }
   }
 }

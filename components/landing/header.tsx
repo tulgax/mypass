@@ -117,6 +117,9 @@ function HeaderNav() {
               />
             </button>
 
+            <Link href="/explore" className="hover:text-foreground">
+              {t('explore')}
+            </Link>
             <Link href="#pricing" className="hover:text-foreground">
               {t('pricing')}
             </Link>
@@ -267,6 +270,13 @@ function HeaderNav() {
                 </div>
               )}
 
+              <Link
+                href="/explore"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-3 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                {t('explore')}
+              </Link>
               <Link
                 href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}

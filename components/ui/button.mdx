@@ -1,0 +1,63 @@
+import { Meta, Canvas, Controls, Story } from "@storybook/addon-docs/blocks"
+
+import * as ButtonStories from "./button.stories"
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Buttons trigger actions in the UI. Prefer one primary button per view, and use
+secondary styles for supporting actions.
+
+## Usage guidelines
+
+- Use `default` for the primary action.
+- Use `outline` or `secondary` for supporting actions.
+- Reserve `destructive` for irreversible actions.
+- Use `asChild` with an anchor for navigation links.
+
+## Do / Don’t
+
+<Canvas>
+  <div className="grid gap-4 md:grid-cols-2">
+    <div className="rounded-lg border border-border/60 p-4">
+      <div className="text-xs font-medium text-muted-foreground">Do</div>
+      <div className="mt-3 flex items-center gap-2">
+        <ButtonStories.Default />
+        <ButtonStories.Variants />
+      </div>
+    </div>
+    <div className="rounded-lg border border-border/60 p-4">
+      <div className="text-xs font-medium text-muted-foreground">Don’t</div>
+      <div className="mt-3 flex items-center gap-2">
+        <ButtonStories.Destructive />
+        <ButtonStories.Destructive />
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Avoid using multiple destructive actions together.
+      </p>
+    </div>
+  </div>
+</Canvas>
+
+## Examples
+
+<Canvas>
+  <Story of={ButtonStories.Default} />
+</Canvas>
+
+<Canvas>
+  <Story of={ButtonStories.Variants} />
+</Canvas>
+
+<Canvas>
+  <Story of={ButtonStories.Sizes} />
+</Canvas>
+
+<Canvas>
+  <Story of={ButtonStories.Destructive} />
+</Canvas>
+
+## Props
+
+<Controls />

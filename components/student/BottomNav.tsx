@@ -12,7 +12,7 @@ const items = [
   },
   {
     title: 'Explore',
-    href: '/student/explore',
+    href: '/explore',
     icon: CompassIcon,
   },
   {
