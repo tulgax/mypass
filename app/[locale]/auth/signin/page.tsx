@@ -32,7 +32,7 @@ export default async function SignInPage({
     if (profile?.role === 'studio_owner') {
       redirect(`/${locale}/studio`)
     } else {
-      redirect(`/${locale}/student`)
+      redirect(`/${locale}/explore`)
     }
   }
 

@@ -61,6 +61,8 @@ interface TeamClientProps {
   studioId: number
   currentUserId: string
   teamRows: TeamMemberRow[]
+  instructorStatsMap?: Record<string, { classesTaught: number; hoursTaught: number }>
+  canManageTeam?: boolean
 }
 
 function RoleBadge({ role, t }: { role: string; t: (key: string) => string }) {
@@ -100,7 +102,7 @@ function formatDate(dateStr: string, locale: string) {
   }
 }
 
-export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProps) {
+export function TeamClient({ studioId, currentUserId, teamRows, instructorStatsMap = {}, canManageTeam = true }: TeamClientProps) {
   const t = useTranslations('studio.settings.team')
   const tCommon = useTranslations('studio.common')
   const router = useRouter()
@@ -183,10 +185,12 @@ export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProp
           <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={() => setInviteOpen(true)} className="gap-2">
-          <UserPlus className="h-4 w-4" />
-          {t('inviteMember')}
-        </Button>
+        {canManageTeam && (
+          <Button onClick={() => setInviteOpen(true)} className="gap-2">
+            <UserPlus className="h-4 w-4" />
+            {t('inviteMember')}
+          </Button>
+        )}
       </div>
 
       {/* Team table */}
@@ -209,6 +213,8 @@ export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProp
                 <TableHead>{t('colEmail')}</TableHead>
                 <TableHead className="hidden sm:table-cell">{t('colPhone')}</TableHead>
                 <TableHead>{t('colRole')}</TableHead>
+                <TableHead className="hidden lg:table-cell text-right">{t('colClassesTaught')}</TableHead>
+                <TableHead className="hidden lg:table-cell text-right">{t('colHoursTaught')}</TableHead>
                 <TableHead className="hidden md:table-cell">{t('colJoined')}</TableHead>
                 <TableHead className="w-12.5">
                   <span className="sr-only">{t('colActions')}</span>
@@ -265,6 +271,20 @@ export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProp
                       <RoleBadge role={row.role} t={t} />
                     </TableCell>
 
+                    {/* Classes Taught */}
+                    <TableCell className="hidden lg:table-cell text-right">
+                      <span className="text-sm tabular-nums">
+                        {instructorStatsMap[row.user_id]?.classesTaught ?? '—'}
+                      </span>
+                    </TableCell>
+
+                    {/* Hours Taught */}
+                    <TableCell className="hidden lg:table-cell text-right">
+                      <span className="text-sm tabular-nums">
+                        {instructorStatsMap[row.user_id]?.hoursTaught ?? '—'}
+                      </span>
+                    </TableCell>
+
                     {/* Joined */}
                     <TableCell className="hidden md:table-cell">
                       <span className="text-sm text-muted-foreground">
@@ -274,7 +294,7 @@ export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProp
 
                     {/* Actions */}
                     <TableCell>
-                      {!isOwner && (
+                      {canManageTeam && !isOwner && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -319,7 +339,7 @@ export function TeamClient({ studioId, currentUserId, teamRows }: TeamClientProp
 
               {teamRows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={8} className="h-24 text-center">
                     <p className="text-muted-foreground">{t('noMembers')}</p>
                   </TableCell>
                 </TableRow>

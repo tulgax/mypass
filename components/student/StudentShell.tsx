@@ -1,7 +1,7 @@
 "use client"
 
 import { Link, usePathname } from "@/i18n/routing"
-import { CalendarDaysIcon, CompassIcon, LayoutDashboardIcon, CreditCardIcon } from "lucide-react"
+import { CompassIcon, CalendarDaysIcon, CreditCardIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +17,6 @@ import {
   SidebarProvider,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/student/BottomNav"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -35,7 +34,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User, LogOut } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile"
 
 interface StudentShellProps {
   children: React.ReactNode
@@ -48,11 +46,6 @@ interface StudentShellProps {
 }
 
 const items = [
-  {
-    title: "Overview",
-    href: "/student",
-    icon: LayoutDashboardIcon,
-  },
   {
     title: "Explore",
     href: "/explore",
@@ -72,7 +65,6 @@ const items = [
 
 export function StudentShell({ children, user, onSignOut }: StudentShellProps) {
   const pathname = usePathname()
-  const isMobile = useIsMobile()
 
   return (
     <SidebarProvider defaultOpen>
@@ -81,7 +73,7 @@ export function StudentShell({ children, user, onSignOut }: StudentShellProps) {
           <div className="flex items-center justify-between px-2 py-1">
             <div>
               <p className="text-sm font-semibold">MyPass</p>
-              <p className="text-xs text-muted-foreground">Student Dashboard</p>
+              <p className="text-xs text-muted-foreground">Student</p>
             </div>
           </div>
         </SidebarHeader>

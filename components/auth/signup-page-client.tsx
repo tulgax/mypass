@@ -153,7 +153,7 @@ export function SignUpPageClient({ initialError }: SignUpPageClientProps) {
             },
             { onConflict: "id" }
           )
-        router.push(`/${locale}/student`)
+        router.push(`/${locale}/explore`)
         router.refresh()
       }
     } catch {

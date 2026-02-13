@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       ? segments[0]
       : routing.defaultLocale
 
-  let redirectPath = next ?? "/student"
+  let redirectPath = next ?? "/explore"
 
   if (code) {
     const supabase = await createClient()
@@ -42,11 +42,11 @@ export async function GET(request: NextRequest) {
             },
             { onConflict: "id" }
           )
-        redirectPath = next ?? "/student"
+        redirectPath = next ?? "/explore"
       } else if (profile.role === "studio_owner") {
         redirectPath = next ?? "/studio"
       } else {
-        redirectPath = next ?? "/student"
+        redirectPath = next ?? "/explore"
       }
     }
   }

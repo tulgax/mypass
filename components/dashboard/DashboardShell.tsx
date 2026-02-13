@@ -8,12 +8,13 @@ import {
   CalendarDays,
   CreditCard,
   Video,
-  GraduationCap,
   LayoutGrid,
   Users,
   Settings,
-  FolderOpen,
+  Package,
   Bell,
+  UserCog,
+  BookOpen,
 } from "lucide-react"
 import {
   SidebarInset,
@@ -55,27 +56,35 @@ interface DashboardShellProps {
 const pathToNavKey: Record<string, string> = {
   "/studio/overview": "overview",
   "/studio/schedule": "schedule",
-  "/studio/catalog": "catalog",
-  "/studio/catalog/classes": "classes",
-  "/studio/catalog/plans": "plans",
-  "/studio/catalog/coupons": "coupons",
-  "/studio/catalog/orders": "orders",
-  "/studio/catalog/classes/new": "createClass",
-  "/studio/catalog/membership": "membership",
-  "/studio/clients": "clients",
-  "/studio/memberships": "memberships",
-  "/studio/memberships/checkin": "checkIn",
+  "/studio/products": "products",
+  "/studio/products/classes": "classes",
+  "/studio/products/classes/new": "createClass",
+  "/studio/products/plans": "plans",
+  "/studio/products/memberships": "membershipPlans",
+  "/studio/products/videos": "videoClasses",
+  "/studio/customers": "customers",
+  "/studio/customers/bookings": "bookings",
+  "/studio/customers/members": "members",
+  "/studio/team": "team",
   "/studio/settings": "settings",
   "/studio/settings/studio": "studioSettings",
   "/studio/settings/account": "account",
-  "/studio/settings/payments": "payments",
-  "/studio/settings/policies": "policies",
-  "/studio/settings/availability": "availability",
-  "/studio/settings/billing": "planBilling",
-  "/studio/settings/team": "team",
+  "/studio/settings/billing": "billing",
   "/studio/settings/integrations": "integrations",
-  "/studio/instructors": "instructors",
+  // Legacy path support for breadcrumbs
+  "/studio/catalog": "products",
+  "/studio/catalog/classes": "classes",
+  "/studio/catalog/plans": "plans",
+  "/studio/catalog/membership": "membershipPlans",
+  "/studio/clients": "bookings",
+  "/studio/memberships": "members",
+  "/studio/memberships/checkin": "checkIn",
+  "/studio/instructors": "team",
   "/studio/video-classes": "videoClasses",
+  "/studio/settings/payments": "billing",
+  "/studio/settings/policies": "studioSettings",
+  "/studio/settings/availability": "studioSettings",
+  "/studio/settings/team": "team",
 }
 
 /**
@@ -151,10 +160,9 @@ export function DashboardShell({
   const pathname = usePathname()
   const breadcrumbs = generateBreadcrumbs(pathname, (key) => t(key))
 
-  const canEditCatalog = studioRole === 'owner' || studioRole === 'manager'
+  const canEditProducts = studioRole === 'owner' || studioRole === 'manager'
   const canSeeSettings = studioRole === 'owner'
-  const canSeeInstructors = studioRole === 'owner' || studioRole === 'manager'
-  const canSeeVideoClasses = studioRole === 'owner' || studioRole === 'manager'
+  const canSeeTeam = studioRole === 'owner' || studioRole === 'manager'
 
   const navItems = React.useMemo(() => {
     const items: Array<{
@@ -178,42 +186,38 @@ export function DashboardShell({
       },
     ]
 
-    if (canEditCatalog) {
+    if (canEditProducts) {
       items.push({
-        title: t('catalog'),
+        title: t('products'),
         url: "/studio/catalog/classes",
-        icon: FolderOpen,
-        isActive: pathname.startsWith("/studio/catalog"),
+        icon: Package,
+        isActive: pathname.startsWith("/studio/catalog") || pathname.startsWith("/studio/video-classes"),
         items: [
           { title: t('classes'), url: "/studio/catalog/classes", isActive: pathname === "/studio/catalog/classes" || pathname.startsWith("/studio/catalog/classes/") },
           { title: t('plans'), url: "/studio/catalog/plans", isActive: pathname === "/studio/catalog/plans" },
-          { title: t('membership'), url: "/studio/catalog/membership", isActive: pathname === "/studio/catalog/membership" || pathname.startsWith("/studio/catalog/membership/") },
-          { title: t('coupons'), url: "/studio/catalog/coupons", isActive: pathname === "/studio/catalog/coupons" },
-          { title: t('orders'), url: "/studio/catalog/orders", isActive: pathname === "/studio/catalog/orders" || pathname.startsWith("/studio/catalog/orders/") },
+          { title: t('membershipPlans'), url: "/studio/catalog/membership", isActive: pathname === "/studio/catalog/membership" || pathname.startsWith("/studio/catalog/membership/") },
+          { title: t('videoClasses'), url: "/studio/video-classes", isActive: pathname.startsWith("/studio/video-classes") },
         ],
       })
     }
 
-    items.push(
-      { title: t('clients'), url: "/studio/clients", icon: Users, isActive: pathname === "/studio/clients" },
-      { title: t('memberships'), url: "/studio/memberships", icon: CreditCard, isActive: pathname.startsWith("/studio/memberships") },
-    )
+    items.push({
+      title: t('customers'),
+      url: "/studio/clients",
+      icon: BookOpen,
+      isActive: pathname.startsWith("/studio/clients") || pathname.startsWith("/studio/memberships"),
+      items: [
+        { title: t('bookings'), url: "/studio/clients", isActive: pathname === "/studio/clients" },
+        { title: t('members'), url: "/studio/memberships", isActive: pathname.startsWith("/studio/memberships") },
+      ],
+    })
 
-    if (canSeeVideoClasses) {
+    if (canSeeTeam) {
       items.push({
-        title: t('videoClasses'),
-        url: "/studio/video-classes",
-        icon: Video,
-        isActive: pathname === "/studio/video-classes",
-      })
-    }
-
-    if (canSeeInstructors) {
-      items.push({
-        title: t('instructors'),
-        url: "/studio/instructors",
-        icon: GraduationCap,
-        isActive: pathname === "/studio/instructors",
+        title: t('team'),
+        url: "/studio/settings/team",
+        icon: UserCog,
+        isActive: pathname === "/studio/settings/team" || pathname === "/studio/instructors",
       })
     }
 
@@ -222,22 +226,18 @@ export function DashboardShell({
         title: t('settings'),
         url: "#",
         icon: Settings,
-        isActive: pathname.startsWith("/studio/settings"),
+        isActive: pathname.startsWith("/studio/settings") && pathname !== "/studio/settings/team",
         items: [
+          { title: t('studioSettings'), url: "/studio/settings/studio", isActive: pathname === "/studio/settings/studio" || pathname === "/studio/settings/policies" || pathname === "/studio/settings/availability" },
           { title: t('account'), url: "/studio/settings/account", isActive: pathname === "/studio/settings/account" },
-          { title: t('payments'), url: "/studio/settings/payments", isActive: pathname === "/studio/settings/payments" },
-          { title: t('policies'), url: "/studio/settings/policies", isActive: pathname === "/studio/settings/policies" },
-          { title: t('availability'), url: "/studio/settings/availability", isActive: pathname === "/studio/settings/availability" },
-          { title: t('planBilling'), url: "/studio/settings/billing", isActive: pathname === "/studio/settings/billing" },
-          { title: t('team'), url: "/studio/settings/team", isActive: pathname === "/studio/settings/team" },
+          { title: t('billing'), url: "/studio/settings/billing", isActive: pathname === "/studio/settings/billing" || pathname === "/studio/settings/payments" },
           { title: t('integrations'), url: "/studio/settings/integrations", isActive: pathname === "/studio/settings/integrations" },
-          { title: t('studioSettings'), url: "/studio/settings/studio", isActive: pathname === "/studio/settings/studio" },
         ],
       })
     }
 
     return items
-  }, [pathname, studioRole, canEditCatalog, canSeeSettings, canSeeInstructors, t])
+  }, [pathname, studioRole, canEditProducts, canSeeSettings, canSeeTeam, t])
 
   return (
     <SidebarProvider>
